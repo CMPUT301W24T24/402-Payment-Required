@@ -43,7 +43,7 @@ public class Database {
                     usersList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         String id = doc.getId();
-                        User newUser = new User(id, doc.getString("name"), doc.getString("email"), doc.getString("phone"), doc.getString("homepage"), doc.getBoolean("geo"), doc.getBoolean("admin"));
+                        User newUser = new User(id, doc.getString("name"), doc.getString("email"), doc.getString("phone"), doc.getString("homepage"), Boolean.TRUE.equals(doc.getBoolean("geo")), Boolean.TRUE.equals(doc.getBoolean("admin")));
                         // TODO remove this log
                         usersList.add(newUser);
                         Log.d("Firestore", "User fetched: " + newUser.getDataString());
