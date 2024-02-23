@@ -1,4 +1,4 @@
-package com.example.qrcheckin;
+package com.example.qrcheckin.core;
 
 /**
  * An object that keeps track of the event data

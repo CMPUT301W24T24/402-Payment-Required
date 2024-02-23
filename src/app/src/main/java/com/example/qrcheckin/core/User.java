@@ -1,4 +1,4 @@
-package com.example.qrcheckin;
+package com.example.qrcheckin.core;
 
 public class User {
     private String id;

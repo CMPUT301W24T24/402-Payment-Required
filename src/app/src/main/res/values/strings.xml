@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">QRCheckIn</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_my_events">My events</string>
+    <string name="nav_hosted_events">Hosted events</string>
+    <string name="nav_profile">Profile</string>
 </resources>

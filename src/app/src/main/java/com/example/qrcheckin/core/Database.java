@@ -1,4 +1,4 @@
-package com.example.qrcheckin;
+package com.example.qrcheckin.core;
 
 import android.util.Log;
 

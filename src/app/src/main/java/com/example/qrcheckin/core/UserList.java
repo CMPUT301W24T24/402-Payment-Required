@@ -1,4 +1,6 @@
-package com.example.qrcheckin;
+package com.example.qrcheckin.core;
+
+import com.example.qrcheckin.core.User;
 
 import java.util.ArrayList;
 import java.util.List;
