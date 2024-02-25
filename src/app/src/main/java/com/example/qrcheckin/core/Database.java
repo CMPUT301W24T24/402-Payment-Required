@@ -3,17 +3,13 @@ package com.example.qrcheckin.core;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +20,9 @@ public class Database {
     private CollectionReference usersRef;
     private CollectionReference eventsRef;
     private CollectionReference checkinsRef;
+    private CollectionReference signupsRef;
 
-    Database() {
+    public Database() {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         eventsRef = db.collection("events");
@@ -61,10 +58,10 @@ public class Database {
     }
 
     /**
-     * Add a new user to the database
-     * @param user The user to add
+     * Add a new user to the database or Edit an existing user (with the same id)
+     * @param user The user to add or edit
      */
-    public void addNewUser(User user) {
+    public void addEditUser(User user) {
         DocumentReference docRef = usersRef.document(user.getId());
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", user.getName());
@@ -88,7 +85,24 @@ public class Database {
                 });
     }
 
+    /**
+     * get the FirebaseFirestore object
+     * @return FirebaseFirestore object
+     */
     public FirebaseFirestore getDb() {
         return db;
+    }
+
+    public void getAttendeeListOfEvent(UserList attendees, Event event) {
+        checkinsRef.whereEqualTo("event", event.getId())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        attendees.add(getUser(document.getString("user")));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", e.toString());
+                });
     }
 }
