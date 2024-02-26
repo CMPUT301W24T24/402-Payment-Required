@@ -12,7 +12,6 @@ import android.view.Menu;
 
 import com.example.qrcheckin.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
-
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -51,4 +50,5 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
 }
