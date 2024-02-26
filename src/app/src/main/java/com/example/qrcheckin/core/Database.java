@@ -61,7 +61,7 @@ public class Database {
      * Add a new user to the database or Edit an existing user (with the same id)
      * @param user The user to add or edit
      */
-    public void addEditUser(User user) {
+    public void addEditUser(@NonNull User user) {
         DocumentReference docRef = usersRef.document(user.getId());
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", user.getName());
@@ -86,11 +86,24 @@ public class Database {
     }
 
     /**
-     * get the FirebaseFirestore object
-     * @return FirebaseFirestore object
+     * Delete a user from the database
+     * @param id The id of the user to delete
      */
-    public FirebaseFirestore getDb() {
-        return db;
+    public void deleteUser(String id) {
+        DocumentReference docRef = usersRef.document(id);
+        docRef.delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Firestore", e.toString());
+                    }
+                });
     }
 
     public void getAttendeeListOfEvent(UserList attendees, Event event) {
