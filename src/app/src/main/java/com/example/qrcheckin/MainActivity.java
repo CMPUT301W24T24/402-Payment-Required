@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 R.id.nav_host_event,
                 R.id.nav_explore_event,
                 R.id.nav_profile,
+                R.id.nav_notifications,
                 R.id.nav_all_event, R.id.nav_all_images, R.id.nav_all_profile)
                 .setOpenableLayout(drawer)
                 .build();

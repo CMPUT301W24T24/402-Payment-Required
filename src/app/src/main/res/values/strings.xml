@@ -6,6 +6,7 @@
     <string name="nav_my_events">My Events</string>
     <string name="nav_hosted_events">Hosted Events</string>
     <string name="nav_profile">Profile</string>
+    <string name="nav_notifications">Notifications</string>
     <string name="add_event">Add Event</string>
     <string name="nav_explore_events">Explore Events</string>
     <string name="nav_all_profile">All Profiles</string>

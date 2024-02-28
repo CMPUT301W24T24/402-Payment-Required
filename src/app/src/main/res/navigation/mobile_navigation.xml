@@ -36,6 +36,12 @@
         tools:layout="@layout/fragment_profile" />
 
     <fragment
+        android:id="@+id/nav_notifications"
+        android:name="com.example.qrcheckin.user.notifications.NotificationsFragment"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
         android:id="@+id/nav_all_event"
         android:name="com.example.qrcheckin.admin.allevents.AllEventsFragment"
         android:label="@string/nav_all_event"

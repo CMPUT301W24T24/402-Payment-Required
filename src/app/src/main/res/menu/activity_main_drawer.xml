@@ -25,6 +25,10 @@
             android:icon="@drawable/nav_profile"
             android:title="@string/nav_profile"/>
         <item
+            android:id="@+id/nav_notifications"
+            android:icon="@drawable/nav_notifications"
+            android:title="Notifications"/>
+        <item
             android:id="@+id/nav_all_profile"
             android:icon="@drawable/nav_all_profiles"
             android:title="@string/nav_all_profile"/>
