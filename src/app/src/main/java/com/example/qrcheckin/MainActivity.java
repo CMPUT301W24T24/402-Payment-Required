@@ -117,6 +117,11 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         currentUser = user;
         Log.d("Firestore", "User fetched: " + user.getDataString());
 
+        // set the user to the application
+        ((QRCheckInApplication) getApplication()).setCurrentUser(currentUser);
+
+        // set the user name to the navigation view
+        // TODO: set the user picture to the navigation view
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
         TextView navProfileName = headerView.findViewById(R.id.nav_profile_name);
