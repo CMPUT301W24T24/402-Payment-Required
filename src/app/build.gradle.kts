@@ -43,7 +43,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
 
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-    implementation("com.google.zxing:core:3.3.3")
+    implementation("com.google.zxing:core:3.4.1")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
