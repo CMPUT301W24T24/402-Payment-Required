@@ -220,6 +220,12 @@ public class Database {
                 });
     }
 
+    /**
+     * This method fetches the picture of a user from the storage and sets it to an ImageView
+     * <a href="https://stackoverflow.com/questions/13854742/byte-array-of-image-into-imageview">ByteArray to bitmap, Dipak Keshariya, HB., accessed on 2024-02-28</a>
+     * @param user the user to fetch the picture from
+     * @param imageView the ImageView to set the picture to
+     */
     public void getUserPicture(User user, ImageView imageView) {
         if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
             Log.e("Firestorage", "No picture reference");
