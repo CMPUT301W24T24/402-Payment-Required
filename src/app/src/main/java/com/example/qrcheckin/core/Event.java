@@ -82,4 +82,7 @@ public class Event {
     public void setAttendees(UserList attendees) {
         this.attendees = attendees;
     }
+
 }
+
+
