@@ -6,6 +6,7 @@ public class User {
     private String email;
     private String phone;
     private String homepage;
+    private String imageRef;
     private boolean geo;
     private boolean admin;
 
@@ -27,6 +28,29 @@ public class User {
         this.homepage = homepage;
         this.geo = geo;
         this.admin = admin;
+        this.imageRef = null;
+    }
+
+    /**
+     * Constructor for the User class
+     * @param id the id of the user
+     * @param name the name of the user
+     * @param email the email of the user
+     * @param phone the phone number of the user
+     * @param homepage the homepage of the user
+     * @param geo if the user has geo enabled
+     * @param admin if the user is an admin
+     * @param imageRef the reference path on firestore to the image of the user
+     */
+    public User(String id, String name, String email, String phone, String homepage, boolean geo, boolean admin, String imageRef) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.homepage = homepage;
+        this.geo = geo;
+        this.admin = admin;
+        this.imageRef = imageRef;
     }
 
     /**
@@ -139,5 +163,13 @@ public class User {
      */
     public boolean isAdmin() {
         return admin;
+    }
+
+    public String getImageRef() {
+        return imageRef;
+    }
+
+    public void setImageRef(String imageRef) {
+        this.imageRef = imageRef;
     }
 }
