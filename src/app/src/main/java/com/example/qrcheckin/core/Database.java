@@ -1,7 +1,10 @@
 package com.example.qrcheckin.core;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
@@ -12,6 +15,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.HashMap;
 
@@ -23,6 +27,7 @@ public class Database {
     }
 
     private FirebaseFirestore db;
+    private FirebaseStorage storage;
     private CollectionReference usersRef;
     private UserListener userListener;
     private CollectionReference eventsRef;
@@ -35,6 +40,7 @@ public class Database {
      */
     public Database() {
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
         usersRef = db.collection("users");
         eventsRef = db.collection("events");
         checkinsRef = db.collection("checkins");
@@ -48,6 +54,7 @@ public class Database {
      */
     public Database(Context context) {
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
         usersRef = db.collection("users");
         eventsRef = db.collection("events");
         checkinsRef = db.collection("checkins");
@@ -76,7 +83,8 @@ public class Database {
                             documentSnapshot.getString("phone"),
                             documentSnapshot.getString("homepage"),
                             Boolean.TRUE.equals(documentSnapshot.getBoolean("geo")),
-                            Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"))
+                            Boolean.TRUE.equals(documentSnapshot.getBoolean("admin")),
+                            documentSnapshot.getString("imageRef")
                     );
                     userListener.onUserFetched(user);
                 } else {
@@ -105,6 +113,7 @@ public class Database {
         data.put("homepage", user.getHomepage());
         data.put("geo", user.isGeo());
         data.put("admin", user.isAdmin());
+        data.put("imageRef", user.getImageRef());
         docRef.update(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -132,6 +141,7 @@ public class Database {
         data.put("homepage", user.getHomepage());
         data.put("geo", user.isGeo());
         data.put("admin", user.isAdmin());
+        data.put("imageRef", user.getImageRef());
         usersRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     user.setId(documentReference.getId());
@@ -208,5 +218,31 @@ public class Database {
                 .addOnFailureListener(e -> {
                     Log.e("Firestore", e.toString());
                 });
+    }
+
+    /**
+     * This method fetches the picture of a user from the storage and sets it to an ImageView
+     * <a href="https://stackoverflow.com/questions/13854742/byte-array-of-image-into-imageview">ByteArray to bitmap, Dipak Keshariya, HB., accessed on 2024-02-28</a>
+     * @param user the user to fetch the picture from
+     * @param imageView the ImageView to set the picture to
+     */
+    public void getUserPicture(User user, ImageView imageView) {
+        if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            // TODO: set a default picture or handle no picture
+            return;
+        }
+        storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length), imageView.getWidth(), imageView.getHeight(), false);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+            }
+        });
     }
 }

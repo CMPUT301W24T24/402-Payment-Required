@@ -24,14 +24,14 @@ public class EventFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        EventViewModel galleryViewModel =
+        EventViewModel eventViewModel =
                 new ViewModelProvider(this).get(EventViewModel.class);
 
         binding = FragmentEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textEvent;
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        eventViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

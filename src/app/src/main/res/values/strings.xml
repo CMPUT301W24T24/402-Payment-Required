@@ -6,5 +6,9 @@
     <string name="nav_my_events">My events</string>
     <string name="nav_hosted_events">Hosted events</string>
     <string name="nav_profile">Profile</string>
+<<<<<<< HEAD
     <string name="nav_notifications">Notifications</string>
+=======
+    <string name="add_event">Add Event</string>
+>>>>>>> 44d044b081548ff9dafd121648f4ce3dc139f8f9
 </resources>
