@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.qrcheckin.core.Database;
@@ -109,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     }
 
     /**
-     * Get the user from the database, interface method
+     * This method is called when user is fetched from the database, interface method
+     * It sets the user to the application and the user name and picture to the navigation view
      * @param user the user
      */
     @Override
@@ -121,11 +123,14 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         ((QRCheckInApplication) getApplication()).setCurrentUser(currentUser);
 
         // set the user name to the navigation view
-        // TODO: set the user picture to the navigation view
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
         TextView navProfileName = headerView.findViewById(R.id.nav_profile_name);
         navProfileName.setText(currentUser.getName());
+
+        ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
+        Database db = new Database();
+        db.getUserPicture(currentUser, navProfileImage);
     }
 
     /**
@@ -136,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     public void onUserAdded(String id) {
         currentUser.setId(id);
         writeIdToFile(id);
+        onUserFetched(currentUser);
     }
 
     /**
@@ -145,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      */
     private User createDefaultUser(String id) {
         return new User(id, "Anonymous User", "", "", "", false, false);
+//        return new User(id, "Anonymous User", "", "", "", false, false, "users/cat.jpg");
     }
 
     @Override
