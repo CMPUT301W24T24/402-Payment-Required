@@ -10,6 +10,8 @@ public class Event {
     private User owner;
     private UserList attendees;
 
+    private double latitude,longitude,distanceLimit; //geolocation data
+
     /**
      * The constructor for the event class
      * @param id the id of the event
@@ -22,6 +24,60 @@ public class Event {
         this.name = name;
         this.owner = owner;
         this.attendees = attendees;
+        this.latitude = 0;
+        this.longitude = 0;
+        this.distanceLimit = Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Alternative constructor for event, allows for geolocation information to be additionally stored
+     * @param id the id of the event
+     * @param name the name of the event
+     * @param owner who is hosting the event
+     * @param attendees a list of those attending the event
+     */
+    public Event(String id, String name, User owner, UserList attendees,double latitude,double longitude, double distanceLimit) {
+        this.id = id;
+        this.name = name;
+        this.owner = owner;
+        this.attendees = attendees;
+        this.latitude=latitude;
+        this.longitude=longitude;
+        this.distanceLimit=distanceLimit;
+    }
+
+    /**
+     * Used to check whether an event limits its attendees based on geolocation data
+     * @return true if this event limits its attendees, false otherwise
+     */
+    public boolean usesGeolocation(){return Double.isInfinite(distanceLimit);}
+
+    /**
+     * Changes the geolocation data for the event,
+     * @param latitude The latitude for the center of the circular event area
+     * @param longitude The longitude for the center of the circular event area
+     * @param distanceLimit The radius of the area in meters
+     */
+    public void setGeolocationData(double latitude, double longitude, double distanceLimit){
+        this.latitude=latitude;
+        this.longitude=longitude;
+        this.distanceLimit=distanceLimit;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getDistanceLimit() {
+        return distanceLimit;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

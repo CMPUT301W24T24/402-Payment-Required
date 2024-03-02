@@ -175,6 +175,32 @@ public class Database {
     }
 
     /**
+     * Find an event in the database by ID
+     * @param id Unique ID to search for
+     * @return The event object with given ID
+     */
+    public void getEventByID(String id){
+
+    }
+
+
+    public void addEvent(Event event){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("name", event.getName());
+        data.put("owner", event.getOwner().getId());
+        //data.put("attendees", event.getAttendees());
+        usersRef.add(data)
+                .addOnSuccessListener(documentReference -> {
+                    event.setId(documentReference.getId());
+                    userListener.onUserAdded(documentReference.getId());
+                    Log.d("Firestore", "DocumentSnapshot successfully written with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", e.toString());
+                });
+    }
+
+    /**
      * Check in a user to an event
      * @param user The user to check in
      * @param event The event to check in to
