@@ -35,6 +35,9 @@ public class Event {
      * @param name the name of the event
      * @param owner who is hosting the event
      * @param attendees a list of those attending the event
+     * @param latitude double latitude of the center of the event location
+     * @param longitude double longitude of the center of the event location
+     * @param distanceLimit double maximum allowed distance in meters from the events center
      */
     public Event(String id, String name, User owner, UserList attendees,double latitude,double longitude, double distanceLimit) {
         this.id = id;
@@ -62,6 +65,22 @@ public class Event {
         this.latitude=latitude;
         this.longitude=longitude;
         this.distanceLimit=distanceLimit;
+    }
+
+    public void checkIn(User user, Double latitude, Double longitude){
+
+    }
+
+    /** Simple haversine implementation to covert latitude longitude pairs to a distance in meters, see https://www.movable-type.co.uk/scripts/latlong.html
+     * @return approximation of the distance in meters between the two latitude longitude pairs
+     */
+    public double haversine(Double lat1,Double lon1, Double lat2,Double lon2){
+        final int R = 6371000;//radius of earth in meters
+        Double latDistSin = Math.sin((lat2-lat1)*Math.PI/360);
+        Double lonDistSin = Math.sin((lon2-lon1)*Math.PI/360);
+        Double a = latDistSin*latDistSin + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * lonDistSin*lonDistSin;
+        Double distance = R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return distance;
     }
 
     public double getLatitude() {

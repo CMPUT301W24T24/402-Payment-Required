@@ -188,7 +188,9 @@ public class Database {
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", event.getName());
         data.put("owner", event.getOwner().getId());
-        //data.put("attendees", event.getAttendees());
+        data.put("latitude", event.getName());
+        data.put("longitude", event.getName());
+        data.put("distance", event.getName());
         usersRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     event.setId(documentReference.getId());
