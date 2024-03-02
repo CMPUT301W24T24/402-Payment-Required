@@ -9,7 +9,14 @@ import java.util.List;
  * This is a class which keeps track of a list of user objects (the people who are attending an event)
  */
 public class UserList {
-    private List<User> users = new ArrayList<>();
+    private ArrayList<User> users;
+
+    /**
+     * Constructor for the UserList class
+     */
+    public UserList() {
+        users = new ArrayList<>();
+    }
 
     /**
      * This adds a user to the list (the event) if the user is not already in the list

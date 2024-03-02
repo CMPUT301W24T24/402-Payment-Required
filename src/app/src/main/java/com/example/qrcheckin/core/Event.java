@@ -6,20 +6,20 @@ package com.example.qrcheckin.core;
 public class Event {
 
     private String id;
-    private String eventName;
+    private String name;
     private User owner;
     private UserList attendees;
 
     /**
      * The constructor for the event class
      * @param id the id of the event
-     * @param eventName the name of the event
+     * @param name the name of the event
      * @param owner who is hosting the event
      * @param attendees a list of those attending the event
      */
-    public Event(String id, String eventName, User owner, UserList attendees) {
+    public Event(String id, String name, User owner, UserList attendees) {
         this.id = id;
-        this.eventName = eventName;
+        this.name = name;
         this.owner = owner;
         this.attendees = attendees;
     }
@@ -37,16 +37,16 @@ public class Event {
      * @return
      * The name of the event
      */
-    public String getEventName() {
-        return eventName;
+    public String getName() {
+        return name;
     }
 
     /**
      * A method which sets the name of the event
-     * @param eventName the new name of the event
+     * @param name the new name of the event
      */
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

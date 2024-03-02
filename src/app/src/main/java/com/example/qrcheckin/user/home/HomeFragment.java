@@ -23,7 +23,6 @@ import com.journeyapps.barcodescanner.ScanOptions;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private ImageView qrButton;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -37,7 +36,7 @@ public class HomeFragment extends Fragment {
         final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
-        qrButton=root.findViewById(R.id.qr_icon);
+        ImageView qrButton=root.findViewById(R.id.qr_icon);
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +57,7 @@ public class HomeFragment extends Fragment {
         ScanOptions options = new ScanOptions();
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
         options.setOrientationLocked(true);
+        options.setPrompt("Scan a QR code to sign in");
         barcodeLauncher.launch(options);
     }
 
@@ -69,5 +69,4 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 }
             });
-
 }
