@@ -1,4 +1,4 @@
-package com.example.qrcheckin.user.myevent;
+package com.example.qrcheckin.user.exploreEvent;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,23 +14,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.qrcheckin.R;
-import com.example.qrcheckin.databinding.FragmentEventBinding;
-import com.example.qrcheckin.databinding.FragmentHostedEventBinding;
-import com.example.qrcheckin.user.hostedevent.HostedEventViewModel;
+import com.example.qrcheckin.databinding.FragmentExploreEventBinding; // Correct import
+import com.example.qrcheckin.user.exploreEvent.ExploreEventViewModel;
 
-public class EventFragment extends Fragment {
-
-    private FragmentEventBinding binding;
+public class ExploreEventFragment extends Fragment {
+    private FragmentExploreEventBinding binding; // Correct binding class
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        EventViewModel eventViewModel =
-                new ViewModelProvider(this).get(EventViewModel.class);
+        ExploreEventViewModel eventViewModel = new ViewModelProvider(this).get(ExploreEventViewModel.class);
 
-        binding = FragmentEventBinding.inflate(inflater, container, false);
+        binding = FragmentExploreEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textEvent;
+        final TextView textView = binding.textExploreEvent; // Correct text view reference
         eventViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
@@ -40,5 +37,4 @@ public class EventFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 }

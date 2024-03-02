@@ -1,5 +1,7 @@
 package com.example.qrcheckin.core;
 
+import java.util.Objects;
+
 /**
  * An object that keeps track of the event data
  */
@@ -83,6 +85,42 @@ public class Event {
         this.attendees = attendees;
     }
 
+    /**
+     * This method compares two city objects based on event id
+     *
+     * @param o the object to be compared.
+     * @return an integer specifying the comparison between events
+     */
+    public int compareTo(Object o) {
+        Event event = (Event) o;
+        return this.id.compareTo(event.getId());
+    }
+
+    /**
+     * This method is used to compare two event objects if they have the same id
+     * @param o object need to be compared
+     * @return 'true' if both cities have the id; otherwise 'false'
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Event event = (Event) o;
+        return Objects.equals(id, event.getId());
+    }
+
+    /**
+     * This method generates a hash code for an event object with the same id producing the same hash code
+     * @return an integer value to quickly identify the city object in the hash table
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
 
 
