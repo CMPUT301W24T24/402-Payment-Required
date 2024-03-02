@@ -9,6 +9,10 @@
             android:icon="@drawable/nav_home"
             android:title="@string/nav_home"/>
         <item
+            android:id="@+id/nav_notifications"
+            android:icon="@drawable/nav_notifications"
+            android:title="@string/nav_notifications"/>
+        <item
             android:id="@+id/nav_event"
             android:icon="@drawable/nav_events"
             android:title="@string/nav_my_events"/>
@@ -24,10 +28,6 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/nav_profile"
             android:title="@string/nav_profile"/>
-        <item
-            android:id="@+id/nav_notifications"
-            android:icon="@drawable/nav_notifications"
-            android:title="Notifications"/>
         <item
             android:id="@+id/nav_all_profile"
             android:icon="@drawable/nav_all_profiles"
