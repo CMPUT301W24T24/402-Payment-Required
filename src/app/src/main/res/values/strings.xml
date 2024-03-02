@@ -6,6 +6,7 @@
     <string name="nav_my_events">My events</string>
     <string name="nav_hosted_events">Hosted events</string>
     <string name="nav_profile">Profile</string>
+    <string name="qr_preview">QR_Preview</string>
     <string name="add_event">Add Event</string>
     <string name="nav_notifications">Notifications</string>
 </resources>
