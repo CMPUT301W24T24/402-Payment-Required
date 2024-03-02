@@ -131,6 +131,13 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
         Database db = new Database();
         db.getUserPicture(currentUser, navProfileImage);
+
+        if (!currentUser.isAdmin()) {
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.nav_all_event).setVisible(false);
+            menu.findItem(R.id.nav_all_images).setVisible(false);
+            menu.findItem(R.id.nav_all_profile).setVisible(false);
+        }
     }
 
     /**
