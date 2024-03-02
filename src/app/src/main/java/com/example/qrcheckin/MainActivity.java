@@ -166,4 +166,5 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
 }
