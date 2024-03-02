@@ -4,20 +4,32 @@ package com.example.qrcheckin.core;
  * An object that keeps track of the event data
  */
 public class Event {
+
+    private String id;
     private String eventName;
     private User owner;
     private UserList attendees;
 
     /**
      * The constructor for the event class
+     * @param id the id of the event
      * @param eventName the name of the event
      * @param owner who is hosting the event
      * @param attendees a list of those attending the event
      */
-    public Event(String eventName, User owner, UserList attendees) {
+    public Event(String id, String eventName, User owner, UserList attendees) {
+        this.id = id;
         this.eventName = eventName;
         this.owner = owner;
         this.attendees = attendees;
+    }
+
+    /**
+     * The method returns the id of the event
+     * @return The id of the event
+     */
+    public String getId() {
+        return id;
     }
 
     /**
