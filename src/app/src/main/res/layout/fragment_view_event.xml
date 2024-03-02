@@ -30,51 +30,31 @@
         app:layout_constraintTop_toBottomOf="@id/view_event_poster"
         tools:ignore="HardcodedText" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+
+    <TextView
+        android:id="@+id/view_event_date"
+        app:layout_constraintTop_toBottomOf="@+id/view_event_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@id/view_event_poster"
-        app:layout_constraintStart_toStartOf="@id/view_event_poster"
-        app:layout_constraintTop_toBottomOf="@id/view_event_title">
+        android:layout_weight="1"
+        android:text="Date|Time"
+        android:textColor="@color/pink"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/view_event_date"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Date"
-            android:textColor="@color/pink"
-            android:textSize="20sp"
-            tools:ignore="HardcodedText" />
-
-        <TextView
-            android:id="@+id/view_event_time"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Time"
-            android:textColor="@color/pink"
-            android:textSize="20sp" />
-    </LinearLayout>
 
     <TextView
         android:id="@+id/view_event_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:background="@drawable/pink_box_background"
         android:padding="20dp"
         android:text="Description of the event"
         android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        tools:layout_editor_absoluteX="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintTop_toBottomOf="@+id/view_event_date"
+        tools:ignore="HardcodedText"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
         android:id="@+id/view_event_attend_button"

@@ -18,7 +18,7 @@ import com.example.qrcheckin.databinding.FragmentExploreEventBinding; // Correct
 import com.example.qrcheckin.user.exploreEvent.ExploreEventViewModel;
 
 public class ExploreEventFragment extends Fragment {
-    private FragmentExploreEventBinding binding; // Correct binding class
+    private FragmentExploreEventBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -27,7 +27,7 @@ public class ExploreEventFragment extends Fragment {
         binding = FragmentExploreEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textExploreEvent; // Correct text view reference
+        final TextView textView = binding.textExploreEvent;
         eventViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
