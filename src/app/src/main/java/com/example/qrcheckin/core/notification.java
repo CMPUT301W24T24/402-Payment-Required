@@ -5,12 +5,14 @@ public class notification {
     private String message;
     private String time;
     private String eventName;
+    private String eventId;
 
 
-    public notification(String m, String t, String e) {
-        this.message = m;
-        this.time = t;
-        this.eventName = e;
+    public notification(String message, String time, String eventName, String eventId) {
+        this.message = message;
+        this.time = time;
+        this.eventName = eventName;
+        this.eventId = eventId;
     }
 
     public String getMessage() {
@@ -23,5 +25,8 @@ public class notification {
 
     public String getEventName() {
         return this.eventName;
+    }
+    public String getEventId() {
+        return this.eventId ;
     }
 }

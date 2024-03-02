@@ -66,7 +66,7 @@ public class User {
      * @return the id of the user
      */
     public String getId() {
-        return id;
+        return this.id;
     }
 
     /**

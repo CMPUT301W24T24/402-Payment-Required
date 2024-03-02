@@ -1,5 +1,6 @@
 package com.example.qrcheckin.user.notifications;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,36 +19,64 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.core.notification;
 import com.example.qrcheckin.core.notificationArrayAdapter;
 import com.example.qrcheckin.databinding.FragmentNotificationsBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class NotificationsFragment extends Fragment {
 
-    private ListView notificationList;
+    /**
+     * ListView of notifications being listed
+     */
+    private ListView notificationViewList;
+    /**
+     * binding for notification fragment
+     */
     private FragmentNotificationsBinding binding;
-    private ArrayList<notification> notifications;    // update from links
+    /**
+     * Array Adapter connected to notificationViewList
+     * and notifications (the data list)
+     */
     private notificationArrayAdapter nArrayAdapter;
+    /**
+     * ArrayList of Collection Reference objects
+     * each collection reference is referring to a collection of notifications from user's event
+     */
     private ArrayList<CollectionReference> fireEventNotifs;
-    private Map<String, ArrayList<notification>> links; // being changed by listener
+    /**
+     * notificationsMap allows a space for listeners of the firebase to
+     */
+    private Map<String, ArrayList<notification>> notificationsMap; // being changed by listener
+    /**
+     * notifications is the list of notifications to be displayed
+     * by the ArrayAdapter
+     */
+    private ArrayList<notification> notifications;    // update from links
 
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        NotificationsViewModel NotificationsViewModel =
-                new ViewModelProvider(this).get(NotificationsViewModel.class);
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        NotificationsViewModel NotificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
 
         binding = FragmentNotificationsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -55,43 +84,58 @@ public class NotificationsFragment extends Fragment {
         final TextView textView = binding.textNotifications;
         NotificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
+        notificationsMap = new HashMap<>();
         notifications = new ArrayList<>();
 
-        notificationList =
-
-        notificationList.setAdapter(nArrayAdapter);
+        notificationViewList = binding.notificationsList;
+        nArrayAdapter = new notificationArrayAdapter(getActivity().getApplicationContext(), notifications);
+        notificationViewList.setAdapter(nArrayAdapter);
 
         // https://stackoverflow.com/questions/69164648/adding-a-listview-in-a-fragment
 
-        // attach ListView
+        fireEventNotifs = new ArrayList<CollectionReference>();
 
+        // get User
+        String currentUser = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser().getId();
 
-        CollectionReference signups = FirebaseFirestore.getInstance().collection("SignUpTable");
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        QuerySnapshot signupQuery = signups.get().getResult();
+        // get all events User has signed up for
+        ArrayList<String> eventList = new ArrayList<>();
+        db.collection("SignUpTable")
+                .whereArrayContains("user_id", currentUser).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> signupDocs = queryDocumentSnapshots.getDocuments();
+                        for (DocumentSnapshot signupDoc: signupDocs) {
+                            eventList.add((String) signupDoc.get("event_id"));
+                        }
+                    }
+                });
 
-        for ( QueryDocumentSnapshot s: signupQuery) {
-            if (s.get("user_id") == userID ) {
-
-            }
+        // get names of events in database
+        Map<String, String> eventsMap = new HashMap<>();
+        for (String event: eventList) {
+            db.collection("events").document(event).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    eventsMap.put(documentSnapshot.getString("name"), event);
+                }
+            });
         }
 
+        // add listeners to notification collections of events
+        for (String eventID: eventList) {
 
-        // https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
-        // initialize all arrays that will be
-        // append all relevant ????
+            // create new collection reference and put into fireEventsNotifs
+            CollectionReference notificationRef = db
+                    .collection("events")
+                    .document(eventID)
+                    .collection("notifications");
 
-        // need: list of collection references. Initialized
-
-        // Create snapshot listener for each collection.
-        // Do not have to worry about new listeners because user can't sign up for events on this page
-        //
-
-
-        for (String eventID: links.keySet()) { // for eventID in user events
-
-            fireNotifs.document( eventID ).collection("notifications");
-            fireNotifs.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            // add listener to new collection
+            notificationRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
                     if (error != null) {
@@ -100,20 +144,30 @@ public class NotificationsFragment extends Fragment {
                     }
 
                     if (querySnapshots != null) {
-                        links.get(eventID).clear();
+                        ArrayList<notification> notifList = new ArrayList<>();
                         for (QueryDocumentSnapshot doc: querySnapshots) {
-                            String message = doc.getString("message");
-                            String time = doc.getString("time");
-                            links.get(eventID).add(new notification(message, time, eventName));
+                            //
+                            notifList.add(new notification(
+                                    doc.getString("message"),
+                                    doc.getString("time"),
+                                    eventsMap.get(eventID),
+                                    eventID));
+                            notificationsMap.put(eventID, notifList);
                         }
 
-                        notifications = links.values(); // for each link in links put into notifications list then update
+                        // for each notification array in map, put into notifications list then update
+                        notifications.clear();
+                        for (String nk: notificationsMap.keySet()) {
+                            notifications.addAll(notificationsMap.get(nk));
+                        }
+                        // notifications.sort(); Sort by time of notification
                         nArrayAdapter.notifyDataSetChanged();
                     }
-
                 }
             });
+            fireEventNotifs.add(notificationRef);
         }
+
         // for each event in events user signed up to
         //    for notification in notifications of events
         //        ?? possibly skip notifications that user removed and store removed items to phone

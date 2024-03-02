@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.ActivityMainBinding;
+import com.example.qrcheckin.user.notifications.NotificationsFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.BufferedReader;

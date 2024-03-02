@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class NotificationsViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
 
-    public NotificationsViewModel(ArrayList<notification> notifArray) {
+    public NotificationsViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is notifications fragment");
     }
