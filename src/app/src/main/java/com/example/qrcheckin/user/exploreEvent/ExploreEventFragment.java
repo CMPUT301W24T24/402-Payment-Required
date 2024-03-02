@@ -24,7 +24,7 @@ public class ExploreEventFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         ExploreEventViewModel eventViewModel = new ViewModelProvider(this).get(ExploreEventViewModel.class);
 
-        binding = FragmentExploreEventBinding.inflate(inflater, container, false); // Correct binding inflation
+        binding = FragmentExploreEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textExploreEvent; // Correct text view reference

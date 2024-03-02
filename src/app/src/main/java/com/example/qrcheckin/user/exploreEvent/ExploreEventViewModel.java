@@ -8,7 +8,7 @@ public class ExploreEventViewModel extends ViewModel {
 
     public ExploreEventViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is hostedEvent fragment");
+        mText.setValue("This is exploreEvent fragment");
     }
 
     public LiveData<String> getText() { return mText; }
