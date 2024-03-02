@@ -29,4 +29,11 @@ public class CreateEventFragment extends Fragment {
         createEventViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
 }
