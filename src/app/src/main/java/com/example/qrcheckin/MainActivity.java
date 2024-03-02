@@ -46,7 +46,12 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_event, R.id.nav_host_event, R.id.nav_profile)
+                R.id.nav_home,
+                R.id.nav_event,
+                R.id.nav_host_event,
+                R.id.nav_explore_event,
+                R.id.nav_profile,
+                R.id.nav_all_event, R.id.nav_all_images, R.id.nav_all_profile)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
