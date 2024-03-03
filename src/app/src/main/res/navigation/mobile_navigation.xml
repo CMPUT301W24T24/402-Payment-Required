@@ -15,7 +15,11 @@
         android:id="@+id/nav_event"
         android:name="com.example.qrcheckin.user.myevent.EventFragment"
         android:label="@string/nav_my_events"
-        tools:layout="@layout/fragment_event" />
+        tools:layout="@layout/fragment_event">
+        <action
+            android:id="@+id/action_nav_event_to_nav_view_event"
+            app:destination="@id/nav_view_event" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_host_event"
@@ -28,5 +32,11 @@
         android:name="com.example.qrcheckin.user.profile.ProfileFragment"
         android:label="@string/nav_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/nav_view_event"
+        android:name="com.example.qrcheckin.user.viewEvent.ViewEventFragment"
+        android:label="view_event"
+        tools:layout="@layout/fragment_view_event" />
 
 </navigation>
