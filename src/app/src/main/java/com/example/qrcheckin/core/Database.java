@@ -183,18 +183,20 @@ public class Database {
 
     }
 
-
+    /**
+     * Adds a given event to the database of available events
+     * @param event
+     */
     public void addEvent(Event event){
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", event.getName());
         data.put("owner", event.getOwner().getId());
-        data.put("latitude", event.getName());
-        data.put("longitude", event.getName());
-        data.put("distance", event.getName());
-        usersRef.add(data)
+        data.put("latitude", event.getLatitude());
+        data.put("longitude", event.getLongitude());
+        data.put("distance", event.getDistanceLimit());
+        eventsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     event.setId(documentReference.getId());
-                    userListener.onUserAdded(documentReference.getId());
                     Log.d("Firestore", "DocumentSnapshot successfully written with ID: " + documentReference.getId());
                 })
                 .addOnFailureListener(e -> {
@@ -208,12 +210,13 @@ public class Database {
      * @param event The event to check in to
      */
     public void checkIn(User user, Event event) {
-        Long timestamp = System.currentTimeMillis() / 1000;
         FieldValue serverTimestamp = FieldValue.serverTimestamp();
         HashMap<String, Object> data = new HashMap<>();
         data.put("user_id", user.getId());
         data.put("event_id", event.getId());
         data.put("time", serverTimestamp);
+        data.put("latitude", null);
+        data.put("longitude", null);
         checkinsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     Log.d("Firestore", "Checked in with ID: " + documentReference.getId());
@@ -231,7 +234,6 @@ public class Database {
      * @param longitude The longitude of the user's location
      */
     public void checkInWithGeo(User user, Event event, double latitude, double longitude) {
-        Long timestamp = System.currentTimeMillis() / 1000;
         FieldValue serverTimestamp = FieldValue.serverTimestamp();
         HashMap<String, Object> data = new HashMap<>();
         data.put("user_id", user.getId());

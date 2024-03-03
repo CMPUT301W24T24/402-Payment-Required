@@ -6,6 +6,7 @@ package com.example.qrcheckin.core;
 public class Event {
 
     private String id;
+    private String qrRef;
     private String name;
     private User owner;
     private UserList attendees;
@@ -87,6 +88,21 @@ public class Event {
             return true;//success
         }
         return false;//failed to check in
+    }
+
+    /**
+     * Alternative to checkIn which does not apply geo data, but will always fail if geo data is required
+     * @param user User who wants to check in to event
+     * @return True if user successfully checked in (only if geo is disabled), false otherwise
+     */
+    public boolean checkIn(User user){
+        if(usesGeolocation())
+            return false;//failed to check in as no location provided
+
+        (new Database()).checkIn(user,this);
+        if(!attendees.hasUser(user))
+            attendees.add(user);
+        return true;//success
     }
 
     /** Simple haversine implementation to covert latitude longitude pairs to a distance in meters, see https://www.movable-type.co.uk/scripts/latlong.html
