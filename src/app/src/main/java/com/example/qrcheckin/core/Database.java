@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -175,12 +176,16 @@ public class Database {
     }
 
     /**
-     * Find an event in the database by ID
+     * Find an event in the database by ID, returns null if the ID is not present in the database
      * @param id Unique ID to search for
-     * @return The event object with given ID
+     * @return The event object with given ID, null otherwise
      */
-    public void getEventByID(String id){
-
+    public Event getEventByID(String id){
+        DocumentSnapshot document = eventsRef.document(id).get().getResult();
+        if(document.exists()){
+            return document.toObject(Event.class);
+        }
+        return null;
     }
 
     /**
