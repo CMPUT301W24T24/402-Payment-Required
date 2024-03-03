@@ -15,7 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Database;
+import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentHomeBinding;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -66,7 +70,15 @@ public class HomeFragment extends Fragment {
                 if(result.getContents() == null) {
                     Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                    User currentUser=((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
+                    Event event = (new Database()).getEventByQR(result.getContents());
+
+                    if(event.checkIn(currentUser)){
+                        Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(getActivity(), "Failed to check into "+event.getName(), Toast.LENGTH_LONG).show();
+                    }
+
                 }
             });
 }

@@ -16,6 +16,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.HashMap;
@@ -176,7 +177,7 @@ public class Database {
     }
 
     /**
-     * Find an event in the database by ID, returns null if the ID is not present in the database
+     * Find an event in the database by database ID, returns null if the ID is not present in the database
      * @param id Unique ID to search for
      * @return The event object with given ID, null otherwise
      */
@@ -184,6 +185,19 @@ public class Database {
         DocumentSnapshot document = eventsRef.document(id).get().getResult();
         if(document.exists()){
             return document.toObject(Event.class);
+        }
+        return null;
+    }
+
+    /**
+     * Find an event in the database by QR value, returns null if the QR value is not present in the database
+     * @param qrValue Unique QR value to search for
+     * @return The event object with given QR value, null otherwise
+     */
+    public Event getEventByQR(String qrValue){
+        QuerySnapshot snapshot = eventsRef.whereEqualTo("checkinId",qrValue).get().getResult();
+        if(!snapshot.isEmpty()){
+            return snapshot.getDocuments().get(0).toObject(Event.class);
         }
         return null;
     }

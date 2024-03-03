@@ -109,7 +109,7 @@ public class Event {
     /**
      * Alternative to checkIn which does not apply geo data, but will always fail if geo data is required
      * @param user User who wants to check in to event
-     * @return True if user successfully checked in (only if geo is disabled), false otherwise
+     * @return True if user successfully checked in (only if event geo is disabled), false otherwise
      */
     public boolean checkIn(User user){
         if(usesGeolocation())
