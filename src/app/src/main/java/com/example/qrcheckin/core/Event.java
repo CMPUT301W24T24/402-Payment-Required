@@ -1,12 +1,13 @@
 package com.example.qrcheckin.core;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 /**
  * An object that keeps track of the event data
  */
-public class Event {
+public class Event implements Serializable {
 
     private String id;
     private User host;
