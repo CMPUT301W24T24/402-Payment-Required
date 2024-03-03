@@ -53,7 +53,7 @@ public class Event {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.distanceLimit = distanceLimit
+        this.distanceLimit = distanceLimit;
         this.checkinId = checkinId;
         this.promoteId = promoteId;
         this.geo = geo;
@@ -71,7 +71,7 @@ public class Event {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.distanceLimit = distanceLimit
+        this.distanceLimit = distanceLimit;
         this.checkinId = checkinId;
         this.checkinRq = checkinRq;
         this.promoteId = promoteId;
