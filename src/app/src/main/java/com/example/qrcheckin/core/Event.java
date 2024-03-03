@@ -78,6 +78,23 @@ public class Event {
         this.attendees = attendees;
     }
 
+    public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit) {
+        this.host = host;
+        this.name = name;
+        this.description = description;
+        this.posterRef = posterRef;
+        this.time = time;
+        this.location = location;
+        this.locationGeoLat = locationGeoLat;
+        this.locationGeoLong = locationGeoLong;
+        this.checkinId = checkinId;
+        this.checkinRq = checkinRq;
+        this.promoteId = promoteId;
+        this.promoteRq = promoteRq;
+        this.geo = geo;
+        this.limit = limit;
+    }
+
     /**
      * The method returns the id of the event
      * @return The id of the event
@@ -137,42 +154,126 @@ public class Event {
         this.attendees = attendees;
     }
 
-    /**
-     * This method compares two city objects based on event id
-     *
-     * @param o the object to be compared.
-     * @return an integer specifying the comparison between events
-     */
-    public int compareTo(Object o) {
-        Event event = (Event) o;
-        return this.id.compareTo(event.getId());
+    public void setId(String id) {
+        this.id = id;
     }
 
-    /**
-     * This method is used to compare two event objects if they have the same id
-     * @param o object need to be compared
-     * @return 'true' if both cities have the id; otherwise 'false'
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Event event = (Event) o;
-        return Objects.equals(id, event.getId());
+    public User getHost() {
+        return host;
     }
 
-    /**
-     * This method generates a hash code for an event object with the same id producing the same hash code
-     * @return an integer value to quickly identify the city object in the hash table
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public void setHost(User host) {
+        this.host = host;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPosterRef() {
+        return posterRef;
+    }
+
+    public void setPosterRef(String posterRef) {
+        this.posterRef = posterRef;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Double getLocationGeoLat() {
+        return locationGeoLat;
+    }
+
+    public void setLocationGeoLat(Double locationGeoLat) {
+        this.locationGeoLat = locationGeoLat;
+    }
+
+    public Double getLocationGeoLong() {
+        return locationGeoLong;
+    }
+
+    public void setLocationGeoLong(Double locationGeoLong) {
+        this.locationGeoLong = locationGeoLong;
+    }
+
+    public String getCheckinId() {
+        return checkinId;
+    }
+
+    public void setCheckinId(String checkinId) {
+        this.checkinId = checkinId;
+    }
+
+    public String getCheckinRq() {
+        return checkinRq;
+    }
+
+    public void setCheckinRq(String checkinRq) {
+        this.checkinRq = checkinRq;
+    }
+
+    public String getPromoteId() {
+        return promoteId;
+    }
+
+    public void setPromoteId(String promoteId) {
+        this.promoteId = promoteId;
+    }
+
+    public String getPromoteRq() {
+        return promoteRq;
+    }
+
+    public void setPromoteRq(String promoteRq) {
+        this.promoteRq = promoteRq;
+    }
+
+    public Boolean getGeo() {
+        return geo;
+    }
+
+    public void setGeo(Boolean geo) {
+        this.geo = geo;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+//    /**
+//     * This method compares two city objects based on event id
+//     *
+//     * @param o the object to be compared.
+//     * @return an integer specifying the comparison between events
+//     */
+//    @Override
+//    public int compareTo(Object o) {
+//        Event event = (Event) o;
+//        return this.id.compareTo(event.getId());
+//    }
+
 }
 
 
