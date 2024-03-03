@@ -187,13 +187,23 @@ public class Database {
      * Adds a given event to the database of available events
      * @param event
      */
-    public void addEvent(Event event){
+    public void addEvent(@NonNull Event event){
         HashMap<String, Object> data = new HashMap<>();
+        data.put("host", event.getOwner().getId());
         data.put("name", event.getName());
-        data.put("owner", event.getOwner().getId());
+        data.put("description", event.getDescription());
+        data.put("posterRef", null);
+        data.put("time", null);
+        data.put("location", null);
         data.put("latitude", event.getLatitude());
         data.put("longitude", event.getLongitude());
-        data.put("distance", event.getDistanceLimit());
+        data.put("distanceLimit", event.getDistanceLimit());
+        data.put("checkinId", null);
+        data.put("checkinQR", null);
+        data.put("promoteId", null);
+        data.put("promoteQR", null);
+        data.put("geo", null);
+        data.put("limit", null);
         eventsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     event.setId(documentReference.getId());

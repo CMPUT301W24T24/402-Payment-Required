@@ -11,15 +11,16 @@ public class Event {
     private String id;
     private User host;
     private String name;
+
     private String description;
     private String posterRef;
     private Date time;
     private String location;
     private double latitude,longitude,distanceLimit; //geolocation data
     private String checkinId;
-    private String checkinRq;
+    private String checkinQR;
     private String promoteId;
-    private String promoteRq;
+    private String promoteQR;
     private Boolean geo;
     private Integer limit;
     private UserList attendees;
@@ -37,6 +38,7 @@ public class Event {
      * @param location the location of the event
      * @param latitude the latitude of the location
      * @param longitude the longitude of the location
+     * @param distanceLimit the maximum distance in meters you can be from the event to check in (radius)
      * @param checkinId the id of the checkin
      * @param promoteId the id of the promotion
      * @param geo the boolean value of the location
@@ -61,7 +63,7 @@ public class Event {
         this.attendees = attendees;
     }
 
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, Double distanceLimit, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit, UserList attendees) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, Double distanceLimit, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
         this.id = id;
         this.host = host;
         this.name = name;
@@ -73,9 +75,9 @@ public class Event {
         this.longitude = longitude;
         this.distanceLimit = distanceLimit;
         this.checkinId = checkinId;
-        this.checkinRq = checkinRq;
+        this.checkinQR = checkinQR;
         this.promoteId = promoteId;
-        this.promoteRq = promoteRq;
+        this.promoteQR = promoteQR;
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
@@ -119,7 +121,7 @@ public class Event {
         return true;//success
     }
 
-    /** Simple haversine implementation to covert latitude longitude pairs to a distance in meters, see https://www.movable-type.co.uk/scripts/latlong.html
+    /** Simple haversine implementation to covert two latitude longitude pairs to a distance in meters, see https://www.movable-type.co.uk/scripts/latlong.html
      * @return approximation of the distance in meters between the two latitude longitude pairs
      */
     public double haversine(Double lat1,Double lon1, Double lat2,Double lon2){
@@ -162,6 +164,10 @@ public class Event {
 
     public double getDistanceLimit() {
         return distanceLimit;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setId(String id) {
