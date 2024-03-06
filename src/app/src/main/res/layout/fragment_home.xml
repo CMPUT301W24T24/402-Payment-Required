@@ -33,4 +33,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/qr_icon" />
 
+    <Button
+        android:id="@+id/shareqrcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share QR Code"
+        android:textSize="10dp"
+        tools:layout_editor_absoluteX="138dp"
+        tools:layout_editor_absoluteY="588dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

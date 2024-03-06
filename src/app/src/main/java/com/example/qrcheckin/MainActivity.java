@@ -36,14 +36,13 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.appBarMain.toolbar);
-
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
+
+        File file = new File(getCacheDir(), "image");
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home,
@@ -179,5 +178,6 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
 
 }
