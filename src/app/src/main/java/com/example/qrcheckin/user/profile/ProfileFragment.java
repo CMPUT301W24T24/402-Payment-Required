@@ -29,6 +29,7 @@ public class ProfileFragment extends Fragment {
         final TextView profileName = binding.profileName;
         profileViewModel.getText().observe(getViewLifecycleOwner(), profileName::setText);
         return root;
+
     }
 
     @Override
