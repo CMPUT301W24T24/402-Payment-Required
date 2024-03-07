@@ -13,16 +13,13 @@ public class CreateEventViewModel extends ViewModel {
 
     public CreateEventViewModel() {
         bannerRef = new MutableLiveData<>();
-        bannerRef.setValue("img");
 
         eventTitle = new MutableLiveData<>();
         eventTitle.setValue("Add your event Title");
 
         eventDate = new MutableLiveData<>();
-        eventDate.setValue("Enter Event Date");
 
         eventTime = new MutableLiveData<>();
-        eventTime.setValue("Enter Event Time");
 
         eventDescription = new MutableLiveData<>();
         eventDescription.setValue("Enter Event Description");

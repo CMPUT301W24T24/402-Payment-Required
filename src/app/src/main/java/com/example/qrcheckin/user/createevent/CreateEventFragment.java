@@ -1,24 +1,34 @@
+// https://stackoverflow.com/questions/6421874/how-to-get-the-date-from-the-datepicker-widget-in-android
+// used to get the date from datepicker
 package com.example.qrcheckin.user.createevent;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.qrcheckin.QRCheckInApplication;
+import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
+import com.google.firebase.Firebase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Date;
+import java.util.HashMap;
 
 public class CreateEventFragment extends Fragment {
     private FragmentCreateEventBinding binding;
-
-    public static CreateEventFragment newInstance() {
-        return new CreateEventFragment();
-    }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CreateEventViewModel createEventViewModel = new ViewModelProvider(this).get(CreateEventViewModel.class);
@@ -26,26 +36,57 @@ public class CreateEventFragment extends Fragment {
         binding = FragmentCreateEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // banner
-        final ImageView bannerImageView = binding.imageCreateEventBanner;
+        ImageView bannerImageView = binding.imageCreateEventBanner;
         // TODO: set the image reference
         //createEventViewModel.getBannerRef().observe(getViewLifecycleOwner(), bannerImageView::);
 
-        // title
-        final TextView textView = binding.textCreateEventTitle;
-        createEventViewModel.getEventTitle().observe(getViewLifecycleOwner(), textView::setText);
+        EditText titleTextView = binding.textCreateEventTitle;
+        createEventViewModel.getEventTitle().observe(getViewLifecycleOwner(), titleTextView::setText);
 
-        // date
-        final TextView dateTextView = binding.dateCreateEvent;
-        createEventViewModel.getEventDate().observe(getViewLifecycleOwner(), dateTextView::setText);
+        DatePicker dateView = binding.dateCreateEvent;
 
-        // time
-        final TextView timeTextView = binding.timeCreateEvent;
-        createEventViewModel.getEventTime().observe(getViewLifecycleOwner(), timeTextView::setText);
+        TimePicker timeView = binding.timeCreateEvent;
 
-        // description
-        final TextView descriptionTextView = binding.textCreateEventDescription;
+        EditText descriptionTextView = binding.textCreateEventDescription;
         createEventViewModel.getEventDescription().observe(getViewLifecycleOwner(), descriptionTextView::setText);
+
+        binding.buttonCreateEventSubmit.setOnClickListener(v -> {
+            // TODO: if everything is filled out add to firebase
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference eventsRef = db.collection("events");
+
+            User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
+            String titleText = titleTextView.getText().toString();
+            String descriptionText = descriptionTextView.getText().toString();
+            // TODO: get the poster reference
+            String posterRef = "poster.png";
+
+            int date = dateView.getDayOfMonth();
+            int month = dateView.getMonth();
+            int year = dateView.getYear();
+            int hours = timeView.getHour();
+            int min = timeView.getMinute();
+            Date time = new Date(year, month, date, hours, min);
+
+            Event event = new Event(user, titleText, descriptionText, posterRef, time, );
+
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("name", event.getName());
+            data.put("description", event.getDescription());
+            data.put("time", event.getTime());
+            data.put("posterRef", event.getPosterRef());
+            data.put("location_geo_long", event.getLocationGeoLong());
+            data.put("location_geo_lat", event.getLocationGeoLat());
+            data.put("limit",event.getLimit());
+            data.put("host", event.getHost());
+            data.put("geo", event.getGeo());
+            data.put("promote_id", event.getPromoteId());
+            data.put("promote_qr", event.getPromoteRq());
+            data.put("location", event.getLocation());
+            data.put("checkin_id", event.getCheckinId());
+            data.put("checkin_qr", event.getCheckinRq());
+        });
+
 
         return root;
     }

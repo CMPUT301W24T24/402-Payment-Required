@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toTopOf="@+id/text_create_event_title"
         android:src="@drawable/ic_launcher_foreground"/>
 
-    <TextView
+    <EditText
         android:id="@+id/text_create_event_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,11 +29,11 @@
         app:layout_constraintTop_toBottomOf="@id/image_create_event_banner"
         android:text="Title of Event"/>
 
-    <TextView
+    <EditText
+        android:id="@+id/text_create_event_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Description"
-        android:id="@+id/text_create_event_description"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -43,51 +43,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_create_event_title"/>
 
-    <LinearLayout
+    <DatePicker
+        android:id="@+id/date_create_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/linearlayout_create_event_date_time"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Date"
+        app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_create_event_description">
+        app:layout_constraintTop_toBottomOf="@id/text_create_event_description" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Date"
-            android:id="@+id/date_create_event"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toStartOf="@id/time_create_event"
-            app:layout_constraintStart_toStartOf="parent"/>
+    <TimePicker
+        android:id="@+id/time_create_event"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date_create_event"
+        app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Time"
-            android:id="@+id/time_create_event"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/date_create_event"/>
 
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/button_create_event_attend_limit"
+    <EditText
+        android:id="@+id/create_event_attend_limit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Limit on attendees"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_date_time">
-    </Button>
+        app:layout_constraintTop_toBottomOf="@id/time_create_event">
+    </EditText>
 
     <TextView
         android:id="@+id/text_create_event_description_qr"
@@ -101,7 +84,7 @@
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_create_event_attend_limit"/>
+        app:layout_constraintTop_toBottomOf="@id/create_event_attend_limit"/>
 
     <LinearLayout
         android:id="@+id/linearlayout_create_event_description_qr"
@@ -131,7 +114,7 @@
 
 
 
-    <!-- Description QR Code View -->
+    <!-- TODO: Description QR Code View -->
 
 
 
@@ -176,7 +159,7 @@
     </LinearLayout>
 
 
-    <!-- Checkin QR Code View -->
+    <!-- TODO: Checkin QR Code View -->
 
 
     <CheckBox
@@ -202,9 +185,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/checkbox_create_event_geolocation"/>
 
-    <!-- Event Location Mapview -->
+    <!-- TODO: Event Location Mapview -->
 
-
+    <Button
+        android:id="@+id/button_create_event_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_create_event_location"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
