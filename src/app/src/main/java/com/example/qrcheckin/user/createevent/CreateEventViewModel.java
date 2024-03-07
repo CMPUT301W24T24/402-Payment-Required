@@ -5,14 +5,47 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class CreateEventViewModel extends ViewModel {
-    private final MutableLiveData<String> mText;
+    private final MutableLiveData<String> bannerRef;
+    private final MutableLiveData<String> eventTitle;
+    private final MutableLiveData<String> eventDate;
+    private final MutableLiveData<String> eventTime;
+    private final MutableLiveData<String> eventDescription;
 
     public CreateEventViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is create event fragment");
+        bannerRef = new MutableLiveData<>();
+        bannerRef.setValue("img");
+
+        eventTitle = new MutableLiveData<>();
+        eventTitle.setValue("Add your event Title");
+
+        eventDate = new MutableLiveData<>();
+        eventDate.setValue("Enter Event Date");
+
+        eventTime = new MutableLiveData<>();
+        eventTime.setValue("Enter Event Time");
+
+        eventDescription = new MutableLiveData<>();
+        eventDescription.setValue("Enter Event Description");
+
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public MutableLiveData<String> getBannerRef() {
+        return bannerRef;
+    }
+
+    public MutableLiveData<String> getEventTitle() {
+        return eventTitle;
+    }
+
+    public MutableLiveData<String> getEventDate() {
+        return eventDate;
+    }
+
+    public MutableLiveData<String> getEventTime() {
+        return eventTime;
+    }
+
+    public MutableLiveData<String> getEventDescription() {
+        return eventDescription;
     }
 }
