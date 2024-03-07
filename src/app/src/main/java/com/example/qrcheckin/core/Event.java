@@ -1,17 +1,17 @@
 package com.example.qrcheckin.core;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 /**
  * An object that keeps track of the event data
  */
-public class Event {
+public class Event implements Serializable {
 
     private String id;
     private User host;
     private String name;
-
     private String description;
     private String posterRef;
     private Date time;
@@ -92,7 +92,7 @@ public class Event {
      * @return True if user successfully checked in, false otherwise
      */
     public boolean checkIn(User user, Double latitude, Double longitude){
-        if(!usesGeolocation()) {
+        if(!geo) {
             (new Database()).checkIn(user,this);
             if(!attendees.hasUser(user))
                 attendees.add(user);
@@ -112,7 +112,7 @@ public class Event {
      * @return True if user successfully checked in (only if event geo is disabled), false otherwise
      */
     public boolean checkIn(User user){
-        if(usesGeolocation())
+        if(geo)
             return false;//failed to check in as no location provided
 
         (new Database()).checkIn(user,this);
@@ -144,14 +144,6 @@ public class Event {
         this.latitude=latitude;
         this.longitude=longitude;
         this.distanceLimit=distanceLimit;
-    }
-
-    /**
-     * Used to check whether an event limits its attendees based on geolocation data
-     * @return true if this event limits its attendees, false otherwise
-     */
-    public boolean usesGeolocation(){
-        return geo;
     }
 
     public double getLatitude() {
@@ -232,4 +224,127 @@ public class Event {
     public void setAttendees(UserList attendees) {
         this.attendees = attendees;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public User getHost() {
+        return host;
+    }
+
+    public void setHost(User host) {
+        this.host = host;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPosterRef() {
+        return posterRef;
+    }
+
+    public void setPosterRef(String posterRef) {
+        this.posterRef = posterRef;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Double getLocationGeoLat() {
+        return locationGeoLat;
+    }
+
+    public void setLocationGeoLat(Double locationGeoLat) {
+        this.locationGeoLat = locationGeoLat;
+    }
+
+    public Double getLocationGeoLong() {
+        return locationGeoLong;
+    }
+
+    public void setLocationGeoLong(Double locationGeoLong) {
+        this.locationGeoLong = locationGeoLong;
+    }
+
+    public String getCheckinId() {
+        return checkinId;
+    }
+
+    public void setCheckinId(String checkinId) {
+        this.checkinId = checkinId;
+    }
+
+    public String getCheckinRq() {
+        return checkinRq;
+    }
+
+    public void setCheckinRq(String checkinRq) {
+        this.checkinRq = checkinRq;
+    }
+
+    public String getPromoteId() {
+        return promoteId;
+    }
+
+    public void setPromoteId(String promoteId) {
+        this.promoteId = promoteId;
+    }
+
+    public String getPromoteRq() {
+        return promoteRq;
+    }
+
+    public void setPromoteRq(String promoteRq) {
+        this.promoteRq = promoteRq;
+    }
+
+    public Boolean getGeo() {
+        return geo;
+    }
+
+    public void setGeo(Boolean geo) {
+        this.geo = geo;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+//    /**
+//     * This method compares two city objects based on event id
+//     *
+//     * @param o the object to be compared.
+//     * @return an integer specifying the comparison between events
+//     */
+//    @Override
+//    public int compareTo(Object o) {
+//        Event event = (Event) o;
+//        return this.id.compareTo(event.getId());
+//    }
+
 }
+
+
