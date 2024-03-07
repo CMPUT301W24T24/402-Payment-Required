@@ -69,14 +69,4 @@ public class UserList {
         users.remove(user);
     }
 
-    /**
-     * Send a message to all attendees participating an event
-     * @param message the message that is sent
-     */
-    public void notifyAttendees(String message) {
-        for (int i = 0; i<users.size(); i++) {
-            User user = users.get(i);
-            System.out.println("Notification to " + user.getName() + ": " + message);
-        }
-    }
 }

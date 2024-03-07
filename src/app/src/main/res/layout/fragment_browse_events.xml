@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".user.createevent.CreateEventFragment">
-
+    tools:context=".user.browseevent.BrowseEventFragment">
     <TextView
-        android:id="@+id/text_create_event"
+        android:id="@+id/text_browse_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -21,3 +20,5 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
