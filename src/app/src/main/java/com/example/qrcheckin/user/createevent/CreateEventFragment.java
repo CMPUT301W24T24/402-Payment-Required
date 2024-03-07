@@ -28,7 +28,8 @@ public class CreateEventFragment extends Fragment {
 
         // banner
         final ImageView bannerImageView = binding.imageCreateEventBanner;
-        //createEventViewModel.getText().observe(getViewLifecycleOwner(), bannerImageView::setImage...);
+        // TODO: set the image reference
+        //createEventViewModel.getBannerRef().observe(getViewLifecycleOwner(), bannerImageView::);
 
         // title
         final TextView textView = binding.textCreateEventTitle;
