@@ -10,9 +10,10 @@
         android:id="@+id/image_create_event_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/event_banner"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/text_create_event_title"
-        android:contentDescription="@string/event_banner"/>
+        android:src="@drawable/ic_launcher_foreground"/>
 
     <TextView
         android:id="@+id/text_create_event_title"
