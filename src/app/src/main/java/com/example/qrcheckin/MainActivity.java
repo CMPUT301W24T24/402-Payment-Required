@@ -46,7 +46,13 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_event, R.id.nav_host_event, R.id.nav_profile)
+                R.id.nav_home,
+                R.id.nav_event,
+                R.id.nav_host_event,
+                R.id.nav_explore_event,
+                R.id.nav_profile,
+                R.id.nav_notifications,
+                R.id.nav_all_event, R.id.nav_all_images, R.id.nav_all_profile)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -131,6 +137,13 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
         Database db = new Database();
         db.getUserPicture(currentUser, navProfileImage);
+
+        if (!currentUser.isAdmin()) {
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.nav_all_event).setVisible(false);
+            menu.findItem(R.id.nav_all_images).setVisible(false);
+            menu.findItem(R.id.nav_all_profile).setVisible(false);
+        }
     }
 
     /**

@@ -24,9 +24,39 @@
         tools:layout="@layout/fragment_hosted_event" />
 
     <fragment
+        android:id="@+id/nav_explore_event"
+        android:name="com.example.qrcheckin.user.browseevent.BrowseEventFragment"
+        android:label="@string/nav_explore_events"
+        tools:layout="@layout/fragment_browse_events" />
+
+    <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.qrcheckin.user.profile.ProfileFragment"
         android:label="@string/nav_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/nav_notifications"
+        android:name="com.example.qrcheckin.user.notifications.NotificationsFragment"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/nav_all_event"
+        android:name="com.example.qrcheckin.admin.allevents.AllEventsFragment"
+        android:label="@string/nav_all_event"
+        tools:layout="@layout/fragment_all_events" />
+
+    <fragment
+        android:id="@+id/nav_all_images"
+        android:name="com.example.qrcheckin.admin.allimages.AllImagesFragment"
+        android:label="@string/nav_all_event"
+        tools:layout="@layout/fragment_all_images" />
+
+    <fragment
+        android:id="@+id/nav_all_profile"
+        android:name="com.example.qrcheckin.admin.allprofiles.AllProfilesFragment"
+        android:label="@string/nav_all_event"
+        tools:layout="@layout/fragment_all_profiles" />
 
 </navigation>
