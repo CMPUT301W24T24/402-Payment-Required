@@ -1,22 +1,21 @@
 package com.example.qrcheckin.core;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * An object that keeps track of the event data
  */
-public class Event {
+public class Event implements Serializable {
 
     private String id;
     private User host;
     private String name;
-
     private String description;
     private String posterRef;
     private Date time;
     private String location;
-    private double latitude,longitude,distanceLimit; //geolocation data
+    private double locationGeoLat,locationGeoLong; //geolocation data
     private String checkinId;
     private String checkinQR;
     private String promoteId;
@@ -38,14 +37,13 @@ public class Event {
      * @param location the location of the event
      * @param latitude the latitude of the location
      * @param longitude the longitude of the location
-     * @param distanceLimit the maximum distance in meters you can be from the event to check in (radius)
      * @param checkinId the id of the checkin
      * @param promoteId the id of the promotion
      * @param geo the boolean value of the location
      * @param limit the limit of the event
      * @param attendees the list of users attending the event
      */
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, Double distanceLimit, String checkinId, String promoteId, Boolean geo, Integer limit, UserList attendees) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String promoteId, Boolean geo, Integer limit, UserList attendees) {
         this.id = id;
         this.host = host;
         this.name = name;
@@ -53,9 +51,8 @@ public class Event {
         this.posterRef = posterRef;
         this.time = time;
         this.location = location;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.distanceLimit = distanceLimit;
+        this.locationGeoLat = latitude;
+        this.locationGeoLong = longitude;
         this.checkinId = checkinId;
         this.promoteId = promoteId;
         this.geo = geo;
@@ -71,9 +68,8 @@ public class Event {
         this.posterRef = posterRef;
         this.time = time;
         this.location = location;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.distanceLimit = distanceLimit;
+        this.locationGeoLat = latitude;
+        this.locationGeoLong = longitude;
         this.checkinId = checkinId;
         this.checkinQR = checkinQR;
         this.promoteId = promoteId;
@@ -92,12 +88,12 @@ public class Event {
      * @return True if user successfully checked in, false otherwise
      */
     public boolean checkIn(User user, Double latitude, Double longitude){
-        if(!usesGeolocation()) {
+        if(!geo) {
             (new Database()).checkIn(user,this);
             if(!attendees.hasUser(user))
                 attendees.add(user);
             return true;//success
-        }else if(haversine(latitude,longitude,this.latitude,this.longitude) < distanceLimit){
+        }else if(haversine(latitude,longitude,this.locationGeoLat,this.locationGeoLong) < 3000){
             (new Database()).checkInWithGeo(user,this,latitude,longitude);
             if(!attendees.hasUser(user))
                 attendees.add(user);
@@ -112,7 +108,7 @@ public class Event {
      * @return True if user successfully checked in (only if event geo is disabled), false otherwise
      */
     public boolean checkIn(User user){
-        if(usesGeolocation())
+        if(geo)
             return false;//failed to check in as no location provided
 
         (new Database()).checkIn(user,this);
@@ -138,40 +134,10 @@ public class Event {
      * Changes the geolocation data for the event,
      * @param latitude The latitude for the center of the circular event area
      * @param longitude The longitude for the center of the circular event area
-     * @param distanceLimit The radius of the area in meters
      */
-    public void setGeolocationData(double latitude, double longitude, double distanceLimit){
-        this.latitude=latitude;
-        this.longitude=longitude;
-        this.distanceLimit=distanceLimit;
-    }
-
-    /**
-     * Used to check whether an event limits its attendees based on geolocation data
-     * @return true if this event limits its attendees, false otherwise
-     */
-    public boolean usesGeolocation(){
-        return geo;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public double getDistanceLimit() {
-        return distanceLimit;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public void setGeolocationData(double latitude, double longitude){
+        this.locationGeoLat=latitude;
+        this.locationGeoLong=longitude;
     }
 
     /**
@@ -232,4 +198,125 @@ public class Event {
     public void setAttendees(UserList attendees) {
         this.attendees = attendees;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public User getHost() {
+        return host;
+    }
+
+    public void setHost(User host) {
+        this.host = host;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPosterRef() {
+        return posterRef;
+    }
+
+    public void setPosterRef(String posterRef) {
+        this.posterRef = posterRef;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Double getLocationGeoLat() {
+        return locationGeoLat;
+    }
+
+    public void setLocationGeoLat(Double locationGeoLat) {
+        this.locationGeoLat = locationGeoLat;
+    }
+
+    public Double getLocationGeoLong() {
+        return locationGeoLong;
+    }
+
+    public void setLocationGeoLong(Double locationGeoLong) {
+        this.locationGeoLong = locationGeoLong;
+    }
+
+    public String getCheckinId() {
+        return checkinId;
+    }
+
+    public void setCheckinId(String checkinId) {
+        this.checkinId = checkinId;
+    }
+
+    public String getCheckinQR() {  return checkinQR; }
+
+    public void setCheckinQR(String checkinQR) {
+        this.checkinQR = checkinQR;
+    }
+
+    public String getPromoteId() {
+        return promoteId;
+    }
+
+    public void setPromoteId(String promoteId) {
+        this.promoteId = promoteId;
+    }
+
+    public String getPromoteQR() {
+        return promoteQR;
+    }
+
+    public void setPromoteQR(String promoteQR) {
+        this.promoteQR = promoteQR;
+    }
+
+    public Boolean getGeo() {
+        return geo;
+    }
+
+    public void setGeo(Boolean geo) {
+        this.geo = geo;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+//    /**
+//     * This method compares two city objects based on event id
+//     *
+//     * @param o the object to be compared.
+//     * @return an integer specifying the comparison between events
+//     */
+//    @Override
+//    public int compareTo(Object o) {
+//        Event event = (Event) o;
+//        return this.id.compareTo(event.getId());
+//    }
+
 }
+
+
