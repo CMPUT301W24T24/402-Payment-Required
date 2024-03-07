@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,8 +26,26 @@ public class CreateEventFragment extends Fragment {
         binding = FragmentCreateEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textCreateEvent;
-        createEventViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        // banner
+        final ImageView bannerImageView = binding.imageCreateEventBanner;
+        //createEventViewModel.getText().observe(getViewLifecycleOwner(), bannerImageView::setImage...);
+
+        // title
+        final TextView textView = binding.textCreateEventTitle;
+        createEventViewModel.getEventTitle().observe(getViewLifecycleOwner(), textView::setText);
+
+        // date
+        final TextView dateTextView = binding.dateCreateEvent;
+        createEventViewModel.getEventDate().observe(getViewLifecycleOwner(), dateTextView::setText);
+
+        // time
+        final TextView timeTextView = binding.timeCreateEvent;
+        createEventViewModel.getEventTime().observe(getViewLifecycleOwner(), timeTextView::setText);
+
+        // description
+        final TextView descriptionTextView = binding.textCreateEventDescription;
+        createEventViewModel.getEventDescription().observe(getViewLifecycleOwner(), descriptionTextView::setText);
+
         return root;
     }
 
