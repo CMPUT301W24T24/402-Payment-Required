@@ -1,5 +1,7 @@
 package com.example.qrcheckin.user.exploreevent;
 
+import static com.example.qrcheckin.core.Database.onEventListChanged;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -34,76 +36,10 @@ public class ExploreEventViewModel extends ViewModel {
     public ExploreEventViewModel() {
         mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
         eventList = new ArrayList<Event>();
-        onEventListChanged();
+        onEventListChanged(eventList, mEventArrayAdaptor);
     }
     public void initializeAdaptor(Context context) {
         mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-    }
-
-    private void onEventListChanged() {
-        CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
-        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Log.e("Firestore", error.toString());
-                    return;
-                }
-                if (querySnapshots != null) {
-                    Log.d("Firestore", "Event list changed " + querySnapshots.size());
-                    eventList.clear();
-                    IncrementableInt i = new IncrementableInt(0);
-                    for (QueryDocumentSnapshot doc: querySnapshots) {
-                        fetchHost(doc, doc.getDocumentReference("host"), i, querySnapshots.size());
-                    }
-                }
-
-            }
-        });
-    }
-
-    private void fetchHost(QueryDocumentSnapshot doc, DocumentReference userRef, IncrementableInt i, int size) {
-        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot userDoc) {
-                if (userDoc.exists()) {
-                    User user = new User(userDoc.getId(),
-                            userDoc.getString("name"),
-                            userDoc.getString("email"),
-                            userDoc.getString("phone"),
-                            userDoc.getString("homepage"),
-                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
-                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
-                            userDoc.getString("imageRef")
-                    );
-                    Event event = new Event(doc.getId(),
-                            user,
-                            doc.getString("name"),
-                            doc.getString("description"),
-                            doc.getString("posterRef"),
-                            doc.getDate("time"),
-                            doc.getString("location"),
-                            doc.getDouble("location_geo_lat"),
-                            doc.getDouble("location_geo_long"),
-                            doc.getString("checkin_id"),
-                            doc.getString("checkin_qr"),
-                            doc.getString("promote_id"),
-                            doc.getString("promote_qr"),
-                            Boolean.TRUE.equals(doc.getBoolean("geo")),
-                            Objects.requireNonNull(doc.getLong("limit")).intValue(),
-                            null
-                    );
-                    Log.d("Firestore", "User fetched " + user.getName());
-                    i.increment();
-                    eventList.add(event);
-                    if (i.getValue() == size) {
-                        Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
-                    }
-                } else {
-                    Log.e("Firestore", "User not found");
-                }
-            }
-        });
     }
 
     public LiveData<EventArrayAdaptor> getEventList() {
