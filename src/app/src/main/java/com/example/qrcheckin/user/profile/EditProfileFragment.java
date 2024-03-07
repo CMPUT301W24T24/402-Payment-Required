@@ -20,7 +20,8 @@ import com.example.qrcheckin.core.User;
 public class EditProfileFragment extends DialogFragment {
 
     protected EditText profileName;
-    protected EditText contact;
+    protected EditText email;
+    protected EditText phone;
     protected EditText homepage;
     protected User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
 
@@ -36,12 +37,14 @@ public class EditProfileFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = getLayoutInflater().inflate(R.layout.fragment_edit_profile, null);
         profileName = view.findViewById(R.id.edit_profile_name);
-        contact = view.findViewById(R.id.edit_profile_contact);
+        email = view.findViewById(R.id.edit_profile_email);
+        phone = view.findViewById(R.id.edit_profile_phone);
         homepage = view.findViewById(R.id.edit_profile_homepage);
         // Set the user profile and details
         profileName.setText(user.getName());
-        contact.setText(user.getEmail());
+        email.setText(user.getEmail());
         homepage.setText(user.getHomepage());
+        phone.setText(user.getPhone());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         AlertDialog dialog = builder
@@ -58,28 +61,20 @@ public class EditProfileFragment extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         String pName = profileName.getText().toString();
-                        String pcontact = contact.getText().toString();
-                        String phomepage = homepage.getText().toString();
+                        String pEmail = email.getText().toString();
+                        String pHomepage = homepage.getText().toString();
+                        String pPhone = phone.getText().toString();
                         boolean condition = true;
                         // Check if the user did not put any value for the profile name
                         if (pName.isEmpty()) {
                             profileName.setError("You must enter the profile name");
                             condition = false;
                         }
-                        // Check if the user did not put any value for the gmail contact
-                        if (pcontact.isEmpty()) {
-                            contact.setError("You must enter the gmail contact information");
-                            condition = false;
-                        }
-                        // Check if the user did not put any value for the homepage
-                        if (phomepage.isEmpty()) {
-                            homepage.setError("You must enter the homepage detail");
-                            condition = false;
-                        }
                         if (condition) {
                             user.setName(pName);
-                            user.setEmail(pcontact);
-                            user.setHomepage(phomepage);
+                            user.setEmail(pEmail);
+                            user.setHomepage(pHomepage);
+                            user.setPhone(pPhone);
                             dismiss();
                         }
                     }
