@@ -42,7 +42,7 @@ public class CreateNotificationFragment extends Fragment {
      */
     private FragmentCreateNotificationBinding binding;
     /**
-     * Button that will send the notificatio when pushed
+     * Button that will send the notification when pushed
      */
     private Button createNotificationButton;
     /**
@@ -75,10 +75,6 @@ public class CreateNotificationFragment extends Fragment {
         createNotificationViewModel.getText().observe(getViewLifecycleOwner(), editText::setText);
 
         event_id = getArguments().getString("eventId");
-
-        //Bundle bundle = new Bundle();
-        //bundle.put()
-        //Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
 
         createNotificationButton = binding.createNotificationButton;
         createNotificationButton.setOnClickListener(new View.OnClickListener() {

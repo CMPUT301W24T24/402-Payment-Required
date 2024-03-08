@@ -60,7 +60,9 @@ public class BigTest {
         Thread.sleep(1000);
         onView(withId(R.id.profile_name)).perform(ViewActions.clearText());
         onView(withId(R.id.profile_name)).perform(ViewActions.typeText("This is my name"));
-
+        onView(withId(R.id.profile_email)).perform(ViewActions.clearText());
+        onView(withId(R.id.profile_email)).perform(ViewActions.typeText("email@ua.ca"));
+        
         Thread.sleep(1000);
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
@@ -83,8 +85,7 @@ public class BigTest {
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         // Click on a navigation item
-        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
-
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_event));
 
     }
 }
