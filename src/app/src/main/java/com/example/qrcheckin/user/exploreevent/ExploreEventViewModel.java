@@ -1,22 +1,48 @@
 package com.example.qrcheckin.user.exploreevent;
 
+import static com.example.qrcheckin.core.Database.onEventListChanged;
+
+import android.content.Context;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-/**
- * Creates a specialized ViewModel for the explore event fragment
- */
-public class ExploreEventViewModel extends ViewModel {
-    private final MutableLiveData<String> mText;
+import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.EventArrayAdaptor;
+import com.example.qrcheckin.core.IncrementableInt;
+import com.example.qrcheckin.core.User;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Objects;
+
+public class ExploreEventViewModel extends ViewModel {
+    private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
+    private final ArrayList<Event> eventList;
     /**
      * Initializes the ExploreEventViewModel class
      */
     public ExploreEventViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is exploreEvent fragment");
+        mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
+        eventList = new ArrayList<Event>();
+        onEventListChanged(eventList, mEventArrayAdaptor);
+    }
+    public void initializeAdaptor(Context context) {
+        mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
     }
 
-    public LiveData<String> getText() { return mText; }
+    public LiveData<EventArrayAdaptor> getEventList() {
+        return mEventArrayAdaptor;
+    }
 }

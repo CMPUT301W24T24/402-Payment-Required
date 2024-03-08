@@ -27,6 +27,8 @@ public class Event implements Serializable {
     private Boolean geo;
     private Integer limit;
     private UserList attendees;
+    private Boolean currentUserSignedUp;
+    private Boolean currentUserCheckedIn;
 
     /**
      * A constructor for the event object
@@ -60,6 +62,8 @@ public class Event implements Serializable {
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
     public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit, UserList attendees) {
@@ -79,6 +83,8 @@ public class Event implements Serializable {
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
     public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit) {
@@ -96,6 +102,8 @@ public class Event implements Serializable {
         this.promoteRq = promoteRq;
         this.geo = geo;
         this.limit = limit;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
     /**

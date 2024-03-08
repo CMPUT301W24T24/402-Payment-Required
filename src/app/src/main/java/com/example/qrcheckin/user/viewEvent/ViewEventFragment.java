@@ -23,12 +23,6 @@ import java.util.HashMap;
 
 public class ViewEventFragment extends Fragment {
     private FragmentViewEventBinding binding;
-    private ViewEventViewModel viewModel;
-    private Event event;
-
-//    public ViewEventFragment(Event event) {
-//        this.event = event;
-//    }
 
     @Nullable
     @Override
@@ -39,15 +33,24 @@ public class ViewEventFragment extends Fragment {
         View root = binding.getRoot();
 
         // Initialize ViewModel
-        viewModel = new ViewModelProvider(this).get(ViewEventViewModel.class);
+        ViewEventViewModel viewModel = new ViewModelProvider(this).get(ViewEventViewModel.class);
+
+        User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
+        Event event = getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null;
+
+        // Set the event details
+        binding.viewEventTitle.setText(event.getName());
+        binding.viewEventDate.setText(event.getTime().toString());
+        binding.viewEventDescription.setText(event.getDescription());
+        if (event.getPosterRef() != null) {
+            // TODO get the poster from the storage
+        }
 
         // Handle the "Attend Event" button click
         binding.viewEventSignUp.setOnClickListener(v -> {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             CollectionReference signupsRef = db.collection("signUpTable");
 
-            User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
-            Event event = getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null;
             // Add the event to the collection
             HashMap<String, Object> data = new HashMap<>();
             data.put("user_id", user.getId());
@@ -61,6 +64,10 @@ public class ViewEventFragment extends Fragment {
                     });
         });
         return root;
+    }
+
+    private void getEventPoster() {
+
     }
 
     @Override
