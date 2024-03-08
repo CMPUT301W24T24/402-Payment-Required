@@ -30,6 +30,8 @@ import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentProfileBinding;
 import com.example.qrcheckin.databinding.FragmentViewEventBinding;
 import com.example.qrcheckin.user.viewEvent.ViewEventViewModel;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -89,12 +91,18 @@ public class ProfileFragment extends Fragment {
                     data.put("phone", user.getPhone());
                     data.put("homepage", user.getHomepage());
                     data.put("geo", user.isGeo());
-                    usersRef.add(data)
-                            .addOnSuccessListener(documentReference -> {
-                                Log.d("Firestore", "Updated profile for: " + documentReference.getId());
+                    docRef.update(data)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d("Firestore", "DocumentSnapshot successfully written!");
+                                }
                             })
-                            .addOnFailureListener(e -> {
-                                Log.e("Firestore", e.toString());
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("Firestore", e.toString());
+                                }
                             });
                 }
             }
