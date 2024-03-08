@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.core.IncrementableInt;
@@ -37,11 +38,11 @@ public class EventViewModel extends ViewModel {
     public EventViewModel() {
         mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
         eventList = new ArrayList<Event>();
-        onEventListChanged(eventList, mEventArrayAdaptor);
     }
 
     public void initializeAdaptor(Context context) {
         mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId());
     }
 
     public LiveData<EventArrayAdaptor> getEventList() {

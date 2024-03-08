@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.core.IncrementableInt;
@@ -35,11 +36,11 @@ public class HostedEventViewModel extends ViewModel {
         mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
         eventList = new ArrayList<Event>();
         // TODO: Change to query only the events hosted by the user
-        onEventListChanged(eventList, mEventArrayAdaptor);
     }
 
     public void initializeAdaptor(Context context) {
         mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId());
     }
 
 
