@@ -43,6 +43,18 @@ public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
 
+    /**
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return the View that contains all the information about the ProfileFragment
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -68,6 +80,10 @@ public class ProfileFragment extends Fragment {
         } else {
             Log.e(TAG, "User is null");
         }
+
+        /**
+         * Save the updated profile information on FireStore database
+         */
         binding.profileSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +132,9 @@ public class ProfileFragment extends Fragment {
         binding = null;
     }
 
+    /**
+     * if the user switches to change profile without click on EditButton, the information would not be changed on the UI
+     */
     @Override
     public void onPause() {
         super.onPause();

@@ -48,6 +48,18 @@ import java.util.HashMap;
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
 
+    /**
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return a UI view that allows the user to edit
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,6 +94,7 @@ public class EditEventFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsRef = db.collection("events");
         DocumentReference docRef = eventsRef.document(event.getId());
+        //Retrieve the time and date information from the database
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -104,7 +117,7 @@ public class EditEventFragment extends Fragment {
                         editEventDate.setText(String.valueOf(formattedDate));
                         editEventTime.setText(String.valueOf(formattedTime));
 
-                        //get CheckInCode
+                        //generate QR code for CheckInCode
                         String check_inId = documentSnapshot.getString("checkin_id");
                         checkInCode.setImageBitmap(QRCodeGenerator.generateQRCode(check_inId, 800, 800));
                         checkInCode.setVisibility(View.VISIBLE);
@@ -113,9 +126,10 @@ public class EditEventFragment extends Fragment {
             }
         });
 
-        //see a list of attendees
+        /**
+         * Allow user to go to the see the list of SignUps
+         */
         showSignUps.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
@@ -181,6 +195,11 @@ public class EditEventFragment extends Fragment {
         // Set OnClickListener for changeTime
         changeTimeButton.setOnClickListener(new View.OnClickListener() {
             String holderTime;
+
+            /**
+             * Update the time accordingly
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 // Fetch timestamp from the database
@@ -207,6 +226,11 @@ public class EditEventFragment extends Fragment {
                 });
             }
 
+            /**
+             * open the dialog and update the time
+             * @param hour current hour of the event that is in the database
+             * @param minute current minute of the event that is in the database
+             */
             private void openTimeDialog(int hour, int minute) {
                 TimePickerDialog dialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -226,6 +250,12 @@ public class EditEventFragment extends Fragment {
                 dialog.show();
             }
 
+            /**
+             * Open the Date Dialog and update the date accordingly
+             * @param year the year of the event in database
+             * @param month the month of the event in database
+             * @param day the day of the event in database
+             */
             private void openDateDialog(int year, int month, int day) {
                 DatePickerDialog dialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override
