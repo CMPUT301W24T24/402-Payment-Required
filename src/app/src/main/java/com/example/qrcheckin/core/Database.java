@@ -413,7 +413,7 @@ public class Database {
                             event.setCurrentUserCheckedIn(Boolean.TRUE);
                         }
                     }
-                    if (toAdd && event.isCurrentUserCheckedIn()) {
+                    if (toAdd && event.isCurrentUserCheckedIn() && eventList.contains(event) == Boolean.FALSE) {
                         eventList.add(event);
                     }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
@@ -447,7 +447,7 @@ public class Database {
                             event.setCurrentUserSignedUp(Boolean.TRUE);
                         }
                     }
-                    if (toAdd && event.isCurrentUserSignedUp()) {
+                    if (toAdd && event.isCurrentUserSignedUp() && eventList.contains(event) == Boolean.FALSE) {
                         eventList.add(event);
                     }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
