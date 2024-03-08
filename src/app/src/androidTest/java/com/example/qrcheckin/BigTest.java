@@ -62,7 +62,7 @@ public class BigTest {
         onView(withId(R.id.profile_name)).perform(ViewActions.typeText("This is my name"));
         onView(withId(R.id.profile_email)).perform(ViewActions.clearText());
         onView(withId(R.id.profile_email)).perform(ViewActions.typeText("email@ua.ca"));
-        
+
         Thread.sleep(1000);
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
