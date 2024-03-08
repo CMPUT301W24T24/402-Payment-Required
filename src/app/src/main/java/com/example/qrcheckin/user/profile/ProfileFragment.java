@@ -108,22 +108,22 @@ public class ProfileFragment extends Fragment {
         binding = null;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
-        if (!(binding.profileName.getText().toString().equals(user.getName()))) {
-            binding.profileName.setText(user.getName());
-
-        }
-        if (!(binding.profilePhoneNumber.getText().toString().equals(user.getPhone()))) {
-            binding.profilePhoneNumber.setText(user.getPhone());
-        }
-        if (!(binding.profileEmail.getText().toString().equals(user.getEmail()))) {
-            binding.profileEmail.setText(user.getEmail());
-        }
-        if (!(binding.profileHomepageLink.getText().toString().equals(user.getHomepage()))) {
-            binding.profileHomepageLink.setText(user.getHomepage());
-        }
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
+//        if (!(binding.profileName.getText().toString().equals(user.getName()))) {
+//            binding.profileName.setText(user.getName());
+//
+//        }
+//        if (!(binding.profilePhoneNumber.getText().toString().equals(user.getPhone()))) {
+//            binding.profilePhoneNumber.setText(user.getPhone());
+//        }
+//        if (!(binding.profileEmail.getText().toString().equals(user.getEmail()))) {
+//            binding.profileEmail.setText(user.getEmail());
+//        }
+//        if (!(binding.profileHomepageLink.getText().toString().equals(user.getHomepage()))) {
+//            binding.profileHomepageLink.setText(user.getHomepage());
+//        }
+//    }
 }
