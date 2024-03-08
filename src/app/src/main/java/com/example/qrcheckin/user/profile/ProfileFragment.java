@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import static androidx.navigation.Navigation.findNavController;
 
+import static com.google.common.reflect.Reflection.getPackageName;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -58,6 +59,10 @@ public class ProfileFragment extends Fragment {
             // Set geolocation checkbox state based on user's preference
             binding.profileGeolocation.setChecked(user.isGeo());
 
+            //String uri = "@drawable/cat.jpg";
+            //int imageResource = getResources().getIdentifier(uri, null, getPackageName());
+            binding.profilePicture.setImageResource(R.drawable.cat);
+
         } else {
             Log.e(TAG, "User is null");
         }
@@ -101,5 +106,24 @@ public class ProfileFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
+        if (!(binding.profileName.getText().toString().equals(user.getName()))) {
+            binding.profileName.setText(user.getName());
+
+        }
+        if (!(binding.profilePhoneNumber.getText().toString().equals(user.getPhone()))) {
+            binding.profilePhoneNumber.setText(user.getPhone());
+        }
+        if (!(binding.profileEmail.getText().toString().equals(user.getEmail()))) {
+            binding.profileEmail.setText(user.getEmail());
+        }
+        if (!(binding.profileHomepageLink.getText().toString().equals(user.getHomepage()))) {
+            binding.profileHomepageLink.setText(user.getHomepage());
+        }
     }
 }
