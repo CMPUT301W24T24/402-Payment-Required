@@ -43,7 +43,7 @@ public class ViewEventFragment extends Fragment {
         binding.viewEventDate.setText(event.getTime().toString());
         binding.viewEventDescription.setText(event.getDescription());
         if (event.getPosterRef() != null) {
-
+            // TODO get the poster from the storage
         }
 
         // Handle the "Attend Event" button click
