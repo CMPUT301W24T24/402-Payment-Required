@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
+        // set up the app bar configuration
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home,
                 R.id.nav_home,
@@ -201,12 +202,21 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 //        return new User(id, "Anonymous User", "", "", "", false, false, "users/cat.jpg");
     }
 
+    /**
+     * Set up the navigation
+     * @param menu the menu item
+     * @return the boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+    /**
+     * Set up the navigation
+     * @return the boolean
+     */
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);

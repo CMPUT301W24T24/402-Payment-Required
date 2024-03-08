@@ -27,6 +27,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * This class is used to interact with the Firestore database
+ * It can be used to fetch, add, edit and delete users
+ * It can also be used to add events and check in users to events
+ */
 public class Database {
 
     public interface UserListener {
@@ -284,6 +289,14 @@ public class Database {
         });
     }
 
+    /**
+     * This static function is used to set on event listeners to the list of events from the database
+     * It's used to update the list of events in the EventArrayAdaptor in all three explore, my and hosted events
+     * @param eventList the list to update
+     * @param mEventArrayAdaptor the MutableLiveData of the EventArrayAdaptor to notify the adaptor of the change
+     * @param currentUserId the id of the current user from the app user
+     * @param type the type of the event list, explore, my or hosted
+     */
     public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
