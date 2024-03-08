@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         // set the notification listeners for event user is signed up for
         createNotificationListeners();
-        if (!currentUser.isAdmin()) {
+        if (currentUser.isAdmin()) {
             Menu menu = navigationView.getMenu();
             menu.findItem(R.id.nav_all_event).setVisible(true);
             menu.findItem(R.id.nav_all_images).setVisible(true);
