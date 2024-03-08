@@ -29,7 +29,17 @@
         <action
             android:id="@+id/action_nav_event_to_nav_create_event"
             app:destination="@id/nav_create_event" />
+        <action
+            android:id="@+id/action_nav_host_event_to_nav_edit_event"
+            app:destination="@id/nav_edit_event"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_edit_event"
+        android:name="com.example.qrcheckin.user.editevent.EditEventFragment"
+        android:label="Edit Events"
+        tools:layout="@layout/fragment_edit_event"
+        />
 
     <fragment
         android:id="@+id/nav_explore_event"
@@ -45,7 +55,9 @@
         android:id="@+id/nav_profile"
         android:name="com.example.qrcheckin.user.profile.ProfileFragment"
         android:label="@string/nav_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_notifications"
