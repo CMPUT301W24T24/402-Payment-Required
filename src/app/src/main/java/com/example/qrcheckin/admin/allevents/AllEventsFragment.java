@@ -19,6 +19,10 @@ import com.example.qrcheckin.databinding.FragmentAllEventsBinding;
 import com.example.qrcheckin.databinding.FragmentEventBinding;
 import com.example.qrcheckin.user.myevent.EventViewModel;
 
+/**
+ * The fragment class for all events which can only be seen by admins
+ * This has not been worked on yet
+ */
 public class AllEventsFragment extends Fragment {
 
     private FragmentAllEventsBinding binding;

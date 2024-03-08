@@ -1,5 +1,8 @@
 package com.example.qrcheckin.core;
 
+/**
+ * The user class which connects with the database and uses the app
+ */
 public class User {
     private String id;
     private String name;

@@ -15,6 +15,9 @@ import com.example.qrcheckin.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An array adapter for displaying event information and connecting it with the ui
+ */
 public class EventArrayAdaptor extends ArrayAdapter<Event> {
     interface CreateListener {
         void createEvent(int position);

@@ -50,6 +50,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The main activity class which contains the navigation bar and starts the user on the Home fragment
+ */
 public class MainActivity extends AppCompatActivity implements Database.UserListener {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -58,6 +61,13 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     private Map<String, String> eventIdToName;
     private long notificationListenerLastUpdate;
 
+    /**
+     * When the app is first opened this is called
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

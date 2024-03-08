@@ -16,6 +16,10 @@ import android.widget.TextView;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.databinding.FragmentAllImagesBinding;
 
+/**
+ * The fragment class for all images which can only be seen by admins
+ * This has not been worked on yet
+ */
 public class AllImagesFragment extends Fragment {
 
     private FragmentAllImagesBinding binding;

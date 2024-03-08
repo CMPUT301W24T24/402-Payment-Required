@@ -23,11 +23,26 @@ import com.example.qrcheckin.databinding.FragmentHostedEventBinding;
 
 import java.io.Serializable;
 
+/**
+ * A fragment which contains a list of events the user is hosting
+ */
 public class HostedEventFragment extends Fragment {
 
     private FragmentHostedEventBinding binding;
     private ListView listView;
 
+    /**
+     * Creates a view
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HostedEventViewModel hostedEventViewModel =
@@ -43,6 +58,12 @@ public class HostedEventFragment extends Fragment {
         return root;
     }
 
+    /**
+     * When a view is created
+     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -66,6 +87,9 @@ public class HostedEventFragment extends Fragment {
         });
     }
 
+    /**
+     * When the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

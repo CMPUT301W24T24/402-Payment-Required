@@ -25,6 +25,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 
+/**
+ * A fragment which is acrtivitated when an event is clicked on
+ */
 public class ViewEventFragment extends Fragment {
     private FragmentViewEventBinding binding;
     private Event event;
