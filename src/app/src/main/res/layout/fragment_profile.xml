@@ -177,7 +177,7 @@
                 android:textSize="20sp"
                 tools:ignore="HardcodedText" />
 
-            <RadioButton
+            <CheckBox
                 android:id="@+id/profile_geolocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
