@@ -15,7 +15,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.HashMap;
@@ -176,32 +175,6 @@ public class Database {
     }
 
     /**
-     * Find an event in the database by database ID, returns null if the ID is not present in the database
-     * @param id Unique ID to search for
-     * @return The event object with given ID, null otherwise
-     */
-    public Event getEventByID(String id){
-        DocumentSnapshot document = eventsRef.document(id).get().getResult();
-        if(document.exists()){
-            return document.toObject(Event.class);
-        }
-        return null;
-    }
-
-    /**
-     * Find an event in the database by QR value, returns null if the QR value is not present in the database
-     * @param qrValue Unique QR value to search for
-     * @return The event object with given QR value, null otherwise
-     */
-    public Event getEventByQR(String qrValue){
-        QuerySnapshot snapshot = eventsRef.whereEqualTo("checkinId",qrValue).get().getResult();
-        if(!snapshot.isEmpty()){
-            return snapshot.getDocuments().get(0).toObject(Event.class);
-        }
-        return null;
-    }
-
-    /**
      * Adds a given event to the database of available events
      * @param event
      */
@@ -213,12 +186,12 @@ public class Database {
         data.put("posterRef", null);
         data.put("time", null);
         data.put("location", null);
-        data.put("latitude", event.getLocationGeoLat());
-        data.put("longitude", event.getLocationGeoLong());
-        data.put("checkinId", null);
-        data.put("checkinQR", null);
-        data.put("promoteId", null);
-        data.put("promoteQR", null);
+        data.put("location_geo_lat", event.getLocationGeoLat());
+        data.put("location_geo_long", event.getLocationGeoLong());
+        data.put("checkin_id", null);
+        data.put("checkin_qr", null);
+        data.put("promote_id", null);
+        data.put("promote_qr", null);
         data.put("geo", null);
         data.put("limit", null);
         eventsRef.add(data)

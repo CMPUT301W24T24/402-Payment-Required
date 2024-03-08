@@ -60,7 +60,7 @@ public class Event implements Serializable {
         this.attendees = attendees;
     }
 
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, Double distanceLimit, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
         this.id = id;
         this.host = host;
         this.name = name;
