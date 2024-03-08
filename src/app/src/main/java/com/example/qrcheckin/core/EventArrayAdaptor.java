@@ -40,9 +40,10 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
 
         Event event = events.get(position);
 
-        TextView eventName = view.findViewById(R.id.event_name_text);
-
-        eventName.setText(event.getName());
+        ((TextView) view.findViewById(R.id.event_name_text)).setText(event.getName());
+        ((TextView) view.findViewById(R.id.event_date_time_text)).setText(event.getTime().toString());
+        ((TextView) view.findViewById(R.id.event_status_check_in_text)).setText(event.isCurrentUserCheckedIn() ? "Checked In" : "Not Checked In");
+        ((TextView) view.findViewById(R.id.event_status_sign_up_text)).setText(event.isCurrentUserSignedUp() ? "Signed Up" : "Not Signed Up");
 
         return view;
     }

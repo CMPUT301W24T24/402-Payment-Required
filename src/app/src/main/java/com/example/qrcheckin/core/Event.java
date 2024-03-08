@@ -1,5 +1,7 @@
 package com.example.qrcheckin.core;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,7 +17,7 @@ public class Event implements Serializable {
     private String posterRef;
     private Date time;
     private String location;
-    private double locationGeoLat,locationGeoLong; //geolocation data
+    private Double locationGeoLat,locationGeoLong; //geolocation data
     private String checkinId;
     private String checkinQR;
     private String promoteId;
@@ -23,6 +25,8 @@ public class Event implements Serializable {
     private Boolean geo;
     private Integer limit;
     private UserList attendees;
+    private Boolean currentUserSignedUp;
+    private Boolean currentUserCheckedIn;
 
    
 
@@ -58,6 +62,8 @@ public class Event implements Serializable {
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
     public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
@@ -77,10 +83,30 @@ public class Event implements Serializable {
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
+    public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit) {
+        this.host = host;
+        this.name = name;
+        this.description = description;
+        this.posterRef = posterRef;
+        this.time = time;
+        this.location = location;
+        this.locationGeoLat = locationGeoLat;
+        this.locationGeoLong = locationGeoLong;
+        this.checkinId = checkinId;
+        this.checkinQR = checkinQR;
+        this.promoteId = promoteId;
+        this.promoteQR = promoteQR;
+        this.geo = geo;
+        this.limit = limit;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
+    }
 
-    /**
+        /**
      * CheckIn attempts to check in a user, and if required checks their location against the events
      * @param user User who wants to check in to event
      * @param latitude Latitude of user who wants to check into event
@@ -316,6 +342,29 @@ public class Event implements Serializable {
 //        Event event = (Event) o;
 //        return this.id.compareTo(event.getId());
 //    }
+
+    public Bitmap getQRCodeFromID(int width, int height) {
+        if (checkinId == null) {
+            return null;
+        }
+        return QRCodeGenerator.generateQRCode(checkinId, width, height);
+    }
+
+    public Boolean isCurrentUserSignedUp() {
+        return currentUserSignedUp;
+    }
+
+    public void setCurrentUserSignedUp(Boolean currentUserSignedUp) {
+        this.currentUserSignedUp = currentUserSignedUp;
+    }
+
+    public Boolean isCurrentUserCheckedIn() {
+        return currentUserCheckedIn;
+    }
+
+    public void setCurrentUserCheckedIn(Boolean currentUserCheckedIn) {
+        this.currentUserCheckedIn = currentUserCheckedIn;
+    }
 
 }
 
