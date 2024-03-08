@@ -34,15 +34,15 @@ public class UserArrayAdaptor extends ArrayAdapter<User> {
         View view = convertView;
 
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.content_event, parent,false);
+            view = LayoutInflater.from(context).inflate(R.layout.content_user, parent,false);
         }
 
-        Event event = events.get(position);
+        User user = users.get(position);
 
-        ((TextView) view.findViewById(R.id.event_name_text)).setText(event.getName());
-        ((TextView) view.findViewById(R.id.event_date_time_text)).setText(event.getTime().toString());
-        ((TextView) view.findViewById(R.id.event_status_check_in_text)).setText(event.isCurrentUserCheckedIn() ? "Checked In" : "Not Checked In");
-        ((TextView) view.findViewById(R.id.event_status_sign_up_text)).setText(event.isCurrentUserSignedUp() ? "Signed Up" : "Not Signed Up");
+        ((TextView) view.findViewById(R.id.user_name_text)).setText(user.getName());
+        // TODO: set user number of checkins
+        ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("0");
+        ((TextView) view.findViewById(R.id.user_phone_number_text)).setText(user.getPhone());
 
         return view;
     }

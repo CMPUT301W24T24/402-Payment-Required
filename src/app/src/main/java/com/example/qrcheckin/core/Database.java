@@ -23,6 +23,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -395,6 +396,82 @@ public class Database {
             }
         });
 
+    }
+
+    public static void getUsersSignedUpTOEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEvent) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    Log.d("Firestore", "User list changed " + querySnapshots.size());
+                    userList.clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        DocumentReference user = doc.getDocumentReference("user_id");
+                        Log.d("Firestore", "User fetched " + doc.getId());
+                        fetchUser(doc, user, mUserArrayAdaptor, userList, currentEvent);
+                    }
+                }
+
+            }
+        });
+
+    }
+
+    /**
+     * Fetches the current user signed up to an event
+     * @param doc
+     * @param userid
+     * @param mUserArrayAdaptor
+     * @param userList
+     * @param currentEventId
+     */
+    private static void fetchUser(QueryDocumentSnapshot doc, String userid, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, ArrayList<User> userList, String currentEventId) {
+        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(userid);
+        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot userDoc) {
+                if (userDoc.exists()) {
+                    User user = new User(userDoc.getId(),
+                            userDoc.getString("name"),
+                            userDoc.getString("email"),
+                            userDoc.getString("phone"),
+                            userDoc.getString("homepage"),
+                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
+                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
+                            userDoc.getString("imageRef")
+                    );
+                    Event event = new Event(doc.getId(),
+                            user,
+                            doc.getString("name"),
+                            doc.getString("description"),
+                            doc.getString("posterRef"),
+                            doc.getDate("time"),
+                            doc.getString("location"),
+                            doc.getDouble("location_geo_lat"),
+                            doc.getDouble("location_geo_long"),
+                            doc.getString("checkin_id"),
+                            doc.getString("checkin_qr"),
+                            doc.getString("promote_id"),
+                            doc.getString("promote_qr"),
+                            Boolean.TRUE.equals(doc.getBoolean("geo")),
+                            doc.getLong("limit").intValue(),
+                            null
+                    );
+                    Log.d("Firestore", "Host fetched " + user.getName());
+                    getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId);
+                    getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId);
+                    eventList.add(event);
+                    Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
+                } else {
+                    Log.e("Firestore", "Host not found");
+                }
+            }
+        });
     }
 
 }
