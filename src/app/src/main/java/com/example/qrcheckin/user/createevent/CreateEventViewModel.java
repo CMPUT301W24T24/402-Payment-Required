@@ -45,4 +45,5 @@ public class CreateEventViewModel extends ViewModel {
     public MutableLiveData<String> getEventDescription() {
         return eventDescription;
     }
+
 }

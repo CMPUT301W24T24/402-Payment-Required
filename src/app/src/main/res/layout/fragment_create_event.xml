@@ -39,14 +39,12 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image_create_event_banner"
-                android:text="Title of Event"/>
+                app:layout_constraintTop_toBottomOf="@id/image_create_event_banner" />
 
             <EditText
                 android:id="@+id/text_create_event_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Description"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
@@ -56,22 +54,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_create_event_title"/>
 
-            <CalendarView
-                android:id="@+id/time_create_event"
+            <DatePicker
+                android:id="@+id/date_create_event"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toStartOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_create_event_description" />
 
-            <!--<DatePicker
-                android:id="@+id/date_create_event"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Date"
-                app:layout_constraintEnd_toStartOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_create_event_description" />
 
             <TimePicker
                 android:id="@+id/time_create_event"
@@ -80,18 +70,29 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/date_create_event"
-                app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit"/> -->
+                app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit_description_text"/>
 
+            <TextView
+                android:id="@+id/create_event_attend_limit_description_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enter the attendee limit"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit" />
 
-            <EditText
+            <NumberPicker
                 android:id="@+id/create_event_attend_limit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Limit on attendees"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/time_create_event">
-            </EditText>
+                app:layout_constraintTop_toBottomOf="@id/create_event_attend_limit_description_text"/>
 
             <TextView
                 android:id="@+id/text_create_event_description_qr"
@@ -120,6 +121,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Generate QR Code"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
                     app:layout_constraintEnd_toStartOf="@id/button_create_event_use_existing_description"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -128,6 +131,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Use Existing Code"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/button_create_event_generate_qr_description"/>
 
@@ -166,6 +171,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Generate QR Code"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
                     app:layout_constraintEnd_toStartOf="@id/button_create_event_use_existing_checkin"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -174,6 +181,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Use Existing Code"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/button_create_event_generate_qr_checkin"/>
 
@@ -196,7 +205,7 @@
                 android:id="@+id/text_create_event_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/create_event_location"
+                android:hint="@string/create_event_location"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
@@ -213,6 +222,7 @@
                 android:id="@+id/button_create_event_submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="Create Event"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_create_event_location"/>
