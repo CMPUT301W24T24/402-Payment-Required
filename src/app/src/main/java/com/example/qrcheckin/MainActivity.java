@@ -59,6 +59,11 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        Menu menu = navigationView.getMenu();
+        menu.findItem(R.id.nav_all_event).setVisible(false);
+        menu.findItem(R.id.nav_all_images).setVisible(false);
+        menu.findItem(R.id.nav_all_profile).setVisible(false);
+
         getDeviceUser(this);
     }
 
@@ -138,11 +143,11 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         Database db = new Database();
         db.getUserPicture(currentUser, navProfileImage);
 
-        if (!currentUser.isAdmin()) {
+        if (currentUser.isAdmin()) {
             Menu menu = navigationView.getMenu();
-            menu.findItem(R.id.nav_all_event).setVisible(false);
-            menu.findItem(R.id.nav_all_images).setVisible(false);
-            menu.findItem(R.id.nav_all_profile).setVisible(false);
+            menu.findItem(R.id.nav_all_event).setVisible(true);
+            menu.findItem(R.id.nav_all_images).setVisible(true);
+            menu.findItem(R.id.nav_all_profile).setVisible(true);
         }
     }
 

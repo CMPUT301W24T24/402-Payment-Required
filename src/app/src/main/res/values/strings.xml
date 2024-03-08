@@ -17,4 +17,6 @@
     <string name="nav_all_profile">All Profiles</string>
     <string name="nav_all_event">All Events</string>
     <string name="nav_all_image">All Images</string>
+    <string name="unsign_up">Withdraw Sign Up</string>
+    <string name="sign_up">Sign Me Up</string>
 </resources>

@@ -36,12 +36,13 @@ android {
 }
 
 dependencies {
-    // firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    //Firebase, primary DB API
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
 
+    //Zebra crossing, used by the main QR scanner
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.google.zxing:core:3.4.1")
 
