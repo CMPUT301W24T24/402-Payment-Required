@@ -3,6 +3,7 @@
 package com.example.qrcheckin.user.createevent;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +100,21 @@ public class CreateEventFragment extends Fragment {
             data.put("location", event.getLocation());
             data.put("checkin_id", event.getCheckinId());
             data.put("checkin_qr", event.getCheckinRq());
+
+            eventsRef.add(data)
+                    .addOnSuccessListener(documentReference -> {
+                        event.setId(documentReference.getId());
+                        Log.d("Firestore", "Created an event with ID: " + documentReference.getId());
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firesotre", e.toString());
+                    });
+
+
+            // TODO: go back to the previous fragment
         });
+
+        // TODO: copy format of add user
 
 
         return root;
