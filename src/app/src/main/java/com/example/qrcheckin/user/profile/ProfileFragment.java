@@ -89,7 +89,7 @@ public class ProfileFragment extends Fragment {
                     data.put("phone", user.getPhone());
                     data.put("homepage", user.getHomepage());
                     data.put("geo", user.isGeo());
-                    usersRef.add(data)
+                    docRef.update(data)
                             .addOnSuccessListener(documentReference -> {
                                 Log.d("Firestore", "Updated profile for: " + documentReference.getId());
                             })
