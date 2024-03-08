@@ -44,7 +44,9 @@ dependencies {
 
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.google.zxing:core:3.4.1")
-
+    implementation("androidx.fragment:fragment-testing:1.6.2")
+    val nav_version = "2.7.7"
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
