@@ -42,8 +42,10 @@ public class ViewEventFragment extends Fragment {
         binding.viewEventTitle.setText(event.getName());
         binding.viewEventDate.setText(event.getTime().toString());
         binding.viewEventDescription.setText(event.getDescription());
-        if (event.getPosterRef() != null) {
-            // TODO get the poster from the storage
+        if (event.isCurrentUserSignedUp()) {
+            binding.viewEventSignUp.setVisibility(View.GONE);
+        } else {
+            binding.viewEventSignUp.setVisibility(View.VISIBLE);
         }
 
         // Handle the "Attend Event" button click
