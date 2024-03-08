@@ -75,6 +75,8 @@ public class EditEventFragment extends Fragment {
         editEventTitle.setText(event.getName());
         editEventDescription.setText(event.getDescription());
         editEventAttendLimit.setText(String.valueOf(event.getLimit()));
+        //set poster
+        eventPoster.setImageResource(R.drawable.cat);
 
         //Accessing the events database
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -118,7 +120,7 @@ public class EditEventFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
-                //create an id to navigate from edit to see_signUps
+                //TODO: create an id to navigate from edit to see_signUps
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
             }
         });
@@ -278,4 +280,5 @@ public class EditEventFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }
