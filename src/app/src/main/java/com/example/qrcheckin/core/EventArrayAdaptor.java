@@ -22,13 +22,24 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
     private ArrayList<Event> events;
     private Context context;
 
-
+    /**
+     * Constructor for the EventArrayAdaptor
+     * @param context the context of the app
+     * @param events the list of events
+     */
     public EventArrayAdaptor(Context context, ArrayList<Event> events) {
         super(context, 0, events);
         this.events = events;
         this.context = context;
     }
 
+    /**
+     * Get the view of the event
+     * @param position the position of the event
+     * @param convertView the view of the event
+     * @param parent the parent of the view
+     * @return the view of the event
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -40,6 +51,7 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
 
         Event event = events.get(position);
 
+        // set the text details of the event
         ((TextView) view.findViewById(R.id.event_name_text)).setText(event.getName());
         ((TextView) view.findViewById(R.id.event_date_time_text)).setText(event.getTime().toString());
         ((TextView) view.findViewById(R.id.event_status_check_in_text)).setText(event.isCurrentUserCheckedIn() ? "Checked In" : "Not Checked In");
