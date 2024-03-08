@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.R;
@@ -37,6 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -109,6 +111,18 @@ public class EditEventFragment extends Fragment {
             }
         });
 
+        //see a list of attendees
+        showSignUps.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("event", (Serializable) event);
+                //create an id to navigate from edit to see_signUps
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
+            }
+        });
+
         //notify atendees
         notify.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,8 +131,7 @@ public class EditEventFragment extends Fragment {
                 args.putString("eventId", event.getId());
                 (new EditEventFragment()).setArguments(args);
                 //TODO: navigate to the notify -> link in the navigation bar
-                NavHostFragment.findNavController(EditEventFragment.this)
-                        .navigate(R.id.editEvent_to_Notification, args);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, args);
             }
         });
 
@@ -138,9 +151,6 @@ public class EditEventFragment extends Fragment {
                     Toast.makeText(getContext(), "Please enter event limit", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                CollectionReference eventsRef = db.collection("events");
-                DocumentReference docRef = eventsRef.document(event.getId());
                 event.setName(String.valueOf(editEventTitle.getText()));
                 event.setDescription(String.valueOf(editEventDescription.getText()));
                 event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
@@ -172,9 +182,6 @@ public class EditEventFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Fetch timestamp from the database
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                CollectionReference eventsRef = db.collection("events");
-                DocumentReference docRef = eventsRef.document(event.getId());
                 docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
