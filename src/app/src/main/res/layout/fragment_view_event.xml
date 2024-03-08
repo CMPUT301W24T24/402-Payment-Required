@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/view_event_poster"
+        android:layout_width="match_parent"
+        android:layout_height="180sp"
+        android:contentDescription="Avatar Placeholder"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars"
+        tools:ignore="HardcodedText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/view_event_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="40sp"
+        android:text="Title"
+        app:layout_constraintStart_toStartOf="@id/view_event_poster"
+        app:layout_constraintEnd_toEndOf="@id/view_event_poster"
+        app:layout_constraintTop_toBottomOf="@id/view_event_poster"
+        tools:ignore="HardcodedText" />
+
+
+    <TextView
+        android:id="@+id/view_event_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Date|Time"
+        android:textColor="@color/pink"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_event_title"
+        tools:ignore="HardcodedText" />
+
+
+    <TextView
+        android:id="@+id/view_event_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/pink_box_background"
+        android:padding="20dp"
+        android:text="Description of the event"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/view_event_date"
+        tools:ignore="HardcodedText"
+        tools:layout_editor_absoluteX="-68dp" />
+
+    <Button
+        android:id="@+id/view_event_sign_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:backgroundTint="@color/pink"
+        android:gravity="center"
+        android:text="Sign up!!!"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_event_description"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/view_event_location_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:text="Location"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_event_sign_up"
+        tools:ignore="HardcodedText" />
+
+    <fragment
+        android:id="@+id/view_event_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_event_location_title"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
