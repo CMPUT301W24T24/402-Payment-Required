@@ -45,9 +45,9 @@ public class CreateEventFragment extends Fragment {
         EditText titleTextView = binding.textCreateEventTitle;
         createEventViewModel.getEventTitle().observe(getViewLifecycleOwner(), titleTextView::setText);
 
-        DatePicker dateView = binding.dateCreateEvent;
+        //DatePicker dateView = binding.dateCreateEvent;
 
-        TimePicker timeView = binding.timeCreateEvent;
+        //TimePicker timeView = binding.timeCreateEvent;
 
         EditText descriptionTextView = binding.textCreateEventDescription;
         createEventViewModel.getEventDescription().observe(getViewLifecycleOwner(), descriptionTextView::setText);
@@ -66,11 +66,11 @@ public class CreateEventFragment extends Fragment {
             // TODO: get the poster reference
             String posterRef = "poster.png";
 
-            int date = dateView.getDayOfMonth();
-            int month = dateView.getMonth();
-            int year = dateView.getYear();
-            int hours = timeView.getHour();
-            int min = timeView.getMinute();
+            int date = 0; //dateView.getDayOfMonth();
+            int month = 0; //dateView.getMonth();
+            int year = 0; //dateView.getYear();
+            int hours = 0; //timeView.getHour();
+            int min = 0; //timeView.getMinute();
             Date time = new Date(year, month, date, hours, min);
             String location = locationTextView.getText().toString();
             Double locationGeoLat = null;
@@ -96,22 +96,21 @@ public class CreateEventFragment extends Fragment {
             data.put("host", event.getHost());
             data.put("geo", event.getGeo());
             data.put("promote_id", event.getPromoteId());
-            data.put("promote_qr", event.getPromoteRq());
             data.put("location", event.getLocation());
             data.put("checkin_id", event.getCheckinId());
-            data.put("checkin_qr", event.getCheckinRq());
 
             eventsRef.add(data)
                     .addOnSuccessListener(documentReference -> {
                         event.setId(documentReference.getId());
+                        // TODO: go back to the previous fragment
                         Log.d("Firestore", "Created an event with ID: " + documentReference.getId());
                     })
                     .addOnFailureListener(e -> {
                         Log.e("Firesotre", e.toString());
+
                     });
 
 
-            // TODO: go back to the previous fragment
         });
 
         // TODO: copy format of add user

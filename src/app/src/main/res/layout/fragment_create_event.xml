@@ -5,200 +5,219 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".user.createevent.CreateEventFragment">
-
-    <ImageView
-        android:id="@+id/image_create_event_banner"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/event_banner"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/text_create_event_title"
-        android:src="@drawable/ic_launcher_foreground"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-    <EditText
-        android:id="@+id/text_create_event_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image_create_event_banner"
-        android:text="Title of Event"/>
+            <ImageView
+                android:id="@+id/image_create_event_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/event_banner"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/text_create_event_title"
+                android:src="@drawable/ic_launcher_foreground"/>
 
-    <EditText
-        android:id="@+id/text_create_event_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Description"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="textStart"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_create_event_title"/>
+            <EditText
+                android:id="@+id/text_create_event_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/image_create_event_banner"
+                android:text="Title of Event"/>
 
-    <CalendarView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            <EditText
+                android:id="@+id/text_create_event_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Description"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="textStart"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_create_event_title"/>
 
-    <DatePicker
-        android:id="@+id/date_create_event"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Date"
-        app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_create_event_description" />
+            <CalendarView
+                android:id="@+id/time_create_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_create_event_description" />
 
-    <TimePicker
-        android:id="@+id/time_create_event"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/date_create_event"
-        app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit"/>
+            <!--<DatePicker
+                android:id="@+id/date_create_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_create_event_description" />
 
-
-    <EditText
-        android:id="@+id/create_event_attend_limit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Limit on attendees"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/time_create_event">
-    </EditText>
-
-    <TextView
-        android:id="@+id/text_create_event_description_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/create_event_description_qr"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/create_event_attend_limit"/>
-
-    <LinearLayout
-        android:id="@+id/linearlayout_create_event_description_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_create_event_description_qr">
-
-        <Button
-            android:id="@+id/button_create_event_generate_qr_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Generate QR Code"
-            app:layout_constraintEnd_toStartOf="@id/button_create_event_use_existing_description"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/button_create_event_use_existing_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Use Existing Code"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_create_event_generate_qr_description"/>
-
-    </LinearLayout>
+            <TimePicker
+                android:id="@+id/time_create_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/date_create_event"
+                app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit"/> -->
 
 
+            <EditText
+                android:id="@+id/create_event_attend_limit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Limit on attendees"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/time_create_event">
+            </EditText>
 
-    <!-- TODO: Description QR Code View -->
+            <TextView
+                android:id="@+id/text_create_event_description_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_event_description_qr"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/create_event_attend_limit"/>
 
+            <LinearLayout
+                android:id="@+id/linearlayout_create_event_description_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_create_event_description_qr">
 
+                <Button
+                    android:id="@+id/button_create_event_generate_qr_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Generate QR Code"
+                    app:layout_constraintEnd_toStartOf="@id/button_create_event_use_existing_description"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/text_create_event_checkin_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/create_event_checkin_qr"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_description_qr"/>
+                <Button
+                    android:id="@+id/button_create_event_use_existing_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Use Existing Code"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/button_create_event_generate_qr_description"/>
 
-    <LinearLayout
-        android:id="@+id/linearlayout_create_event_checkin_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_create_event_checkin_qr">
-
-        <Button
-            android:id="@+id/button_create_event_generate_qr_checkin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Generate QR Code"
-            app:layout_constraintEnd_toStartOf="@id/button_create_event_use_existing_checkin"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/button_create_event_use_existing_checkin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Use Existing Code"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_create_event_generate_qr_checkin"/>
-
-    </LinearLayout>
-
-
-    <!-- TODO: Checkin QR Code View -->
-
-
-    <CheckBox
-        android:id="@+id/checkbox_create_event_geolocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Geolocation Enabled"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_checkin_qr"/>
-
-    <EditText
-        android:id="@+id/text_create_event_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/create_event_location"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkbox_create_event_geolocation"/>
+            </LinearLayout>
 
 
-    <!-- TODO: Event Location Mapview -->
 
-    <Button
-        android:id="@+id/button_create_event_submit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_create_event_location"/>
+            <!-- TODO: Description QR Code View -->
 
+
+
+            <TextView
+                android:id="@+id/text_create_event_checkin_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_event_checkin_qr"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_description_qr"/>
+
+            <LinearLayout
+                android:id="@+id/linearlayout_create_event_checkin_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_create_event_checkin_qr">
+
+                <Button
+                    android:id="@+id/button_create_event_generate_qr_checkin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Generate QR Code"
+                    app:layout_constraintEnd_toStartOf="@id/button_create_event_use_existing_checkin"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <Button
+                    android:id="@+id/button_create_event_use_existing_checkin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Use Existing Code"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/button_create_event_generate_qr_checkin"/>
+
+            </LinearLayout>
+
+
+            <!-- TODO: Checkin QR Code View -->
+
+
+            <CheckBox
+                android:id="@+id/checkbox_create_event_geolocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Geolocation Enabled"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_checkin_qr"/>
+
+            <EditText
+                android:id="@+id/text_create_event_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_event_location"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/checkbox_create_event_geolocation"/>
+
+
+            <!-- TODO: Event Location Mapview -->
+
+            <Button
+                android:id="@+id/button_create_event_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_create_event_location"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
