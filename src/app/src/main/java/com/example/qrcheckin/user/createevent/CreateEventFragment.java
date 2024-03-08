@@ -20,6 +20,7 @@ import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
+import com.google.android.gms.maps.MapView;
 import com.google.firebase.Firebase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -50,6 +51,9 @@ public class CreateEventFragment extends Fragment {
         EditText descriptionTextView = binding.textCreateEventDescription;
         createEventViewModel.getEventDescription().observe(getViewLifecycleOwner(), descriptionTextView::setText);
 
+        EditText locationTextView = binding.textCreateEventLocation;
+
+
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
             // TODO: if everything is filled out add to firebase
             FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -67,8 +71,18 @@ public class CreateEventFragment extends Fragment {
             int hours = timeView.getHour();
             int min = timeView.getMinute();
             Date time = new Date(year, month, date, hours, min);
+            String location = locationTextView.getText().toString();
+            Double locationGeoLat = null;
+            Double locationGeoLong = null;
+            String checkinId = null;
+            String checkinQR = null;
+            String promoteId = null;
+            String promoteQR = null;
+            Boolean geo = null;
+            Integer limit = null;
 
-            Event event = new Event(user, titleText, descriptionText, posterRef, time, );
+
+            Event event = new Event(user, titleText, descriptionText, posterRef, time, location, locationGeoLat, locationGeoLong, checkinId, checkinQR, promoteId, promoteQR, geo, limit);
 
             HashMap<String, Object> data = new HashMap<>();
             data.put("name", event.getName());

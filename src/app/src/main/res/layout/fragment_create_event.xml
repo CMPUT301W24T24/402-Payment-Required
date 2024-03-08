@@ -43,6 +43,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_create_event_title"/>
 
+    <CalendarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <DatePicker
         android:id="@+id/date_create_event"
         android:layout_width="match_parent"
@@ -171,7 +175,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_checkin_qr"/>
 
-    <TextView
+    <EditText
         android:id="@+id/text_create_event_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -184,6 +188,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/checkbox_create_event_geolocation"/>
+
 
     <!-- TODO: Event Location Mapview -->
 
