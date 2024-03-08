@@ -67,4 +67,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1"){
         exclude(module = "protobuf-lite")
     }
+    // https://stackoverflow.com/questions/66154727/java-lang-nosuchmethoderror-no-static-method-registerdefaultinstance-with-fireb
+    // Ansered by: Amir
 }
