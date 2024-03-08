@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Display event title"
+            android:hint="Display event title"
             android:textAlignment="center"
             android:textColor="#EF476F"
             android:textSize="20dp"
@@ -40,12 +40,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_event_profile" />
 
+
+        <EditText
+            android:id="@+id/edit_event_description"
+            android:layout_width="416dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="4dp"
+            android:hint="Write descrtiption for the event"
+            android:textColor="@color/black"
+            android:textSize="17dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_title" />
+
         <LinearLayout
             android:id="@+id/linearlayout_edit_event_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/edit_event_title"
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp">
@@ -113,8 +127,6 @@
                 app:layout_constraintStart_toEndOf="@id/edit_event_title" />
 
         </LinearLayout>
-
-
 
 
         <LinearLayout
