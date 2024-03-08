@@ -1,13 +1,20 @@
 package com.example.qrcheckin;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,10 +23,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.qrcheckin.core.Database;
+import com.example.qrcheckin.core.Notification;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.ActivityMainBinding;
-import com.example.qrcheckin.user.notifications.NotificationsFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,16 +45,24 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements Database.UserListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private User currentUser;
+    private Map<String, String> eventIdToName;
+    private long notificationListenerLastUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -55,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         NavigationUI.setupWithNavController(navigationView, navController);
 
         getDeviceUser(this);
+
     }
 
     /**
@@ -132,6 +159,9 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
         Database db = new Database();
         db.getUserPicture(currentUser, navProfileImage);
+
+        // set the notification listeners for event user is signed up for
+        createNotificationListeners();
     }
 
     /**
@@ -168,4 +198,146 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 || super.onSupportNavigateUp();
     }
 
+    /**
+     *
+     */
+    public void createNotificationListeners() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        ArrayList<String> eventList = new ArrayList<>();
+        eventIdToName = new HashMap<>();
+        db.collection("SignUpTable").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+
+                try {
+                    Log.d("Notifications", "creating notification listeners. Documents in SignUpTable: " + querySnapshots.size());
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+
+                        if (doc.get("user_id").toString().equals(currentUser.getId()) ) {
+                            String event = doc.get("event_id").toString();
+                            Log.d("Notifications", "creating listener for event: " + event);
+                            eventList.add(event);
+                        }
+                    }
+
+                    notificationListenerLastUpdate = System.currentTimeMillis() + 500;
+
+                    getNames(db, eventList);
+
+                }  catch (NullPointerException e) {
+                    Log.e("Notifications", e.toString());
+                }
+
+            }
+        });
+    }
+
+    /**
+     *
+     * @param db
+     * @param eventList
+     */
+    private void getNames(FirebaseFirestore db, ArrayList<String> eventList) {
+        // for each signed up event
+
+        for (String event: eventList) {
+            db.collection("events").document(event).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    eventIdToName.put(event, documentSnapshot.getString("name"));
+                    Log.d("Firestore", "successful event name get");
+
+                    // next step in listener setup
+                    setListeners(db, event);
+                    }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d("Firestore", "unsuccessful event name get");
+                }
+            });
+        }
+    }
+
+    /**
+     *
+     * @param db
+     * @param eventID
+     */
+    private void setListeners(FirebaseFirestore db, String eventID) {
+        // add listeners to notification collections of events
+
+        // create new collection reference and put into fireEventsNotifs
+        CollectionReference notificationRef = db
+                .collection("events")
+                .document(eventID)
+                .collection("notifications");
+
+        // add listener to new collection
+        notificationRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+
+                Log.d("Notifications", "ListenerLastUpdate: " + notificationListenerLastUpdate + " Current Time: " + System.currentTimeMillis());
+
+                if (querySnapshots != null
+                        && notificationListenerLastUpdate <= System.currentTimeMillis()) {
+                    for (DocumentChange document: querySnapshots.getDocumentChanges() ) {
+                        DocumentSnapshot doc = document.getDocument();
+                        // push notification
+                        showNotification(eventIdToName.get(eventID) , doc.getString("message"));
+                    }
+                    Log.d("Notification", "received new push notification");
+                }
+            }
+        });
+    }
+
+    /**
+     *
+     * @param title
+     * @param message
+     */
+    // https://www.geeksforgeeks.org/how-to-push-notification-in-android-using-firebase-cloud-messaging/
+    public void showNotification(String title, String message)
+    {
+        Log.d("Notifications", "creating notification for event: " + title);
+        // Pass the intent to switch to the MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+
+        // Assign channel ID
+        String channel_id = "qrchannel";
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        // Pass the intent to PendingIntent to start the
+        // next Activity
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        // Create a Builder object using NotificationCompat
+        // class. This will allow control over all the flags
+        NotificationCompat.Builder builder = new NotificationCompat
+                .Builder(getApplicationContext(), channel_id)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.nav_events)
+                .setContentIntent(pendingIntent)
+                .setContentTitle(title)
+                .setContentText(message);
+
+
+        NotificationManager notificationManager
+                = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationChannel notificationChannel = new NotificationChannel(
+                channel_id, "Event Notifications",
+                NotificationManager.IMPORTANCE_HIGH);
+
+        notificationManager.createNotificationChannel(notificationChannel);
+
+        notificationManager.notify(0, builder.build());
+    }
 }

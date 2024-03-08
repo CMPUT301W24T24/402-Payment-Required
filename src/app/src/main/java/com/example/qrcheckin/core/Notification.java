@@ -1,6 +1,6 @@
 package com.example.qrcheckin.core;
 
-public class notification {
+public class Notification {
 
     private String message;
     private String time;
@@ -8,7 +8,7 @@ public class notification {
     private String eventId;
 
 
-    public notification(String message, String time, String eventName, String eventId) {
+    public Notification(String message, String time, String eventName, String eventId) {
         this.message = message;
         this.time = time;
         this.eventName = eventName;

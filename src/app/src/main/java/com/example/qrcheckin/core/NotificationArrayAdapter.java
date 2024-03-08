@@ -15,13 +15,13 @@ import com.example.qrcheckin.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class notificationArrayAdapter extends ArrayAdapter {
+public class NotificationArrayAdapter extends ArrayAdapter {
 
-    private List<notification> notifications;
+    private List<Notification> notifications;
 
     private Context context;
 
-    public notificationArrayAdapter(Context context, ArrayList<notification> notifications){
+    public NotificationArrayAdapter(Context context, ArrayList<Notification> notifications){
         super(context,0, notifications);
         this.notifications = notifications;
         this.context = context;
@@ -36,7 +36,7 @@ public class notificationArrayAdapter extends ArrayAdapter {
             view = LayoutInflater.from(context).inflate(R.layout.notification_layout, parent,false);
         }
 
-        notification notification = notifications.get(position);
+        Notification notification = notifications.get(position);
 
         TextView message = view.findViewById(R.id.message_text);
         TextView eventName = view.findViewById(R.id.event_text);

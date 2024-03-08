@@ -35,4 +35,12 @@
         android:label="Notifications"
         tools:layout="@layout/fragment_notifications" />
 
+    <fragment
+        android:id="@+id/nav_create_notifications"
+        android:name="com.example.qrcheckin.user.createnotification.CreateNotificationFragment"
+        android:label="CreateNotifications"
+        tools:layout="@layout/fragment_create_notification" >
+
+    </fragment>
+
 </navigation>
