@@ -72,7 +72,7 @@
             android:layout_marginTop="15dp"
             android:backgroundTint="@color/pink"
             android:gravity="center"
-            android:text="Sign Me Up"
+            android:text="@string/sign_up"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textAllCaps="false"
