@@ -30,6 +30,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.List;
+
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
@@ -91,7 +93,13 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 User currentUser=((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
-                DocumentSnapshot snapshot=querySnapshotTask.getResult().getDocuments().get(0);
+                List<DocumentSnapshot> snapshots=querySnapshotTask.getResult().getDocuments();
+                if(snapshots.isEmpty()){
+                    Log.i("QR Scanner","Failed to check into event by QR: Code scanned is not in database");
+                    Toast.makeText(getActivity(), "Event ID does not exist: "+qrValue, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                DocumentSnapshot snapshot = snapshots.get(0);
                 Event event=new Event(snapshot.getId(),
                         currentUser,
                         snapshot.getString("name"),
@@ -115,7 +123,7 @@ public class HomeFragment extends Fragment {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e("QR Scanner","Failed to check into event by QR: Code scanned is not in database");
+                Log.e("QR Scanner","Failed to check into event by QR: Database failed to retrieve QR");
             }
         });
 
