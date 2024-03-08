@@ -91,6 +91,10 @@ public class HomeFragment extends Fragment {
                 }
             });
 
+    /**
+     * Method for opening the share menu
+     * @param bitmap the coordinates of the image being shared
+     */
     public void shareImageAndText(Bitmap bitmap) {
         Uri uri = getImageToShare(bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -101,6 +105,12 @@ public class HomeFragment extends Fragment {
         startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
+    /**
+     * A method which retrieves the image being shared to another app
+     * @param bitmap the coordinates of the image
+     * @return
+     * The image retrieved
+     */
     public Uri getImageToShare(Bitmap bitmap) {
         File imageFolder = new File(getContext().getCacheDir(), "images");
         Uri uri = null;
