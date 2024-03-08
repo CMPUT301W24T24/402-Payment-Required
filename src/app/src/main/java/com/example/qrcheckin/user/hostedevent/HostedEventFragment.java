@@ -53,7 +53,7 @@ public class HostedEventFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
                 // TODO: define it to change to the edit event page
-//                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_host_event_to_nav_edit_event, bundle);
             }
         });
 
