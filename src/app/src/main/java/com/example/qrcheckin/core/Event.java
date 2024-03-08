@@ -350,6 +350,22 @@ public class Event implements Serializable {
         return QRCodeGenerator.generateQRCode(checkinId, width, height);
     }
 
+    public Boolean isCurrentUserSignedUp() {
+        return currentUserSignedUp;
+    }
+
+    public void setCurrentUserSignedUp(Boolean currentUserSignedUp) {
+        this.currentUserSignedUp = currentUserSignedUp;
+    }
+
+    public Boolean isCurrentUserCheckedIn() {
+        return currentUserCheckedIn;
+    }
+
+    public void setCurrentUserCheckedIn(Boolean currentUserCheckedIn) {
+        this.currentUserCheckedIn = currentUserCheckedIn;
+    }
+
 }
 
 
