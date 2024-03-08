@@ -1,41 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<androidx.cardview.widget.CardView
     android:layout_width="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/event_text"
-        android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="18dp">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Event"
-        android:textSize="30sp">
-    </TextView>
+        android:layout_width="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/time_text"
-        android:textSize="20sp"
-        android:layout_marginLeft="40dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="time">
-    </TextView>
+        <TextView
+            android:id="@+id/event_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Event"
+            android:textSize="30sp">
+        </TextView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/message_text"
-        android:textSize="25sp"
-        android:ellipsize="end"
-        android:maxLines="10"
-        android:layout_marginLeft="20dp"
-        android:text="message">
-    </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/time_text"
+            android:textSize="17sp"
+            android:layout_marginLeft="40dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="time">
+        </TextView>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_text"
+            android:textSize="25sp"
+            android:ellipsize="end"
+            android:maxLines="10"
+            android:layout_marginLeft="20dp"
+            android:text="message"
+            android:padding="7dp">
+        </TextView>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                         }
                     }
 
-                    notificationListenerLastUpdate = System.currentTimeMillis() + 500;
+                    notificationListenerLastUpdate = System.currentTimeMillis() + 1250;
 
                     getNames(db, eventList);
 
