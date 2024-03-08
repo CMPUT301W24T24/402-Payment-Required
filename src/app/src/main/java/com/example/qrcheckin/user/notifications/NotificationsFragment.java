@@ -1,5 +1,7 @@
 package com.example.qrcheckin.user.notifications;
 
+
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.core.Notification;
@@ -66,11 +69,8 @@ public class NotificationsFragment extends Fragment {
     private FirebaseFirestore db;
     private String currentUser;
 
-
-
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        NotificationsViewModel NotificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentNotificationsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -92,7 +92,6 @@ public class NotificationsFragment extends Fragment {
 
         // get names of events in database and set listeners to them
         getEventNames();
-
         return root;
     }
 

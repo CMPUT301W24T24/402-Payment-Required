@@ -7,11 +7,10 @@
     tools:context=".user.notifications.NotificationsFragment">
 
     <ListView
+        android:id="@+id/notifications_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/notifications_list"
         android:orientation="vertical"
-        android:padding="10dp"
-        />
+        android:padding="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

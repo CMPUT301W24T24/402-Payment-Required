@@ -3,10 +3,14 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="nav_home">Home</string>
-    <string name="nav_my_events">My events</string>
-    <string name="nav_hosted_events">Hosted events</string>
+    <string name="nav_my_events">My Events</string>
+    <string name="nav_hosted_events">Hosted Events</string>
     <string name="nav_profile">Profile</string>
+    <string name="nav_notifications">Notifications</string>
     <string name="qr_preview">QR_Preview</string>
     <string name="add_event">Add Event</string>
-    <string name="nav_notifications">Notifications</string>
+    <string name="nav_explore_events">Explore Events</string>
+    <string name="nav_all_profile">All Profiles</string>
+    <string name="nav_all_event">All Events</string>
+    <string name="nav_all_image">All Images</string>
 </resources>

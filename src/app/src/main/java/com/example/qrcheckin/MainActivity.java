@@ -73,9 +73,14 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_event, R.id.nav_host_event, R.id.nav_profile, R.id.nav_notifications)
-                .setOpenableLayout(drawer)
-                .build();
+                R.id.nav_home,
+                R.id.nav_home,
+                R.id.nav_event,
+                R.id.nav_host_event,
+                R.id.nav_explore_event,
+                R.id.nav_profile,
+                R.id.nav_notifications,
+                R.id.nav_all_event, R.id.nav_all_images, R.id.nav_all_profile).setOpenableLayout(drawer).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -162,6 +167,12 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         // set the notification listeners for event user is signed up for
         createNotificationListeners();
+        if (!currentUser.isAdmin()) {
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.nav_all_event).setVisible(false);
+            menu.findItem(R.id.nav_all_images).setVisible(false);
+            menu.findItem(R.id.nav_all_profile).setVisible(false);
+        }
     }
 
     /**
