@@ -15,7 +15,7 @@ public class Event implements Serializable {
     private String posterRef;
     private Date time;
     private String location;
-    private double locationGeoLat,locationGeoLong; //geolocation data
+    private Double locationGeoLat,locationGeoLong; //geolocation data
     private String checkinId;
     private String checkinQR;
     private String promoteId;
@@ -85,7 +85,7 @@ public class Event implements Serializable {
         this.currentUserCheckedIn = false;
     }
 
-    public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit) {
+    public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit) {
         this.host = host;
         this.name = name;
         this.description = description;
@@ -95,9 +95,9 @@ public class Event implements Serializable {
         this.locationGeoLat = locationGeoLat;
         this.locationGeoLong = locationGeoLong;
         this.checkinId = checkinId;
-        this.checkinRq = checkinRq;
+        this.checkinQR = checkinQR;
         this.promoteId = promoteId;
-        this.promoteRq = promoteRq;
+        this.promoteQR = promoteQR;
         this.geo = geo;
         this.limit = limit;
         this.currentUserSignedUp = false;
