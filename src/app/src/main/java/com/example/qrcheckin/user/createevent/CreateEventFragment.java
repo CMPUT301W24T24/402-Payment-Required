@@ -1,5 +1,3 @@
-// https://stackoverflow.com/questions/6421874/how-to-get-the-date-from-the-datepicker-widget-in-android
-// used to get the date from datepicker
 package com.example.qrcheckin.user.createevent;
 
 import android.os.Bundle;
@@ -39,9 +37,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * Create Event Fragment is a class that creates a CreateEventFragment object
+ */
 public class CreateEventFragment extends Fragment {
     private FragmentCreateEventBinding binding;
+    public String checkinId;
+    public String promoteId;
 
+    /**
+     * Initializes the CreateEventFragment on create
+     * Reference: https://stackoverflow.com/questions/6421874/how-to-get-the-date-from-the-datepicker-widget-in-android Berllium Accessed: March 8 2024
+     * @param inflater: the inflater used to create the binding
+     * @param container: the ViewGroup used to create the binding
+     * @param savedInstanceState: the Bundle used to pass information
+     * @return root
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CreateEventViewModel createEventViewModel = new ViewModelProvider(this).get(CreateEventViewModel.class);
 
@@ -49,8 +60,6 @@ public class CreateEventFragment extends Fragment {
         View root = binding.getRoot();
 
         ImageView bannerImageView = binding.imageCreateEventBanner;
-        // TODO: set the image reference
-        //createEventViewModel.getBannerRef().observe(getViewLifecycleOwner(), bannerImageView::);
 
         EditText titleTextView = binding.textCreateEventTitle;
         createEventViewModel.getEventTitle().observe(getViewLifecycleOwner(), titleTextView::setHint);
@@ -70,20 +79,34 @@ public class CreateEventFragment extends Fragment {
 
         CheckBox geoCheckBox = binding.checkboxCreateEventGeolocation;
 
-        /*String checkinId = null;
-        String promoteId = null;
         Button generateQRCheckinButton = binding.buttonCreateEventGenerateQrCheckin;
-        generateQRCheckinButton.setOnClickListener(v -> {
-            QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-            checkinId = QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(location, 100, 100));
-        });*/
+        generateQRCheckinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkinId = generateQRCode();
+            }
+        });
+        Button generateQRPromoteButton = binding.buttonCreateEventGenerateQrDescription;
+        generateQRPromoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promoteId = generateQRCode();
+            }
+        });
 
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
-            if (locationTextView.getText().toString().isEmpty()) {
-                Toast.makeText(getContext(), "Please enter a location", Toast.LENGTH_SHORT).show();
+            if (titleTextView.getText().toString().isEmpty()) {
+                Toast.makeText(getContext(), "Please enter a Title", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (checkinId == null) {
+                checkinId = generateQRCode();
+            }
+            if (promoteId == null) {
+                promoteId = generateQRCode();
+            }
+
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             CollectionReference eventsRef = db.collection("events");
             CollectionReference usersRef = db.collection("users");
@@ -100,13 +123,10 @@ public class CreateEventFragment extends Fragment {
             int min = timeView.getMinute();
             Date time = new Date(year, month, date, hours, min);
             String location = locationTextView.getText().toString();
+            String checkinQR = null;
+            String promoteQR = null;
             Double locationGeoLat = null;
             Double locationGeoLong = null;
-            QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-            String checkinId = QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(location, 100, 100));
-            String checkinQR = null;
-            String promoteId = QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(location, 100, 100));
-            String promoteQR = null;
             Boolean geo = geoCheckBox.isChecked();
             Integer limit = limitNumberPicker.getValue();
 
@@ -143,6 +163,47 @@ public class CreateEventFragment extends Fragment {
         });
 
         return root;
+    }
+
+    /**
+     * This function generates a random alphanumeric string of length n
+     * Reference: https://www.geeksforgeeks.org/generate-random-string-of-given-size-in-java/ Rajput-Ji Accessed March 8 2024
+     * @param n - the length of the alphanumeric string
+     * @return - the alphanumeric string
+     */
+    public String getAlphaNumericString(int n) {
+
+        // choose a Character random from this String
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "0123456789"
+                + "abcdefghijklmnopqrstuvxyz";
+
+        // create StringBuffer size of AlphaNumericString
+        StringBuilder sb = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+
+            // generate a random number between
+            // 0 to AlphaNumericString variable length
+            int index
+                    = (int) (AlphaNumericString.length()
+                    * Math.random());
+
+            // add Character one by one in end of sb
+            sb.append(AlphaNumericString
+                    .charAt(index));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * This generates a checkin QR code
+     * @return - the QR code string data
+     */
+    public String generateQRCode() {
+        QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
+        String randomString = getAlphaNumericString(20);
+        return QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(randomString, 400, 400));
     }
 
     @Override
