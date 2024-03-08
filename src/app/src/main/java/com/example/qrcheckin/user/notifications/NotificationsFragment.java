@@ -106,7 +106,7 @@ public class NotificationsFragment extends Fragment {
 
         ArrayList<String> eventList = new ArrayList<>();
 
-        db.collection("SignUpTable")
+        db.collection("signUpTable")
                 .whereEqualTo("user_id", currentUser).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -175,7 +175,7 @@ public class NotificationsFragment extends Fragment {
                         //
                         notifList.add(new Notification(
                                 doc.getString("message"),
-                                doc.getString("time"),
+                                doc.getTimestamp("time").toDate().toString(),
                                 eventsMap.get(eventID),
                                 eventID));
                         notificationsMap.put(eventID, notifList);
@@ -188,7 +188,6 @@ public class NotificationsFragment extends Fragment {
                     }
                     // notifications.sort(); Sort by time of notification
                     nArrayAdapter.notifyDataSetChanged();
-                    Log.d("Notification", "received new notification. Displayed in notifications fragment");
                 }
             }
         });

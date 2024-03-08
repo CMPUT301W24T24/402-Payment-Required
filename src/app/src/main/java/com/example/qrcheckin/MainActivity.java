@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         ArrayList<String> eventList = new ArrayList<>();
         eventIdToName = new HashMap<>();
-        db.collection("SignUpTable").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("signUpTable").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
 
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                         // push notification
                         showNotification(eventIdToName.get(eventID) , doc.getString("message"));
                     }
-                    Log.d("Notification", "received new push notification");
+                    Log.d("Notifications", "received new push notification");
                 }
             }
         });
@@ -303,20 +303,21 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * @param message
      */
     // https://www.geeksforgeeks.org/how-to-push-notification-in-android-using-firebase-cloud-messaging/
-    public void showNotification(String title, String message)
-    {
+    public void showNotification(String title, String message) {
+        title = "'" + title + "'" + " Sent you a notification!";
+
         Log.d("Notifications", "creating notification for event: " + title);
         // Pass the intent to switch to the MainActivity
-        Intent intent = new Intent(this, MainActivity.class);
+//        Intent intent = new Intent(this, MainActivity.class);
 
         // Assign channel ID
         String channel_id = "qrchannel";
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        // Pass the intent to PendingIntent to start the
-        // next Activity
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        // Pass the intent to PendingIntent to start the
+//        // next Activity
+//        PendingIntent pendingIntent = PendingIntent.getActivity(
+//                this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         // Create a Builder object using NotificationCompat
         // class. This will allow control over all the flags
@@ -324,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 .Builder(getApplicationContext(), channel_id)
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.nav_events)
-                .setContentIntent(pendingIntent)
+                // .setContentIntent(pendingIntent)
                 .setContentTitle(title)
                 .setContentText(message);
 

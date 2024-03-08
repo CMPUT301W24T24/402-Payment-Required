@@ -19,6 +19,8 @@ import androidx.navigation.Navigation;
 import com.example.qrcheckin.databinding.FragmentCreateNotificationBinding;
 import com.example.qrcheckin.databinding.FragmentHostedEventBinding;
 import com.example.qrcheckin.user.hostedevent.HostedEventViewModel;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ktx.Firebase;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -73,9 +75,10 @@ public class CreateNotificationFragment extends Fragment {
     public void sendNotification( String message, String event_id) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Map<String, String> databaseEntry = new HashMap<>();
+        Map<String, Object> databaseEntry = new HashMap<>();
         databaseEntry.put("message", message);
-        databaseEntry.put("time", "time entry" );
+        FieldValue serverTimestamp = FieldValue.serverTimestamp();
+        databaseEntry.put("time", serverTimestamp);
         db.collection("events").document(event_id).collection("notifications").add(databaseEntry);
 
     }
