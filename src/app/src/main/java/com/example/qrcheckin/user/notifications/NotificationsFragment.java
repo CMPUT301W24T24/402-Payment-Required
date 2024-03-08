@@ -36,6 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * NotificationsFragment is the Fragment displayed when a user wants to view
+ * a list of all the notifications for events they have signed up for
+ */
 public class NotificationsFragment extends Fragment {
 
     /**

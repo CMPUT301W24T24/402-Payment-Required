@@ -210,7 +210,8 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     }
 
     /**
-     *
+     * Creates listeners on the notification collection of each event
+     * the user has signed up for
      */
     public void createNotificationListeners() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -222,17 +223,23 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
                 try {
                     Log.d("Notifications", "creating notification listeners. Documents in SignUpTable: " + querySnapshots.size());
-                    for (QueryDocumentSnapshot doc: querySnapshots) {
 
+                    // add each event the user has signed up for
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
                         if (doc.get("user_id").toString().equals(currentUser.getId()) ) {
+
+                            // add event to list
                             String event = doc.get("event_id").toString();
                             Log.d("Notifications", "creating listener for event: " + event);
                             eventList.add(event);
                         }
                     }
 
+                    // set up timer to enable new notification sending.
                     notificationListenerLastUpdate = System.currentTimeMillis() + 1250;
 
+                    // step 2
+                    // get names of events and set listeners
                     getNames(db, eventList);
 
                 }  catch (NullPointerException e) {
@@ -244,9 +251,12 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     }
 
     /**
+     * getNames will get the name of all events specified in the list of event IDs.
+     * This will also set a listener to each events notification collection
      *
-     * @param db
-     * @param eventList
+     * @param db FirestoreFirebase that is listened to
+     * @param eventList list of events that will have their
+     *                  notifications collection listened to
      */
     private void getNames(FirebaseFirestore db, ArrayList<String> eventList) {
         // for each signed up event
@@ -259,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                     Log.d("Firestore", "successful event name get");
 
                     // next step in listener setup
-                    setListeners(db, event);
+                    setListener(db, event);
                     }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -271,12 +281,13 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     }
 
     /**
+     * setListener will set a listener to the specified events notification collection.
+     * This listener will send out a notification when a new notification is detected
      *
-     * @param db
-     * @param eventID
+     * @param db FirebaseFirestore object that listeners are set to
+     * @param eventID ID of the event who's notification collection will be listened to
      */
-    private void setListeners(FirebaseFirestore db, String eventID) {
-        // add listeners to notification collections of events
+    private void setListener(FirebaseFirestore db, String eventID) {
 
         // create new collection reference and put into fireEventsNotifs
         CollectionReference notificationRef = db
@@ -309,11 +320,15 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     }
 
     /**
+     * showNotification will send a push notification to the device
      *
-     * @param title
-     * @param message
+     * Reference:
+     * https://www.geeksforgeeks.org/how-to-push-notification-in-android-using-firebase-cloud-messaging/
+     * from geeksforgeeks
+     *
+     * @param title title of the notification message
+     * @param message the body of the notification message
      */
-    // https://www.geeksforgeeks.org/how-to-push-notification-in-android-using-firebase-cloud-messaging/
     public void showNotification(String title, String message) {
         title = "'" + title + "'" + " Sent you a notification!";
 

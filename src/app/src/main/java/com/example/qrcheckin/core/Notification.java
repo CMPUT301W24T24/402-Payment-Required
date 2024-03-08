@@ -5,9 +5,21 @@ package com.example.qrcheckin.core;
  */
 public class Notification {
 
+    /**
+     * message of the notification
+     */
     private String message;
+    /**
+     * time of the notification
+     */
     private String time;
+    /**
+     * name of the event the notification came from
+     */
     private String eventName;
+    /**
+     * ID of the event the notification came from
+     */
     private String eventId;
 
 
