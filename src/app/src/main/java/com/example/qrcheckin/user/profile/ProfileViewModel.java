@@ -4,15 +4,22 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.qrcheckin.core.User;
+
 public class ProfileViewModel extends ViewModel {
-    private final MutableLiveData<String> mText;
+
+    private final MutableLiveData<User> userLiveData;
 
     public ProfileViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is profile fragment");
+        userLiveData = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<User> getUserLiveData() {
+        return userLiveData;
+    }
+
+    // Method to update the user data in the ViewModel
+    public void setUser(User user) {
+        userLiveData.setValue(user);
     }
 }
