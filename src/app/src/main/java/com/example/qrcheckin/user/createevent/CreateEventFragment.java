@@ -131,7 +131,7 @@ public class CreateEventFragment extends Fragment {
             int date = dateView.getDayOfMonth();
             int hours = timeView.getHour();
             int min = timeView.getMinute();
-            Date time = new Date(year, month, date, hours, min);
+            Date time = new Date(year-1900, month, date, hours, min);
             String location = locationTextView.getText().toString();
             String checkinQR = null;
             String promoteQR = null;
