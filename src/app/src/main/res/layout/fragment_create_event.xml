@@ -147,6 +147,16 @@
 
             </LinearLayout>
 
+            <ImageView
+                android:id="@+id/imageview_create_event_description_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:contentDescription="Description QR Code"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_description_qr"/>
 
             <TextView
                 android:id="@+id/text_create_event_checkin_qr"
@@ -161,7 +171,7 @@
                 android:layout_margin="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_description_qr"/>
+                app:layout_constraintTop_toBottomOf="@id/imageview_create_event_description_qr"/>
 
             <LinearLayout
                 android:id="@+id/linearlayout_create_event_checkin_qr"
@@ -195,6 +205,17 @@
 
             </LinearLayout>
 
+            <ImageView
+                android:id="@+id/imageview_create_event_checkin_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:contentDescription="Checkin QR Code"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_checkin_qr"/>
+
 
             <CheckBox
                 android:id="@+id/checkbox_create_event_geolocation"
@@ -204,7 +225,7 @@
                 android:layout_margin="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linearlayout_create_event_checkin_qr"/>
+                app:layout_constraintTop_toBottomOf="@id/imageview_create_event_checkin_qr"/>
 
             <EditText
                 android:id="@+id/text_create_event_location"

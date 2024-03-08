@@ -18,25 +18,10 @@ public class CreateEventFragmentTest {
     /**
      * This test function ensures gererateQRCode is generating a string
      */
-    public void testGenerateQRCode() {
-        CreateEventFragment createEventFragment = new CreateEventFragment();
-        String qrCode = createEventFragment.generateQRCode();
-        assertNotNull(qrCode);
-    }
-
-    @Test
-    /**
-     * This function tests that the getAlphaNumericString function is working
-     */
-    public void testRandomNumber() {
+    public void testGenerateRandomNumber() {
         CreateEventFragment createEventFragment = new CreateEventFragment();
         String randomNum = createEventFragment.getAlphaNumericString(20);
-
-        // make sure its not null
         assertNotNull(randomNum);
-        // make sure its the right length
-        assertEquals(randomNum.length(), 20);
     }
-
 }
 

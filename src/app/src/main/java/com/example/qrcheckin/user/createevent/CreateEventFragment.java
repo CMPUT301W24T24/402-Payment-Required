@@ -1,5 +1,6 @@
 package com.example.qrcheckin.user.createevent;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -79,18 +80,26 @@ public class CreateEventFragment extends Fragment {
 
         CheckBox geoCheckBox = binding.checkboxCreateEventGeolocation;
 
+        ImageView qrCodeCheckinImageView = binding.imageviewCreateEventCheckinQr;
+        ImageView qrCodePromoteImageView = binding.imageviewCreateEventDescriptionQr;
+
         Button generateQRCheckinButton = binding.buttonCreateEventGenerateQrCheckin;
         generateQRCheckinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkinId = generateQRCode();
+                qrCodeCheckinImageView.setImageBitmap(QRCodeGenerator.generateQRCode(checkinId, 800, 800));
+                qrCodeCheckinImageView.setVisibility(View.VISIBLE);
             }
         });
+
         Button generateQRPromoteButton = binding.buttonCreateEventGenerateQrDescription;
         generateQRPromoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 promoteId = generateQRCode();
+                qrCodePromoteImageView.setImageBitmap(QRCodeGenerator.generateQRCode(promoteId, 800, 800));
+                qrCodePromoteImageView.setVisibility(View.VISIBLE);
             }
         });
 
