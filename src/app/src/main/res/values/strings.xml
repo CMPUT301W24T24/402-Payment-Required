@@ -9,6 +9,10 @@
     <string name="nav_notifications">Notifications</string>
     <string name="qr_preview">QR_Preview</string>
     <string name="add_event">Add Event</string>
+    <string name="event_banner">The Event Banner</string>
+    <string name="create_event_description_qr">Create the Event Description QR Code</string>
+    <string name="create_event_checkin_qr">Create the Event Checkin QR Code</string>
+    <string name="create_event_location">Select the Events Location</string>
     <string name="nav_explore_events">Explore Events</string>
     <string name="nav_all_profile">All Profiles</string>
     <string name="nav_all_event">All Events</string>

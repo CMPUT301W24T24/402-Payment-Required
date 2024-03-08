@@ -1,5 +1,7 @@
 package com.example.qrcheckin.core;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -341,21 +343,13 @@ public class Event implements Serializable {
 //        return this.id.compareTo(event.getId());
 //    }
 
-    public Boolean isCurrentUserSignedUp() {
-        return currentUserSignedUp;
+    public Bitmap getQRCodeFromID(int width, int height) {
+        if (checkinId == null) {
+            return null;
+        }
+        return QRCodeGenerator.generateQRCode(checkinId, width, height);
     }
 
-    public void setCurrentUserSignedUp(Boolean currentUserSignedUp) {
-        this.currentUserSignedUp = currentUserSignedUp;
-    }
-
-    public Boolean isCurrentUserCheckedIn() {
-        return currentUserCheckedIn;
-    }
-
-    public void setCurrentUserCheckedIn(Boolean currentUserCheckedIn) {
-        this.currentUserCheckedIn = currentUserCheckedIn;
-    }
 }
 
 
