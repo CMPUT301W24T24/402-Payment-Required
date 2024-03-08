@@ -24,29 +24,32 @@ import java.util.HashMap;
 public class ViewEventFragment extends Fragment {
     private FragmentViewEventBinding binding;
     private ViewEventViewModel viewModel;
+    private Event event;
+
+//    public ViewEventFragment(Event event) {
+//        this.event = event;
+//    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentViewEventBinding.inflate(inflater, container, false);
+        // TODO query the sign up from database
+        // if not, show the "Signup" button
         View root = binding.getRoot();
 
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this).get(ViewEventViewModel.class);
 
-        // Set the ViewModel for data binding
-        binding.getRoot();
-
         // Handle the "Attend Event" button click
         binding.viewEventSignUp.setOnClickListener(v -> {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            CollectionReference signupsRef = db.collection("signUps");
+            CollectionReference signupsRef = db.collection("signUpTable");
 
             User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
-            Intent intent = new Intent();
-            Event event = intent.getParcelableExtra("event" );
+            Event event = getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null;
             // Add the event to the collection
-            HashMap<String, String> data = new HashMap<>();
+            HashMap<String, Object> data = new HashMap<>();
             data.put("user_id", user.getId());
             data.put("event_id", event.getId());
             signupsRef.add(data)

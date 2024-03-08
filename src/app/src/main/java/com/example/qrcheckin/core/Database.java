@@ -175,17 +175,48 @@ public class Database {
     }
 
     /**
+     * Adds a given event to the database of available events
+     * @param event
+     */
+    public void addEvent(@NonNull Event event){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("host", event.getOwner().getId());
+        data.put("name", event.getName());
+        data.put("description", event.getDescription());
+        data.put("posterRef", null);
+        data.put("time", null);
+        data.put("location", null);
+        data.put("location_geo_lat", event.getLocationGeoLat());
+        data.put("location_geo_long", event.getLocationGeoLong());
+        data.put("checkin_id", null);
+        data.put("checkin_qr", null);
+        data.put("promote_id", null);
+        data.put("promote_qr", null);
+        data.put("geo", null);
+        data.put("limit", null);
+        eventsRef.add(data)
+                .addOnSuccessListener(documentReference -> {
+                    event.setId(documentReference.getId());
+                    Log.d("Firestore", "DocumentSnapshot successfully written with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", e.toString());
+                });
+    }
+
+    /**
      * Check in a user to an event
      * @param user The user to check in
      * @param event The event to check in to
      */
     public void checkIn(User user, Event event) {
-        Long timestamp = System.currentTimeMillis() / 1000;
         FieldValue serverTimestamp = FieldValue.serverTimestamp();
         HashMap<String, Object> data = new HashMap<>();
         data.put("user_id", user.getId());
         data.put("event_id", event.getId());
         data.put("time", serverTimestamp);
+        data.put("latitude", null);
+        data.put("longitude", null);
         checkinsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     Log.d("Firestore", "Checked in with ID: " + documentReference.getId());
@@ -203,7 +234,6 @@ public class Database {
      * @param longitude The longitude of the user's location
      */
     public void checkInWithGeo(User user, Event event, double latitude, double longitude) {
-        Long timestamp = System.currentTimeMillis() / 1000;
         FieldValue serverTimestamp = FieldValue.serverTimestamp();
         HashMap<String, Object> data = new HashMap<>();
         data.put("user_id", user.getId());
