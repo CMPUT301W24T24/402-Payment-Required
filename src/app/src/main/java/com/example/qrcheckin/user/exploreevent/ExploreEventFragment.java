@@ -1,4 +1,4 @@
-package com.example.qrcheckin.user.myevent;
+package com.example.qrcheckin.user.exploreevent;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -17,27 +17,28 @@ import android.widget.ListView;
 
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
-import com.example.qrcheckin.databinding.FragmentEventBinding;
+import com.example.qrcheckin.databinding.FragmentExploreEventBinding;
 
 import java.io.Serializable;
 
-public class EventFragment extends Fragment {
+public class ExploreEventFragment extends Fragment {
 
-    private FragmentEventBinding binding;
+    private FragmentExploreEventBinding binding;
     private ListView listView;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        EventViewModel eventViewModel =
-                new ViewModelProvider(this).get(EventViewModel.class);
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        ExploreEventViewModel exploreEventViewModel =
+                new ViewModelProvider(this).get(ExploreEventViewModel.class);
 
-        binding = FragmentEventBinding.inflate(inflater, container, false);
+        binding = FragmentExploreEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        listView = binding.eventListView;
-        eventViewModel.initializeAdaptor(getContext());
+        listView = binding.exploreEventListView;
+        exploreEventViewModel.initializeAdaptor(getContext());
 
-        eventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        exploreEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
         return root;
     }
@@ -52,15 +53,17 @@ public class EventFragment extends Fragment {
                 Event event = (Event) listView.getItemAtPosition(position);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
-                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_explore_event_to_nav_view_event, bundle);
             }
         });
     }
 
+    /**
+     * A function used to destroy the view once the user left the app
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
-
 }

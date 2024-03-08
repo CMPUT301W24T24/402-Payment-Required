@@ -74,7 +74,7 @@ public class CreateNotificationFragment extends Fragment {
         final EditText editText = binding.createNotificationMessage;
         createNotificationViewModel.getText().observe(getViewLifecycleOwner(), editText::setText);
 
-        event_id = getArguments().getString("event_id");
+        event_id = getArguments().getString("eventId");
 
         //Bundle bundle = new Bundle();
         //bundle.put()

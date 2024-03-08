@@ -1,12 +1,14 @@
 package com.example.qrcheckin.core;
 
+import android.graphics.Bitmap;
+
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * An object that keeps track of the event data
  */
-public class Event {
+public class Event implements Serializable {
 
     private String id;
     private User host;
@@ -15,15 +17,18 @@ public class Event {
     private String posterRef;
     private Date time;
     private String location;
-    private Double locationGeoLat;
-    private Double locationGeoLong;
+    private Double locationGeoLat,locationGeoLong; //geolocation data
     private String checkinId;
-    private String checkinRq;
+    private String checkinQR;
     private String promoteId;
-    private String promoteRq;
+    private String promoteQR;
     private Boolean geo;
     private Integer limit;
     private UserList attendees;
+    private Boolean currentUserSignedUp;
+    private Boolean currentUserCheckedIn;
+
+   
 
     /**
      * A constructor for the event object
@@ -34,15 +39,15 @@ public class Event {
      * @param posterRef the reference to the poster of the event
      * @param time the time of the event
      * @param location the location of the event
-     * @param locationGeoLat the latitude of the location
-     * @param locationGeoLong the longitude of the location
+     * @param latitude the latitude of the location
+     * @param longitude the longitude of the location
      * @param checkinId the id of the checkin
      * @param promoteId the id of the promotion
      * @param geo the boolean value of the location
      * @param limit the limit of the event
      * @param attendees the list of users attending the event
      */
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String promoteId, Boolean geo, Integer limit, UserList attendees) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String promoteId, Boolean geo, Integer limit, UserList attendees) {
         this.id = id;
         this.host = host;
         this.name = name;
@@ -50,16 +55,18 @@ public class Event {
         this.posterRef = posterRef;
         this.time = time;
         this.location = location;
-        this.locationGeoLat = locationGeoLat;
-        this.locationGeoLong = locationGeoLong;
+        this.locationGeoLat = latitude;
+        this.locationGeoLong = longitude;
         this.checkinId = checkinId;
         this.promoteId = promoteId;
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit, UserList attendees) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
         this.id = id;
         this.host = host;
         this.name = name;
@@ -67,18 +74,20 @@ public class Event {
         this.posterRef = posterRef;
         this.time = time;
         this.location = location;
-        this.locationGeoLat = locationGeoLat;
-        this.locationGeoLong = locationGeoLong;
+        this.locationGeoLat = latitude;
+        this.locationGeoLong = longitude;
         this.checkinId = checkinId;
-        this.checkinRq = checkinRq;
+        this.checkinQR = checkinQR;
         this.promoteId = promoteId;
-        this.promoteRq = promoteRq;
+        this.promoteQR = promoteQR;
         this.geo = geo;
         this.limit = limit;
         this.attendees = attendees;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
     }
 
-    public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinRq, String promoteId, String promoteRq, Boolean geo, Integer limit) {
+    public Event(User host, String name, String description, String posterRef, Date time, String location, Double locationGeoLat, Double locationGeoLong, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit) {
         this.host = host;
         this.name = name;
         this.description = description;
@@ -88,11 +97,73 @@ public class Event {
         this.locationGeoLat = locationGeoLat;
         this.locationGeoLong = locationGeoLong;
         this.checkinId = checkinId;
-        this.checkinRq = checkinRq;
+        this.checkinQR = checkinQR;
         this.promoteId = promoteId;
-        this.promoteRq = promoteRq;
+        this.promoteQR = promoteQR;
         this.geo = geo;
         this.limit = limit;
+        this.currentUserSignedUp = false;
+        this.currentUserCheckedIn = false;
+    }
+
+        /**
+     * CheckIn attempts to check in a user, and if required checks their location against the events
+     * @param user User who wants to check in to event
+     * @param latitude Latitude of user who wants to check into event
+     * @param longitude Longitude of user who wants to check into event
+     * @return True if user successfully checked in, false otherwise
+     */
+    public boolean checkIn(User user, Double latitude, Double longitude){
+        if(!geo) {
+            (new Database()).checkIn(user,this);
+            if(!attendees.hasUser(user))
+                attendees.add(user);
+            return true;//success
+        }else if(haversine(latitude,longitude,this.locationGeoLat,this.locationGeoLong) < 3000){
+            (new Database()).checkInWithGeo(user,this,latitude,longitude);
+            if(!attendees.hasUser(user))
+                attendees.add(user);
+            return true;//success
+        }
+        return false;//failed to check in
+    }
+
+    /**
+     * Alternative to checkIn which does not apply geo data, but will always fail if geo data is required
+     * @param user User who wants to check in to event
+     * @return True if user successfully checked in (only if event geo is disabled), false otherwise
+     */
+    public boolean checkIn(User user){
+        if(geo)
+            return false;//failed to check in as no location provided
+
+        (new Database()).checkIn(user,this);
+        if(!attendees.hasUser(user))
+            attendees.add(user);
+        return true;//success
+    }
+
+    /** Simple haversine implementation to covert two latitude longitude pairs to a distance in meters, see https://www.movable-type.co.uk/scripts/latlong.html
+     * @return approximation of the distance in meters between the two latitude longitude pairs
+     */
+    public double haversine(Double lat1,Double lon1, Double lat2,Double lon2){
+        final int R = 6371000;//radius of earth in meters
+        Double latDistSin = Math.sin(Math.toRadians(lat2-lat1)/2);
+        Double lonDistSin = Math.sin(Math.toRadians(lon2-lon1)/2);
+        Double a = latDistSin*latDistSin + lonDistSin*lonDistSin*Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180);
+        Double c=2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        Double distance = R*c;
+        return distance;
+    }
+
+    /**
+     * Changes the geolocation data for the event,
+     * @param latitude The latitude for the center of the circular event area
+     * @param longitude The longitude for the center of the circular event area
+     */
+    public void setGeolocationData(double latitude, double longitude){
+        this.locationGeoLat=latitude;
+        this.locationGeoLong=longitude;
     }
 
     /**
@@ -222,12 +293,10 @@ public class Event {
         this.checkinId = checkinId;
     }
 
-    public String getCheckinRq() {
-        return checkinRq;
-    }
+    public String getCheckinQR() {  return checkinQR; }
 
-    public void setCheckinRq(String checkinRq) {
-        this.checkinRq = checkinRq;
+    public void setCheckinQR(String checkinQR) {
+        this.checkinQR = checkinQR;
     }
 
     public String getPromoteId() {
@@ -238,12 +307,12 @@ public class Event {
         this.promoteId = promoteId;
     }
 
-    public String getPromoteRq() {
-        return promoteRq;
+    public String getPromoteQR() {
+        return promoteQR;
     }
 
-    public void setPromoteRq(String promoteRq) {
-        this.promoteRq = promoteRq;
+    public void setPromoteQR(String promoteQR) {
+        this.promoteQR = promoteQR;
     }
 
     public Boolean getGeo() {
@@ -273,6 +342,29 @@ public class Event {
 //        Event event = (Event) o;
 //        return this.id.compareTo(event.getId());
 //    }
+
+    public Bitmap getQRCodeFromID(int width, int height) {
+        if (checkinId == null) {
+            return null;
+        }
+        return QRCodeGenerator.generateQRCode(checkinId, width, height);
+    }
+
+    public Boolean isCurrentUserSignedUp() {
+        return currentUserSignedUp;
+    }
+
+    public void setCurrentUserSignedUp(Boolean currentUserSignedUp) {
+        this.currentUserSignedUp = currentUserSignedUp;
+    }
+
+    public Boolean isCurrentUserCheckedIn() {
+        return currentUserCheckedIn;
+    }
+
+    public void setCurrentUserCheckedIn(Boolean currentUserCheckedIn) {
+        this.currentUserCheckedIn = currentUserCheckedIn;
+    }
 
 }
 

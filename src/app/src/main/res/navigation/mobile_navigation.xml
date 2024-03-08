@@ -15,19 +15,31 @@
         android:id="@+id/nav_event"
         android:name="com.example.qrcheckin.user.myevent.EventFragment"
         android:label="@string/nav_my_events"
-        tools:layout="@layout/fragment_event" />
+        tools:layout="@layout/fragment_event">
+        <action
+            android:id="@+id/action_nav_event_to_nav_view_event"
+            app:destination="@id/nav_view_event" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_host_event"
         android:name="com.example.qrcheckin.user.hostedevent.HostedEventFragment"
         android:label="@string/nav_hosted_events"
-        tools:layout="@layout/fragment_hosted_event" />
+        tools:layout="@layout/fragment_hosted_event">
+        <action
+            android:id="@+id/action_nav_event_to_nav_create_event"
+            app:destination="@id/nav_create_event" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_explore_event"
-        android:name="com.example.qrcheckin.user.browseevent.BrowseEventFragment"
+        android:name="com.example.qrcheckin.user.exploreevent.ExploreEventFragment"
         android:label="@string/nav_explore_events"
-        tools:layout="@layout/fragment_browse_events" />
+        tools:layout="@layout/fragment_explore_event">
+        <action
+            android:id="@+id/action_nav_explore_event_to_nav_view_event"
+            app:destination="@id/nav_view_event" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_profile"
@@ -66,5 +78,17 @@
         android:name="com.example.qrcheckin.admin.allprofiles.AllProfilesFragment"
         android:label="@string/nav_all_event"
         tools:layout="@layout/fragment_all_profiles" />
+
+    <fragment
+        android:id="@+id/nav_view_event"
+        android:name="com.example.qrcheckin.user.viewEvent.ViewEventFragment"
+        android:label="view_event"
+        tools:layout="@layout/fragment_view_event" />
+
+    <fragment
+        android:id="@+id/nav_create_event"
+        android:name="com.example.qrcheckin.user.createevent.CreateEventFragment"
+        android:label="create_event"
+        tools:layout="@layout/fragment_create_event" />
 
 </navigation>

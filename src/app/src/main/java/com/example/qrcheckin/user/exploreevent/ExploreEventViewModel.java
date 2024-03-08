@@ -1,6 +1,8 @@
-package com.example.qrcheckin.user.hostedevent;
+package com.example.qrcheckin.user.exploreevent;
 
 import static com.example.qrcheckin.core.Database.onEventListChanged;
+
+import static java.security.AccessController.getContext;
 
 import android.content.Context;
 import android.util.Log;
@@ -28,21 +30,21 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class HostedEventViewModel extends ViewModel {
+public class ExploreEventViewModel extends ViewModel {
     private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
     private final ArrayList<Event> eventList;
-
-    public HostedEventViewModel() {
+    private User currentUser;
+    /**
+     * Initializes the ExploreEventViewModel class
+     */
+    public ExploreEventViewModel() {
         mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
         eventList = new ArrayList<Event>();
     }
-
     public void initializeAdaptor(Context context) {
         mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "hosted");
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "explore");
     }
-
-
 
     public LiveData<EventArrayAdaptor> getEventList() {
         return mEventArrayAdaptor;
