@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentAttendeesSignedUpBinding;
 
@@ -22,6 +24,7 @@ import java.io.Serializable;
 public class AttendeesSignedUpFragment extends Fragment {
     private FragmentAttendeesSignedUpBinding binding;
     private ListView listView;
+    private TextView textView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -32,9 +35,13 @@ public class AttendeesSignedUpFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.hostedEventListView;
-        attendeesSignedUpViewModel.initializeAdaptor(getContext(), savedInstanceState);
-
+        attendeesSignedUpViewModel.initializeAdaptor(getContext(), getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null);
         attendeesSignedUpViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        if (listView.getAdapter() == null) {
+            listView.setVisibility(View.INVISIBLE);
+            textView = binding.listEmptyTextView;
+            textView.setVisibility(View.VISIBLE);
+        }
         return root;
     }
 

@@ -448,6 +448,7 @@ public class Database {
 
     public static void getUsersSignedUpToEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEvent) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
+        CollectionReference userRef = FirebaseFirestore.getInstance().collection("users");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -459,10 +460,17 @@ public class Database {
                     Log.d("Firestore", "User list changed " + querySnapshots.size());
                     userList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
-                        if (doc.get("event_id") == currentEvent) {
-                            DocumentReference user = doc.getDocumentReference("user_id");
+                        if (Objects.equals(doc.getString("event_id"), currentEvent)) {
+                            String userId = doc.getString("user_id");
+                            DocumentReference user = userRef.document(userId);
+                            Log.d("Firestore", "Document Reference " + user.toString());
                             Log.d("Firestore", "User fetched " + doc.getId());
-                            fetchUser(doc, user, mUserArrayAdaptor, userList);
+                            if (user == null) {
+                                Log.d("Firestore", "User " + userId +" not found");
+                            }
+                            else {
+                                fetchUser(doc, user, mUserArrayAdaptor, userList);
+                            }
                         }
                     }
                 }

@@ -12,4 +12,14 @@
             android:id="@+id/hosted_event_list_view"
             app:layout_constraintTop_toTopOf="parent"/>
 
+        <TextView
+            android:id="@+id/list_empty_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No one has signed up for this event"
+            android:textSize="20dp"
+            android:layout_margin="50dp"
+            android:textAlignment="center"
+            app:layout_constraintTop_toTopOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

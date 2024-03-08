@@ -26,6 +26,7 @@ import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
+import com.example.qrcheckin.user.attendeessignedup.AttendeesSignedUpFragment;
 import com.example.qrcheckin.user.createevent.CreateEventViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,6 +38,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -120,8 +123,7 @@ public class EditEventFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
-                //TODO: create an id to navigate from edit to see_signUps
-                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_attendee_sign_up, bundle);
             }
         });
 

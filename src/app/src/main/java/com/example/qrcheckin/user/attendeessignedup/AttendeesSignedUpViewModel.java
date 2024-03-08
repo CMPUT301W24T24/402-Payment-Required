@@ -4,12 +4,14 @@ import static com.example.qrcheckin.core.Database.getUsersSignedUpToEvent;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.qrcheckin.QRCheckInApplication;
+import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.core.UserArrayAdaptor;
@@ -27,9 +29,10 @@ public class AttendeesSignedUpViewModel extends ViewModel {
         // TODO: change the query to only hold the users signed up to the event
     }
 
-    public void initializeAdaptor(Context context, Bundle bundle) {
+    public void initializeAdaptor(Context context, Event event) {
         mUserArrayAdapter.setValue(new UserArrayAdaptor(context, userList));
-        getUsersSignedUpToEvent(userList, mUserArrayAdapter, bundle.getString("event"));
+        getUsersSignedUpToEvent(userList, mUserArrayAdapter, event.getId());
+        Log.d("Event Bundle",event.getId());
     }
 
     public LiveData<UserArrayAdaptor> getUserList() {

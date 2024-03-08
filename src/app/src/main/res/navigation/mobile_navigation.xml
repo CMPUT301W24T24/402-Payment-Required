@@ -38,8 +38,11 @@
         android:id="@+id/nav_edit_event"
         android:name="com.example.qrcheckin.user.editevent.EditEventFragment"
         android:label="Edit Events"
-        tools:layout="@layout/fragment_edit_event"
-        />
+        tools:layout="@layout/fragment_edit_event">
+        <action
+            android:id="@+id/action_nav_edit_event_to_nav_attendee_sign_up"
+            app:destination="@id/nav_attendees_signed_up" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_explore_event"
@@ -94,5 +97,12 @@
         android:name="com.example.qrcheckin.user.createevent.CreateEventFragment"
         android:label="create_event"
         tools:layout="@layout/fragment_create_event" />
+
+    <fragment
+        android:id="@+id/nav_attendees_signed_up"
+        android:name="com.example.qrcheckin.user.attendeessignedup.AttendeesSignedUpFragment"
+        android:label="attendees_signed_up"
+        tools:layout="@layout/fragment_attendees_signed_up">
+    </fragment>
 
 </navigation>
