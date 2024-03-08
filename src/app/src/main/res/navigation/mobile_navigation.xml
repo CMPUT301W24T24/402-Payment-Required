@@ -27,6 +27,8 @@
         android:id="@+id/nav_profile"
         android:name="com.example.qrcheckin.user.profile.ProfileFragment"
         android:label="@string/nav_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+    </fragment>
+
 
 </navigation>

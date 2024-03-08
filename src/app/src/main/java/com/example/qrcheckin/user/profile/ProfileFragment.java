@@ -2,6 +2,11 @@ package com.example.qrcheckin.user.profile;
 
 import static android.content.ContentValues.TAG;
 
+import static androidx.navigation.Navigation.findNavController;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,13 +17,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.QRCheckInApplication;
+import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentProfileBinding;
 import com.example.qrcheckin.databinding.FragmentViewEventBinding;
 import com.example.qrcheckin.user.viewEvent.ViewEventViewModel;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+
+import java.util.HashMap;
 
 public class ProfileFragment extends Fragment {
 
@@ -42,17 +58,42 @@ public class ProfileFragment extends Fragment {
             // Set geolocation checkbox state based on user's preference
             binding.profileGeolocation.setChecked(user.isGeo());
 
-            // Print user details to the log
-            Log.d(TAG, "User Details:");
-            Log.d(TAG, "Name: " + user.getName());
-            Log.d(TAG, "Email: " + user.getEmail());
-            Log.d(TAG, "Phone: " + user.getPhone());
-            Log.d(TAG, "Homepage: " + user.getHomepage());
-            Log.d(TAG, "Geolocation Enabled: " + user.isGeo());
         } else {
             Log.e(TAG, "User is null");
         }
-
+        binding.profileSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (user != null) {
+                    user.setName(binding.profileName.getText().toString());
+                    user.setEmail(binding.profileEmail.getText().toString());
+                    user.setPhone(binding.profilePhoneNumber.getText().toString());
+                    user.setHomepage(binding.profileHomepageLink.getText().toString());
+                    if (binding.profileGeolocation.isChecked()) {
+                        user.setGeo(TRUE);
+                    } else {
+                        user.setGeo(FALSE);
+                    }
+                    //Accessing the users database
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    CollectionReference usersRef = db.collection("users");
+                    DocumentReference docRef = usersRef.document(user.getId());
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put("name", user.getName());
+                    data.put("email", user.getEmail());
+                    data.put("phone", user.getPhone());
+                    data.put("homepage", user.getHomepage());
+                    data.put("geo", user.isGeo());
+                    usersRef.add(data)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d("Firestore", "Updated profile for: " + documentReference.getId());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firestore", e.toString());
+                            });
+                }
+            }
+        });
         return root;
     }
 
