@@ -254,7 +254,7 @@ public class Database {
         });
     }
 
-    public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId) {
+    public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -267,10 +267,9 @@ public class Database {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
                     eventList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
-//                        Log.d("Firestore", doc.getId() + doc.getData().toString());
                         DocumentReference hostRef = doc.getDocumentReference("host");
                         Log.d("Firestore", "Event fetched " + doc.getId());
-                        fetchHost(doc, hostRef, mEventArrayAdaptor, eventList, currentUserId);
+                        fetchHost(doc, hostRef, mEventArrayAdaptor, eventList, currentUserId, type);
                     }
                 }
 
@@ -287,7 +286,7 @@ public class Database {
      * @param eventList The list of events
      * @param currentUserId The id of the current user
      */
-    private static void fetchHost(QueryDocumentSnapshot doc, DocumentReference userRef, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, ArrayList<Event> eventList, String currentUserId) {
+    private static void fetchHost(QueryDocumentSnapshot doc, DocumentReference userRef, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, ArrayList<Event> eventList, String currentUserId, String type) {
         userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot userDoc) {
@@ -319,9 +318,26 @@ public class Database {
                             null
                     );
                     Log.d("Firestore", "Host fetched " + user.getName());
-                    getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId);
-                    getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId);
-                    eventList.add(event);
+                    switch(type) {
+                        case "explore":
+                            getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
+                            getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
+                            eventList.add(event);
+                            break;
+                        case "my":
+                            getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId, Boolean.TRUE, eventList);
+                            getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId, Boolean.TRUE, eventList);
+                            break;
+                        case "hosted":
+                            if (user.getId().equals(currentUserId)) {
+                                getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
+                                getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
+                                eventList.add(event);
+                            }
+                            break;
+                        default:
+                            Log.e("Firestore", "Unknown type");
+                    }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
                 } else {
                     Log.e("Firestore", "Host not found");
@@ -337,7 +353,7 @@ public class Database {
      * @param mEventArrayAdaptor The MutableLiveData of the EventArrayAdaptor
      * @param userId The id of the current user
      */
-    private static void getCurrentUserCheckedIns(Event event, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String userId) {
+    private static void getCurrentUserCheckedIns(Event event, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String userId, Boolean toAdd, ArrayList<Event> eventList) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("checkins");
         cr.whereEqualTo("event_id", event.getId()).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -347,15 +363,16 @@ public class Database {
                     return;
                 }
                 if (querySnapshots != null) {
+                    event.setCurrentUserCheckedIn(Boolean.FALSE);
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         if (doc.getString("user_id").equals(userId)) {
                             Log.d("Firestore", "Checked in");
                             event.setCurrentUserCheckedIn(Boolean.TRUE);
-                            Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
-                            return;
                         }
                     }
-                    event.setCurrentUserCheckedIn(Boolean.FALSE);
+                    if (toAdd && event.isCurrentUserCheckedIn()) {
+                        eventList.add(event);
+                    }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
                 }
             }
@@ -370,7 +387,7 @@ public class Database {
      * @param mEventArrayAdaptor The MutableLiveData of the EventArrayAdaptor
      * @param userId The id of the current user
      */
-    private static void getCurrentUserSignedUps(Event event, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String userId) {
+    private static void getCurrentUserSignedUps(Event event, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String userId, Boolean toAdd, ArrayList<Event> eventList) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
         cr.whereEqualTo("event_id", event.getId()).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -380,16 +397,16 @@ public class Database {
                     return;
                 }
                 if (querySnapshots != null) {
-                    Log.d("Firestore", "Signing");
+                    event.setCurrentUserSignedUp(Boolean.FALSE);
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         if (doc.getString("user_id").equals(userId)) {
                             Log.d("Firestore", "Signed up");
                             event.setCurrentUserSignedUp(Boolean.TRUE);
-                            Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
-                            return;
                         }
                     }
-                    event.setCurrentUserSignedUp(Boolean.FALSE);
+                    if (toAdd && event.isCurrentUserSignedUp()) {
+                        eventList.add(event);
+                    }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
                 }
             }

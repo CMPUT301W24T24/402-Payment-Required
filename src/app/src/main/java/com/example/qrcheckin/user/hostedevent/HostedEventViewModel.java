@@ -35,12 +35,11 @@ public class HostedEventViewModel extends ViewModel {
     public HostedEventViewModel() {
         mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
         eventList = new ArrayList<Event>();
-        // TODO: Change to query only the events hosted by the user
     }
 
     public void initializeAdaptor(Context context) {
         mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId());
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "hosted");
     }
 
 

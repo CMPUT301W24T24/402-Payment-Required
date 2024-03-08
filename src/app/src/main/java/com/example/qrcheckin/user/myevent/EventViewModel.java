@@ -42,7 +42,7 @@ public class EventViewModel extends ViewModel {
 
     public void initializeAdaptor(Context context) {
         mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId());
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "my");
     }
 
     public LiveData<EventArrayAdaptor> getEventList() {
