@@ -105,6 +105,7 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
+            // TODO: check that checkinId and promoteID are not the same
             if (titleTextView.getText().toString().isEmpty()) {
                 Toast.makeText(getContext(), "Please enter a Title", Toast.LENGTH_SHORT).show();
                 return;
