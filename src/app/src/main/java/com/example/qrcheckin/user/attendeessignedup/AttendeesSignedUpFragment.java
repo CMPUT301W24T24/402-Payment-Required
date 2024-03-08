@@ -32,9 +32,9 @@ public class AttendeesSignedUpFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.hostedEventListView;
-        attendeesSignedUpViewModel.initializeAdaptor(getContext());
+        attendeesSignedUpViewModel.initializeAdaptor(getContext(), savedInstanceState);
 
-        attendeesSignedUpViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        attendeesSignedUpViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
         return root;
     }
 
