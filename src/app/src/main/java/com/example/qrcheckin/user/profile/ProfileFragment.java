@@ -133,5 +133,8 @@ public class ProfileFragment extends Fragment {
         if (!(binding.profileHomepageLink.getText().toString().equals(user.getHomepage()))) {
             binding.profileHomepageLink.setText(user.getHomepage());
         }
+        if (!(binding.profileGeolocation.isChecked() == user.isGeo())) {
+            binding.profileGeolocation.setChecked(false);
+        }
     }
 }
