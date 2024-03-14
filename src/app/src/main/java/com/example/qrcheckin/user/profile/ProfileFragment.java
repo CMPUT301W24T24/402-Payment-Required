@@ -8,6 +8,10 @@ import static com.google.common.reflect.Reflection.getPackageName;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,7 +67,7 @@ public class ProfileFragment extends Fragment {
 
             //String uri = "@drawable/cat.jpg";
             //int imageResource = getResources().getIdentifier(uri, null, getPackageName());
-            binding.profilePicture.setImageResource(R.drawable.cat);
+            binding.profilePicture.setImageBitmap(generateProfilePicture(user));
 
         } else {
             Log.e(TAG, "User is null");
@@ -137,4 +141,117 @@ public class ProfileFragment extends Fragment {
             binding.profileGeolocation.setChecked(false);
         }
     }
+
+    /**
+     * Generates a profile picture for the user
+     * Reference: https://stackoverflow.com/questions/2655402/android-canvas-drawtext Gaz. Accessed 2024-03-14
+     * @param user the user
+     * @return the profile picture
+     */
+    private Bitmap generateProfilePicture(User user) {
+        String name = "NU";
+        if (user.getName().length() >= 2) {
+            name = user.getName().substring(0, 2);
+        }
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawPaint(paint);
+
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(20);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(name, 50, 55, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+        paint.setColor(hashedColor(name.substring(0,1).toLowerCase()));
+        canvas.drawCircle(50, 50, 35, paint);
+        return bitmap;
+    }
+    private int hashedColor(String s) {
+        switch (s) {
+            case "a":
+                return Color.parseColor("#FF0000");
+            case "b":
+                return Color.parseColor("#FFA500");
+            case "c":
+                return Color.parseColor("#FFFF00");
+
+            case "d":
+                return Color.parseColor("#008000");
+
+            case "e":
+                return Color.parseColor("#0000FF");
+
+            case "f":
+                return Color.parseColor("#4B0082");
+
+            case "g":
+                return Color.parseColor("#EE82EE");
+
+            case "h":
+                return Color.parseColor("#A9A9A9");
+
+            case "i":
+                return Color.parseColor("#808080");
+
+            case "j":
+                return Color.parseColor("#FFFFFF");
+
+            case "k":
+                return Color.parseColor("#FFC0CB");
+
+            case "l":
+                return Color.parseColor("#FFA07A");
+
+            case "m":
+                return Color.parseColor("#FFD700");
+
+            case "n":
+                return Color.parseColor("#ADFF2F");
+
+            case "o":
+                return Color.parseColor("#00FFFF");
+
+            case "p":
+                return Color.parseColor("#800080");
+
+            case "q":
+                return Color.parseColor("#DA70D6");
+
+            case "r":
+                return Color.parseColor("#696969");
+
+            case "s":
+                return Color.parseColor("#D3D3D3");
+
+            case "t":
+                return Color.parseColor("#F5F5F5");
+
+            case "u":
+                return Color.parseColor("#FF69B4");
+
+            case "v":
+                return Color.parseColor("#00FF7F");
+
+            case "w":
+                return Color.parseColor("#87CEEB");
+
+            case "x":
+                return Color.parseColor("#FF6347");
+
+            case "y":
+                return Color.parseColor("#FF4500");
+
+            case "z":
+                return Color.parseColor("#FF1493");
+
+            default:
+                return Color.parseColor("#000000");
+
+        }
+    }
+
 }
