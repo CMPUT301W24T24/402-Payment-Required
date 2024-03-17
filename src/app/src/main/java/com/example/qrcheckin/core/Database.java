@@ -308,7 +308,7 @@ public class Database {
                 }
                 if (querySnapshots != null) {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
-                    eventList.clear();
+                    mEventArrayAdaptor.getValue().getEvents().clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         DocumentReference hostRef = doc.getDocumentReference("host");
                         Log.d("Firestore", "Event fetched " + doc.getId());
