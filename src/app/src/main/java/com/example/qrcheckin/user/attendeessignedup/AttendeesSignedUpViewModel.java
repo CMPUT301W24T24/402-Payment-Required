@@ -16,8 +16,11 @@ import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.core.UserArrayAdaptor;
 import com.example.qrcheckin.core.UserList;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+
 
 public class AttendeesSignedUpViewModel extends ViewModel {
     private final MutableLiveData<UserArrayAdaptor> mUserArrayAdapter;
@@ -36,6 +39,10 @@ public class AttendeesSignedUpViewModel extends ViewModel {
         Log.d("Event Bundle",event.getId());
     }
 
+    /**
+     * Gets the Mutable UserArrayAdapter list
+     * @return the MutableLiveData list of UserArrayAdapters
+     */
     public LiveData<UserArrayAdaptor> getUserList() {
         return mUserArrayAdapter;
     }

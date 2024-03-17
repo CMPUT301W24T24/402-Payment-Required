@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
+import com.example.qrcheckin.core.UserArrayAdaptor;
 import com.example.qrcheckin.databinding.FragmentAttendeesSignedUpBinding;
 
 import java.io.Serializable;
@@ -37,6 +38,7 @@ public class AttendeesSignedUpFragment extends Fragment {
         listView = binding.hostedEventListView;
         attendeesSignedUpViewModel.initializeAdaptor(getContext(), getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null);
         attendeesSignedUpViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
+
         if (listView.getAdapter() == null) {
             listView.setVisibility(View.INVISIBLE);
             textView = binding.listEmptyTextView;
@@ -60,6 +62,9 @@ public class AttendeesSignedUpFragment extends Fragment {
         });
     }
 
+    /**
+     * Destroys the view once the user has left the app
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
