@@ -285,6 +285,7 @@ public class Database {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Log.e("Firestorage", exception.toString());
+                imageView.setImageBitmap(user.generateProfilePicture());
             }
         });
     }
