@@ -178,8 +178,14 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         navProfileName.setText(currentUser.getName());
 
         ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
-        Database db = new Database();
-        db.getUserPicture(currentUser, navProfileImage);
+        if (user.getImageRef() != null && !user.getImageRef().isEmpty()) {
+            // Set the profile picture of the user to the XML view
+            Database db = new Database();
+            db.getUserPicture(currentUser, navProfileImage);
+        } else {
+            // Generate a profile picture for the user and set it to the XML view
+            navProfileImage.setImageBitmap(currentUser.generateProfilePicture());
+        }
 
         // set the notification listeners for event user is signed up for
         createNotificationListeners();
