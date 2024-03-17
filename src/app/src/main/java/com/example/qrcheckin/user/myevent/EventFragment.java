@@ -7,20 +7,27 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.databinding.FragmentEventBinding;
-import com.example.qrcheckin.databinding.FragmentHostedEventBinding;
-import com.example.qrcheckin.user.hostedevent.HostedEventViewModel;
 
+import java.io.Serializable;
+
+/**
+ * Fragment which contains a list of the events a user has checked into
+ */
 public class EventFragment extends Fragment {
 
     private FragmentEventBinding binding;
+    private ListView listView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -30,9 +37,27 @@ public class EventFragment extends Fragment {
         binding = FragmentEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textEvent;
-        eventViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        listView = binding.eventListView;
+        eventViewModel.initializeAdaptor(getContext());
+
+        eventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event event = (Event) listView.getItemAtPosition(position);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("event", (Serializable) event);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
+            }
+        });
     }
 
     @Override
