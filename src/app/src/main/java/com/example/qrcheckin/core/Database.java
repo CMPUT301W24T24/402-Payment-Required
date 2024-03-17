@@ -272,7 +272,7 @@ public class Database {
     public void getUserPicture(User user, ImageView imageView) {
         if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
             Log.e("Firestorage", "No picture reference");
-            // TODO: set a default picture or handle no picture
+            imageView.setImageBitmap(user.generateProfilePicture());
             return;
         }
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
