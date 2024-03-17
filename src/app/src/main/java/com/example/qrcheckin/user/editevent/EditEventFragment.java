@@ -2,6 +2,10 @@ package com.example.qrcheckin.user.editevent;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -38,6 +43,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,8 +74,9 @@ public class EditEventFragment extends Fragment {
         Button notify = binding.editEventNotifyAttendees;
         Button exportQREventCode = binding.editEventExportEventCode;
         ImageView checkInCode = binding.editEventCheckInCode;
-        Button exportCheckCode = binding.editEventExportEventCode;
+        Button exportCheckCode = binding.editEventExportCheckinCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
+        ImageView promoteCode = binding.promoteCode;
 
         // Set event information
         assert event != null;
@@ -108,6 +116,11 @@ public class EditEventFragment extends Fragment {
                         String check_inId = documentSnapshot.getString("checkin_id");
                         checkInCode.setImageBitmap(QRCodeGenerator.generateQRCode(check_inId, 800, 800));
                         checkInCode.setVisibility(View.VISIBLE);
+
+                        //get eventQRCode
+
+                        String eventQRId = documentSnapshot.getString("promote_id");
+                        promoteCode.setImageBitmap(QRCodeGenerator.generateQRCode(eventQRId, 800, 800));
                     }
                 }
             }
@@ -134,6 +147,23 @@ public class EditEventFragment extends Fragment {
                 (new EditEventFragment()).setArguments(args);
                 //TODO: navigate to the notify -> link in the navigation bar
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_create_notification, args);
+            }
+        });
+        exportCheckCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) checkInCode.getDrawable();
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+                shareImageAndText(bitmap);
+            }
+        });
+
+        exportQREventCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) promoteCode.getDrawable();
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+                shareImageAndText(bitmap);
             }
         });
 
@@ -281,4 +311,40 @@ public class EditEventFragment extends Fragment {
         binding = null;
     }
 
+    /**
+     * Method for opening the share menu
+     * @param bitmap the coordinates of the image being shared
+     */
+    public void shareImageAndText(Bitmap bitmap) {
+        Uri uri = getImageToShare(bitmap);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.putExtra(Intent.EXTRA_TEXT, "Sharing Image");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
+        intent.setType("image/png");
+        startActivity(Intent.createChooser(intent, "Share Via"));
+    }
+
+    /**
+     * A method which retrieves the image being shared to another app
+     * @param bitmap the coordinates of the image
+     * @return
+     * The image retrieved
+     */
+    public Uri getImageToShare(Bitmap bitmap) {
+        File imageFolder = new File(getContext().getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imageFolder.mkdirs();
+            File file = new File(imageFolder, "shared_image.png");
+            FileOutputStream outputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            uri = FileProvider.getUriForFile(getContext(), "com.anni.shareimage.fileprovider", file);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        return uri;
+    }
 }

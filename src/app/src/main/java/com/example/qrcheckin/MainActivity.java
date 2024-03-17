@@ -71,24 +71,16 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-<<<<<<< HEAD
-=======
 
-
-
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
-<<<<<<< HEAD
         File file = new File(getCacheDir(), "image");
 
-=======
         // set up the app bar configuration
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home,
                 R.id.nav_home,
@@ -240,9 +232,6 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 || super.onSupportNavigateUp();
     }
 
-<<<<<<< HEAD
-
-=======
     /**
      * Creates listeners on the notification collection of each event
      * the user has signed up for
@@ -401,5 +390,4 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         notificationManager.notify(0, builder.build());
     }
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
 }

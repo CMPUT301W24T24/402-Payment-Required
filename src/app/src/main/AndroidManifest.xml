@@ -36,7 +36,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.anni.shareimage.fileprovider"
@@ -46,9 +45,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/paths" />
         </provider>
-=======
-
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
     </application>
 
 </manifest>

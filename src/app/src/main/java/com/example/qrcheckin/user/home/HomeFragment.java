@@ -1,6 +1,5 @@
 package com.example.qrcheckin.user.home;
 
-<<<<<<< HEAD
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,8 +8,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-=======
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,18 +39,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-<<<<<<< HEAD
 import java.io.File;
 import java.io.FileOutputStream;
 
 
-=======
 import java.util.List;
 
 /**
  * The home fragment which contains the QR scanner
  */
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
@@ -133,7 +127,6 @@ public class HomeFragment extends Fragment {
             });
 
     /**
-<<<<<<< HEAD
      * Method for opening the share menu
      * @param bitmap the coordinates of the image being shared
      */
@@ -169,9 +162,7 @@ public class HomeFragment extends Fragment {
         }
         return uri;
     }
-}
-=======
-     * Find an event in the database by QR value, returns null if the QR value is not present in the database
+     /** Find an event in the database by QR value, returns null if the QR value is not present in the database
      * @param qrValue Unique QR value to search for
      * @return The event object with given QR value, null otherwise
      */
@@ -218,5 +209,3 @@ public class HomeFragment extends Fragment {
 
     }
 }
-
->>>>>>> eb80fc55236ebb31f94e3f77e239875e4d878cc8
