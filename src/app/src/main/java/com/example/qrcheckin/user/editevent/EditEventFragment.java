@@ -24,9 +24,11 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.MapSetUp;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
 import com.example.qrcheckin.user.createevent.CreateEventViewModel;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -69,6 +71,10 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
+//        private MapView mapView = findViewById(R.id.osmmap);
+//        private MapSetUp mapSetUp;
+//
+//        mapSetUp = new MapSetUp(this, mapView);
 
         // Set event information
         assert event != null;
