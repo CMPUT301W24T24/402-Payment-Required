@@ -32,6 +32,7 @@ public class AttendeesSignedUpViewModel extends ViewModel {
     public void initializeAdaptor(Context context, Event event) {
         mUserArrayAdapter.setValue(new UserArrayAdaptor(context, userList));
         getUsersSignedUpToEvent(userList, mUserArrayAdapter, event.getId());
+        Log.d("userList", userList.toString());
         Log.d("Event Bundle",event.getId());
     }
 

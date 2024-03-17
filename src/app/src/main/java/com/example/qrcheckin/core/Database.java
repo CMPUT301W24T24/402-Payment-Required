@@ -446,6 +446,12 @@ public class Database {
 
     }
 
+    /**
+     * Gets the list of users signed up to an event
+     * @param userList The empty list that is to be filled with users
+     * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdaptor
+     * @param currentEvent The id of the current event
+     */
     public static void getUsersSignedUpToEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEvent) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
         CollectionReference userRef = FirebaseFirestore.getInstance().collection("users");
