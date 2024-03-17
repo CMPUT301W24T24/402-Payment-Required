@@ -80,7 +80,7 @@
                 android:id="@+id/create_event_attend_limit_description_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Enter the attendee limit"
+                android:text="Enter the attendee limit\n(Leave blank or enter 0 for unlimited)"
                 android:layout_margin="20dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -91,11 +91,16 @@
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit" />
 
-            <NumberPicker
+            <EditText
                 android:id="@+id/create_event_attend_limit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="100dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="50dp"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:hint="attendee limit"
+                android:textAlignment="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/create_event_attend_limit_description_text"/>

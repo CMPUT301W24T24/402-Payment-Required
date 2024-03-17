@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * NotificationsFragment is the Fragment displayed when a user wants to view
@@ -233,7 +234,7 @@ public class NotificationsFragment extends Fragment {
                         // create new notification object to be displayed by list of notifications
                         notifList.add(new Notification(
                                 doc.getString("message"),
-                                 "Sent @ " + doc.getTimestamp("time").toDate().toString(),
+                                 "Sent @ " + Objects.requireNonNull(doc.getTimestamp("time")).toDate().toString(),
                                 eventsMap.get(eventID),
                                 eventID));
                         notificationsMap.put(eventID, notifList);

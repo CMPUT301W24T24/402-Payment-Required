@@ -74,7 +74,14 @@ public class EditEventFragment extends Fragment {
         assert event != null;
         editEventTitle.setText(event.getName());
         editEventDescription.setText(event.getDescription());
-        editEventAttendLimit.setText(String.valueOf(event.getLimit()));
+
+        // set event attendee limit
+        Integer eventLimit = event.getLimit();
+        String eventLimitText = eventLimit.toString();
+        if (eventLimitText.equals("0"))
+            eventLimitText = "unlimited";
+        editEventAttendLimit.setText(eventLimitText);
+
         //set poster
         eventPoster.setImageResource(R.drawable.cat);
 

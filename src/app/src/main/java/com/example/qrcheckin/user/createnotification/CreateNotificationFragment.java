@@ -14,8 +14,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavAction;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.qrcheckin.R;
 import com.example.qrcheckin.databinding.FragmentCreateNotificationBinding;
 import com.example.qrcheckin.databinding.FragmentHostedEventBinding;
 import com.example.qrcheckin.user.hostedevent.HostedEventViewModel;
@@ -83,6 +86,11 @@ public class CreateNotificationFragment extends Fragment {
                 String message = editText.getText().toString();
 
                 pushNotification(message, event_id);
+
+                // back to edit event page
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+                navController.popBackStack();
+
             }
         });
 

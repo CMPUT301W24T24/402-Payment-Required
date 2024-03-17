@@ -1,5 +1,7 @@
 package com.example.qrcheckin;
 
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         menu.findItem(R.id.nav_all_event).setVisible(false);
         menu.findItem(R.id.nav_all_images).setVisible(false);
         menu.findItem(R.id.nav_all_profile).setVisible(false);
+
 
         getDeviceUser(this);
 
