@@ -8,6 +8,7 @@ import static com.google.common.reflect.Reflection.getPackageName;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -108,30 +109,21 @@ public class ProfileFragment extends Fragment {
                     }
 
                     // Saving the user's profile picture
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference();
-                    String imageName = user.getId() + ".jpg";
-                    StorageReference imageRef = storageReference.child("users/" + imageName);
-                    Uri imageUri = Uri.parse(binding.profilePicture.getTag().toString());
-                    UploadTask uploadTask = imageRef.putFile(imageUri);
+                    // Reference: https://medium.com/@everydayprogrammer/uploading-files-to-firebase-storage-in-android-studio-using-java-63f43b4c8d72
+                    if (binding.profilePicture.getTag() != null) {
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        StorageReference storageReference = storage.getReference();
+                        Uri imageUri = Uri.parse(binding.profilePicture.getTag().toString());
+                        // Getting the image extension
+                        String fileName = imageUri.getPath();
+                        int dotIndex = fileName.lastIndexOf(".");
+                        String imageExtension = fileName.substring(dotIndex);
+                        String imageName = user.getId() + imageExtension;
 
-                    // Monitor the upload progress.
-                    uploadTask.addOnProgressListener(taskSnapshot -> {
-                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                        // This listener will provide the upload status of the file.
-                        // You can add a progress bar in you app and set max of the progress bar to taskSnapshot.getTotalByteCount().
-                        // And process of the progress bar to taskSnapshot.getBytesTransferred().
-                    }).addOnSuccessListener(taskSnapshot -> {
-                        // This listener is triggered when the file is uploaded successfully.
-                        // Using the below code you can get the download url of the file
-                        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                            String imageUrl = uri.toString();
-                            // Do something with the file URL, like saving it to a database or displaying it from cloud.
-                        });
-                    }).addOnFailureListener(exception -> {
-                        // This listener is triggered if there was an exception occured while uploading the file.
-                        // You can display a error message from here if exception occurs.
-                    });
+                        user.setImageRef("users/" + imageName);
+                        StorageReference imageRef = storageReference.child("users/" + imageName);
+                        UploadTask uploadTask = imageRef.putFile(imageUri);
+                    }
 
                     //Accessing the users database
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -173,6 +165,10 @@ public class ProfileFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Opens up the "choose image from gallery" menu
+     * Reference: https://www.geeksforgeeks.org/how-to-select-an-image-from-gallery-in-android/
+     */
     void imageChooser() {
         // create an instance of the
         // intent of the type image
@@ -185,6 +181,18 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(Intent.createChooser(i, "Select Picture"), selectPicture);
     }
 
+    /**
+     * Sets the profile picture to the selected image
+     * Reference: https://www.geeksforgeeks.org/how-to-select-an-image-from-gallery-in-android/
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 

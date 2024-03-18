@@ -36,8 +36,7 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:ignore="HardcodedText"
-            tools:src="@tools:sample/avatars" />
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/textView2"
