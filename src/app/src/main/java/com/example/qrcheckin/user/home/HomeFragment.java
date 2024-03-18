@@ -77,16 +77,6 @@ public class HomeFragment extends Fragment {
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
         ImageView qrButton=root.findViewById(R.id.qr_icon);
-        Button share = root.findViewById(R.id.shareqrcode);
-
-        share.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-                 BitmapDrawable bitmapDrawable = (BitmapDrawable) qrButton.getDrawable();
-                 Bitmap bitmap = bitmapDrawable.getBitmap();
-                 shareImageAndText(bitmap);
-             }
-         });
 
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,42 +116,7 @@ public class HomeFragment extends Fragment {
                     checkInEventByQR(result.getContents());
             });
 
-    /**
-     * Method for opening the share menu
-     * @param bitmap the coordinates of the image being shared
-     */
-    public void shareImageAndText(Bitmap bitmap) {
-        Uri uri = getImageToShare(bitmap);
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.putExtra(Intent.EXTRA_TEXT, "Sharing Image");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
-        intent.setType("image/png");
-        startActivity(Intent.createChooser(intent, "Share Via"));
-    }
 
-    /**
-     * A method which retrieves the image being shared to another app
-     * @param bitmap the coordinates of the image
-     * @return
-     * The image retrieved
-     */
-    public Uri getImageToShare(Bitmap bitmap) {
-        File imageFolder = new File(getContext().getCacheDir(), "images");
-        Uri uri = null;
-        try {
-            imageFolder.mkdirs();
-            File file = new File(imageFolder, "shared_image.png");
-            FileOutputStream outputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
-            outputStream.flush();
-            outputStream.close();
-            uri = FileProvider.getUriForFile(getContext(), "com.anni.shareimage.fileprovider", file);
-        } catch (Exception e) {
-            Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-        return uri;
-    }
      /** Find an event in the database by QR value, returns null if the QR value is not present in the database
      * @param qrValue Unique QR value to search for
      * @return The event object with given QR value, null otherwise

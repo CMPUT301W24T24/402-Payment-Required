@@ -2,13 +2,15 @@ package com.example.qrcheckin.core;
 
 import com.example.qrcheckin.core.User;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This is a class which keeps track of a list of user objects (the people who are attending an event)
  */
-public class UserList {
+public class UserList implements Serializable {
     private ArrayList<User> users;
 
     /**
