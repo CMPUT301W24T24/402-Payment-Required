@@ -34,11 +34,11 @@ public class UserArrayAdaptor extends ArrayAdapter<User> {
     }
 
     /**
-     * Get the view of the event
-     * @param position the position of the event
-     * @param convertView the view of the event
+     * Get the view of the user
+     * @param position the position of the user
+     * @param convertView the view of the user
      * @param parent the parent of the view
-     * @return the view of the event
+     * @return the view of the user
      */
     @NonNull
     @Override
@@ -48,12 +48,11 @@ public class UserArrayAdaptor extends ArrayAdapter<User> {
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.content_user, parent,false);
         }
-
         User user = users.get(position);
         ((ImageView) view.findViewById(R.id.user_profile_image)).setImageBitmap(user.generateProfilePicture());
         ((TextView) view.findViewById(R.id.user_name_text)).setText(user.getName());
         // TODO: set user number of checkins
-        ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("0");
+        ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("number of checkins");
         ((TextView) view.findViewById(R.id.user_phone_number_text)).setText(user.getPhone());
 
         return view;
