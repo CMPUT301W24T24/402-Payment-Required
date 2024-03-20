@@ -36,6 +36,10 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         this.context = context;
     }
 
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
+
     /**
      * Get the view of the event
      * @param position the position of the event
