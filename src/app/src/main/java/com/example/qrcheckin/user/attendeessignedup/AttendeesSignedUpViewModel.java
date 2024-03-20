@@ -29,9 +29,13 @@ public class AttendeesSignedUpViewModel extends ViewModel {
     public AttendeesSignedUpViewModel() {
         mUserArrayAdapter = new MutableLiveData<UserArrayAdaptor>();
         userList = new ArrayList<User>();
-        // TODO: change the query to only hold the users signed up to the event
     }
 
+    /**
+     * Initializes the UserArrayAdaptor to the list of users signed up to the event
+     * @param context The context of the attendee signed up fragment
+     * @param event The event that users have signed up to
+     */
     public void initializeAdaptor(Context context, Event event) {
         mUserArrayAdapter.setValue(new UserArrayAdaptor(context, userList));
         getUsersSignedUpToEvent(userList, mUserArrayAdapter, event.getId());

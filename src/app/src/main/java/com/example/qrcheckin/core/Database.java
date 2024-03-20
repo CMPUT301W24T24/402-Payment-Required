@@ -464,9 +464,9 @@ public class Database {
      * Gets the list of users signed up to an event
      * @param userList The empty list that is to be filled with users
      * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdaptor
-     * @param currentEvent The id of the current event
+     * @param currentEventID The id of the current event
      */
-    public static void getUsersSignedUpToEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEvent) {
+    public static void getUsersSignedUpToEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEventID) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
         CollectionReference userRef = FirebaseFirestore.getInstance().collection("users");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -477,27 +477,26 @@ public class Database {
                     return;
                 }
                 if (querySnapshots != null) {
-                    Log.d("Firestore", "User list changed " + querySnapshots.size());
                     userList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
-                        if (Objects.equals(doc.getString("event_id"), currentEvent)) {
+                        if (Objects.equals(doc.getString("event_id"), currentEventID)) {
                             String userId = doc.getString("user_id");
-                            DocumentReference user = userRef.document(userId);
-                            Log.d("Firestore", "Document Reference " + user.toString());
-                            Log.d("Firestore", "User fetched " + doc.getId());
-                            if (user == null) {
+                            DocumentReference userDoc = userRef.document(userId);
+                            Log.d("Firestore", "Document Reference " + userDoc);
+                            Log.d("Firestore", "User fetched " + userId);
+                            if (userDoc == null) {
                                 Log.d("Firestore", "User " + userId +" not found");
                             }
                             else {
-                                fetchUser(doc, user, mUserArrayAdaptor, userList);
+                                fetchUser(doc, userDoc, mUserArrayAdaptor, userList);
                             }
                         }
                     }
+                    Log.d("Firestore", "User list changed " + userList.size());
                 }
 
             }
         });
-
     }
 
     /**
@@ -523,7 +522,9 @@ public class Database {
                     );
 
                     Log.d("Firestore", "User fetched " + user.getName());
-                    userList.add(user);
+                    if (!userList.contains(user)) {
+                        userList.add(user);
+                    }
                     Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
                 } else {
                     Log.e("Firestore", "User not found");

@@ -1,6 +1,7 @@
 package com.example.qrcheckin.user.attendeessignedup;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +22,26 @@ import com.example.qrcheckin.core.UserArrayAdaptor;
 import com.example.qrcheckin.databinding.FragmentAttendeesSignedUpBinding;
 
 import java.io.Serializable;
+import java.util.Date;
 
+/**
+ * The attendees signed up fragment which contains a list of users that have signed up to the organizers event
+ */
 public class AttendeesSignedUpFragment extends Fragment {
     private FragmentAttendeesSignedUpBinding binding;
     private ListView listView;
     private TextView textView;
 
+    /**
+     * Creates the view
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     *                  The fragment should not add the view itself but this can be used to generate the
+     *                  LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous
+     *                           saved state as given here.
+     * @return The fragments bindings root
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         AttendeesSignedUpViewModel attendeesSignedUpViewModel =
@@ -39,7 +54,8 @@ public class AttendeesSignedUpFragment extends Fragment {
         attendeesSignedUpViewModel.initializeAdaptor(getContext(), getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null);
         attendeesSignedUpViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
-        if (listView.getAdapter() == null) {
+        // TODO: Find a better way to show the text view and hide the list view
+        if (listView.getItemAtPosition(0) == null) {
             listView.setVisibility(View.INVISIBLE);
             textView = binding.listEmptyTextView;
             textView.setVisibility(View.VISIBLE);
@@ -56,8 +72,7 @@ public class AttendeesSignedUpFragment extends Fragment {
                 User user = (User) listView.getItemAtPosition(position);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("user", (Serializable) user);
-                // TODO: define it to change to the view attendee profile page
-                // Navigation.findNavController(requireView()).navigate(R.id.action_nav_attendeessignedup_to...., bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_attendeessignedup_to_nav_view_profile, bundle);
             }
         });
     }

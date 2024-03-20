@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,13 +22,24 @@ public class UserArrayAdaptor extends ArrayAdapter<User> {
     private ArrayList<User> users;
     private Context context;
 
-
+    /**
+     * Constructor for the UserArrayAdaptor
+     * @param context The context of the app
+     * @param users The list of users
+     */
     public UserArrayAdaptor(Context context, ArrayList<User> users) {
         super(context, 0, users);
         this.users = users;
         this.context = context;
     }
 
+    /**
+     * Get the view of the event
+     * @param position the position of the event
+     * @param convertView the view of the event
+     * @param parent the parent of the view
+     * @return the view of the event
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -38,7 +50,7 @@ public class UserArrayAdaptor extends ArrayAdapter<User> {
         }
 
         User user = users.get(position);
-
+        ((ImageView) view.findViewById(R.id.user_profile_image)).setImageBitmap(user.generateProfilePicture());
         ((TextView) view.findViewById(R.id.user_name_text)).setText(user.getName());
         // TODO: set user number of checkins
         ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("0");

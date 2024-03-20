@@ -113,6 +113,9 @@
         android:name="com.example.qrcheckin.user.attendeessignedup.AttendeesSignedUpFragment"
         android:label="attendees_signed_up"
         tools:layout="@layout/fragment_attendees_signed_up">
+        <action
+            android:id="@+id/action_nav_attendeessignedup_to_nav_view_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
 
 </navigation>
