@@ -34,6 +34,7 @@ public class AttendeesSignedUpFragment extends Fragment {
 
     /**
      * Creates the view
+     * References: https://stackoverflow.com/questions/20328944/android-listview-show-a-message-if-arraylist-of-arrayadapter-is-empty/20329154#20329154 nsL Accessed Mar 20 2023
      * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment
      * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
      *                  The fragment should not add the view itself but this can be used to generate the
@@ -54,12 +55,9 @@ public class AttendeesSignedUpFragment extends Fragment {
         attendeesSignedUpViewModel.initializeAdaptor(getContext(), getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null);
         attendeesSignedUpViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
-        // TODO: Find a better way to show the text view and hide the list view
-        if (listView.getItemAtPosition(0) == null) {
-            listView.setVisibility(View.INVISIBLE);
-            textView = binding.listEmptyTextView;
-            textView.setVisibility(View.VISIBLE);
-        }
+        textView = binding.listEmptyTextView;
+        listView.setEmptyView(textView);
+
         return root;
     }
 
