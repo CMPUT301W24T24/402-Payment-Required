@@ -280,7 +280,7 @@ public class Database {
     public void getUserPicture(User user, ImageView imageView) {
         if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
             Log.e("Firestorage", "No picture reference");
-            // TODO: set a default picture or handle no picture
+            imageView.setImageBitmap(user.generateProfilePicture());
             return;
         }
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -293,6 +293,7 @@ public class Database {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Log.e("Firestorage", exception.toString());
+                imageView.setImageBitmap(user.generateProfilePicture());
             }
         });
     }
@@ -316,7 +317,7 @@ public class Database {
                 }
                 if (querySnapshots != null) {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
-                    eventList.clear();
+                    mEventArrayAdaptor.getValue().getEvents().clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         DocumentReference hostRef = doc.getDocumentReference("host");
                         Log.d("Firestore", "Event fetched " + doc.getId());
