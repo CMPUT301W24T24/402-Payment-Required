@@ -42,8 +42,6 @@ public class HostedEventViewModel extends ViewModel {
         onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "hosted");
     }
 
-
-
     public LiveData<EventArrayAdaptor> getEventList() {
         return mEventArrayAdaptor;
     }

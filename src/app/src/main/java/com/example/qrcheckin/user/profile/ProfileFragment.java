@@ -8,11 +8,16 @@ import static com.google.common.reflect.Reflection.getPackageName;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,12 +31,14 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentProfileBinding;
 import com.example.qrcheckin.databinding.FragmentViewEventBinding;
 import com.example.qrcheckin.user.viewEvent.ViewEventViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -63,7 +70,10 @@ public class ProfileFragment extends Fragment {
 
             //String uri = "@drawable/cat.jpg";
             //int imageResource = getResources().getIdentifier(uri, null, getPackageName());
-            binding.profilePicture.setImageResource(R.drawable.cat);
+            ImageView profileImage = binding.profilePicture;
+            // Set the profile picture of the user to the XML view
+            Database db = new Database();
+            db.getUserPicture(user, profileImage);
 
         } else {
             Log.e(TAG, "User is null");
@@ -96,6 +106,16 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d("Firestore", "DocumentSnapshot successfully written!");
+                                    // set the user name to the navigation view
+                                    NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
+                                    View headerView = navigationView.getHeaderView(0);
+                                    TextView navProfileName = headerView.findViewById(R.id.nav_profile_name);
+                                    navProfileName.setText(user.getName());
+
+                                    ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
+                                    // Set the profile picture of the user to the XML view
+                                    Database database = new Database();
+                                    database.getUserPicture(user, navProfileImage);
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -133,5 +153,9 @@ public class ProfileFragment extends Fragment {
         if (!(binding.profileHomepageLink.getText().toString().equals(user.getHomepage()))) {
             binding.profileHomepageLink.setText(user.getHomepage());
         }
+        if (!(binding.profileGeolocation.isChecked() == user.isGeo())) {
+            binding.profileGeolocation.setChecked(false);
+        }
     }
+
 }

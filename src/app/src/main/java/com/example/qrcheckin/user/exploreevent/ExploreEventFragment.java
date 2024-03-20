@@ -21,11 +21,26 @@ import com.example.qrcheckin.databinding.FragmentExploreEventBinding;
 
 import java.io.Serializable;
 
+/**
+ * The fragment for exploring available events
+ */
 public class ExploreEventFragment extends Fragment {
 
     private FragmentExploreEventBinding binding;
     private ListView listView;
 
+    /**
+     * Creates the view
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -43,6 +58,12 @@ public class ExploreEventFragment extends Fragment {
         return root;
     }
 
+    /**
+     * When the view is created
+     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

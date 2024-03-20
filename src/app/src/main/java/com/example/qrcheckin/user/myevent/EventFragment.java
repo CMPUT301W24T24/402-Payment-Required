@@ -21,6 +21,9 @@ import com.example.qrcheckin.databinding.FragmentEventBinding;
 
 import java.io.Serializable;
 
+/**
+ * Fragment which contains a list of the events a user has checked into
+ */
 public class EventFragment extends Fragment {
 
     private FragmentEventBinding binding;

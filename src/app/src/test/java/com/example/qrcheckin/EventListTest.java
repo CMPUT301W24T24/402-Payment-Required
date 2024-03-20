@@ -1,6 +1,7 @@
 package com.example.qrcheckin;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.EventList;
@@ -43,7 +44,6 @@ public class EventListTest {
         eventList.add(mockEvent); //add the event in the event list
         assertTrue(eventList.hasEvent(mockEvent));
     }
-}
 
     @Test
     public void testRemoveEvent() {
@@ -63,7 +63,5 @@ public class EventListTest {
             eventList.removeEvent(mockEvent);
         });
     }
-
-    @Test
-    public void
+}
 

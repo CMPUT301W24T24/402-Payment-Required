@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * This class is used to interact with the Firestore database
+ * It can be used to fetch, add, edit and delete users
+ * It can also be used to add events and check in users to events
+ */
 public class Database {
 
     public interface UserListener {
@@ -268,7 +273,7 @@ public class Database {
     public void getUserPicture(User user, ImageView imageView) {
         if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
             Log.e("Firestorage", "No picture reference");
-            // TODO: set a default picture or handle no picture
+            imageView.setImageBitmap(user.generateProfilePicture());
             return;
         }
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -281,10 +286,19 @@ public class Database {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Log.e("Firestorage", exception.toString());
+                imageView.setImageBitmap(user.generateProfilePicture());
             }
         });
     }
 
+    /**
+     * This static function is used to set on event listeners to the list of events from the database
+     * It's used to update the list of events in the EventArrayAdaptor in all three explore, my and hosted events
+     * @param eventList the list to update
+     * @param mEventArrayAdaptor the MutableLiveData of the EventArrayAdaptor to notify the adaptor of the change
+     * @param currentUserId the id of the current user from the app user
+     * @param type the type of the event list, explore, my or hosted
+     */
     public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -402,7 +416,7 @@ public class Database {
                             event.setCurrentUserCheckedIn(Boolean.TRUE);
                         }
                     }
-                    if (toAdd && event.isCurrentUserCheckedIn()) {
+                    if (toAdd && event.isCurrentUserCheckedIn() && eventList.contains(event) == Boolean.FALSE) {
                         eventList.add(event);
                     }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
@@ -436,7 +450,7 @@ public class Database {
                             event.setCurrentUserSignedUp(Boolean.TRUE);
                         }
                     }
-                    if (toAdd && event.isCurrentUserSignedUp()) {
+                    if (toAdd && event.isCurrentUserSignedUp() && eventList.contains(event) == Boolean.FALSE) {
                         eventList.add(event);
                     }
                     Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
