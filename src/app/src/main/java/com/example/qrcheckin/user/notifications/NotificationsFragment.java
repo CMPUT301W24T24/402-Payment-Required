@@ -234,7 +234,7 @@ public class NotificationsFragment extends Fragment {
                         // create new notification object to be displayed by list of notifications
                         notifList.add(new Notification(
                                 doc.getString("message"),
-                                 "Sent @ " + Objects.requireNonNull(doc.getTimestamp("time")).toDate().toString(),
+                                 "Sent @ " + doc.getTimestamp("time").toDate().toString(),
                                 eventsMap.get(eventID),
                                 eventID));
                         notificationsMap.put(eventID, notifList);

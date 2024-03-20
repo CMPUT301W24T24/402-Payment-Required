@@ -1,6 +1,18 @@
 package com.example.qrcheckin.core;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -27,6 +39,7 @@ public class Event implements Serializable {
     private UserList attendees;
     private Boolean currentUserSignedUp;
     private Boolean currentUserCheckedIn;
+    private Integer attendeeAmount;
 
    
 
@@ -64,6 +77,8 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        this.attendeeAmount = 0;
+        initAttendeeAmount();
     }
 
     /**
@@ -81,7 +96,7 @@ public class Event implements Serializable {
      * @param geo the boolean value of the location
      * @param limit the limit of the event
      */
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees, Integer attendamt) {
         this.id = id;
         this.host = host;
         this.name = name;
@@ -100,6 +115,7 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        this.attendeeAmount = attendamt;
     }
 
     /**
@@ -132,8 +148,28 @@ public class Event implements Serializable {
         this.promoteQR = promoteQR;
         this.geo = geo;
         this.limit = limit;
+        this.attendees = new UserList();
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        this.attendeeAmount = 0;
+    }
+
+    public void initAttendeeAmount() {
+        FirebaseFirestore.getInstance().collection("events").document(this.id).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Integer result = task.getResult().get("checkin_amt", Integer.class);
+                            if (result != null) {
+                                attendeeAmount = result;
+                            }
+                        }
+                        else {
+                            attendeeAmount = 0;
+                        }
+                    }
+                });
     }
 
         /**
@@ -254,6 +290,18 @@ public class Event implements Serializable {
     public void setAttendees(UserList attendees) {
         this.attendees = attendees;
     }
+
+    /**
+     * A method that returns the current number of attendees at an event
+     * @return number of users currently attending event (checked in)
+     */
+    public Integer getAttendeeAmount() {return this.attendeeAmount;}
+
+    /**
+     * A method that sets the current number of attendees at an event
+     * @param amount the amount of attendees at the event
+     */
+    public void setAttendeeAmount(Integer amount) { this.attendeeAmount = amount;}
 
     /**
      * A method sets the id of the event

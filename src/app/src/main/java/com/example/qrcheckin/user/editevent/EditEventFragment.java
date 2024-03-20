@@ -77,10 +77,14 @@ public class EditEventFragment extends Fragment {
 
         // set event attendee limit
         Integer eventLimit = event.getLimit();
-        String eventLimitText = eventLimit.toString();
-        if (eventLimitText.equals("0"))
+        String eventLimitText;
+        if (eventLimit == 0) {
             eventLimitText = "unlimited";
-        editEventAttendLimit.setText(eventLimitText);
+            editEventAttendLimit.setHint(eventLimitText);
+        } else {
+            eventLimitText = eventLimit.toString();
+            editEventAttendLimit.setText(eventLimitText);
+        }
 
         //set poster
         eventPoster.setImageResource(R.drawable.cat);
@@ -157,13 +161,13 @@ public class EditEventFragment extends Fragment {
                     return;
                 }
                 if (editEventAttendLimit.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter event limit", Toast.LENGTH_SHORT).show();
-                    return;
+                    event.setLimit(0);
+                } else {
+                    event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
                 }
                 event.setName(String.valueOf(editEventTitle.getText()));
                 event.setDescription(String.valueOf(editEventDescription.getText()));
-                event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
-                //access the firebase and databse and update
+                //access the firebase and database and update
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("description", event.getDescription());
                 data.put("limit", event.getLimit());

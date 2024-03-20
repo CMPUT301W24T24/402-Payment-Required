@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         menu.findItem(R.id.nav_all_profile).setVisible(false);
 
         // asks user to turn on notifications
-        //https://stackoverflow.com/a/76108866
+        // https://stackoverflow.com/a/76108866
         // by Akshay Karande, Accessed 17 March, 2024
         int permissionState = ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS);
         // If the permission is not granted, request it.

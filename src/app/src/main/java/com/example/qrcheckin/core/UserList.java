@@ -1,6 +1,15 @@
 package com.example.qrcheckin.core;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.qrcheckin.core.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +63,7 @@ public class UserList {
      * @return
      * The size of the user list
      */
-    public int countUsers() {
+    public Integer countUsers() {
         return users.size();
     }
 

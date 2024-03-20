@@ -109,7 +109,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Limit on attendees: "
+                android:text="Limit on attendees:"
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 app:layout_constraintEnd_toStartOf="@id/edit_event_attend_limit"
@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:text="20"
+                android:text=""
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 app:layout_constraintStart_toEndOf="@id/edit_event_title" />

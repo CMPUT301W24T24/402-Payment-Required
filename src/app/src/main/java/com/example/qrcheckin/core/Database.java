@@ -25,6 +25,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -230,6 +231,13 @@ public class Database {
         data.put("time", serverTimestamp);
         data.put("latitude", null);
         data.put("longitude", null);
+
+        HashMap<String, Object> eventData = new HashMap<>();
+        DocumentReference eventRef = eventsRef.document(event.getId());
+
+        eventData.put("checkin_amt", event.getAttendeeAmount() + 1);
+        eventRef.update(eventData);
+
         checkinsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     Log.d("Firestore", "Checked in with ID: " + documentReference.getId());
@@ -358,7 +366,8 @@ public class Database {
                             doc.getString("promote_qr"),
                             Boolean.TRUE.equals(doc.getBoolean("geo")),
                             doc.getLong("limit").intValue(),
-                            null
+                            null,
+                            doc.get("checkin_amt", Integer.class)
                     );
                     Log.d("Firestore", "Host fetched " + user.getName());
                     switch(type) {
