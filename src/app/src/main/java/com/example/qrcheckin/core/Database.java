@@ -363,6 +363,7 @@ public class Database {
                     );
                     Log.d("Firestore", "Host fetched " + user.getName());
                     switch(type) {
+                        // TODO: add "all" type and modify explore to show only current and future events
                         case "explore":
                             getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
                             getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
