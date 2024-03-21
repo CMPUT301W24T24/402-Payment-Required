@@ -1,5 +1,7 @@
 package com.example.qrcheckin.core;
 
+import java.io.Serializable;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 /**
  * The user class which connects with the database and uses the app
  */
-public class User {
+public class User implements Serializable {
     private String id;
     private String name;
     private String email;
