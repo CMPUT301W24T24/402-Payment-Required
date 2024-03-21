@@ -2,6 +2,7 @@ package com.example.qrcheckin.user.editevent;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,21 +15,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.Manifest;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
-import com.example.qrcheckin.core.MapSetUp;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
-import com.example.qrcheckin.user.createevent.CreateEventViewModel;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -40,15 +39,25 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
+    private MapView map;
+    private MapController mapController;
 
     @Nullable
     @Override
@@ -71,10 +80,18 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
-//        private MapView mapView = findViewById(R.id.osmmap);
-//        private MapSetUp mapSetUp;
-//
-//        mapSetUp = new MapSetUp(this, mapView);
+
+        //map permissions
+        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+
+        map=root.findViewById(R.id.osmmap);
+        map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        map.setBuiltInZoomControls(true);
+        mapController = (MapController) map.getController();
+        mapController.setZoom(13);
+        GeoPoint gPt = new GeoPoint(51500000, -150000);
+        mapController.setCenter(gPt);
+
 
         // Set event information
         assert event != null;
@@ -285,6 +302,49 @@ public class EditEventFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {//needed for OSM display
+        super.onResume();
+        map.onResume();
+    }
+
+    @Override
+    public void onPause() {//needed for OSM display
+        super.onPause();
+        map.onPause();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {//needed for OSM permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (int i = 0; i < grantResults.length; i++) {// array to arraylist
+            permissionsToRequest.add(permissions[i]);
+        }
+        if (permissionsToRequest.size() > 0) {
+            ActivityCompat.requestPermissions(
+                    this.getActivity(),
+                    permissionsToRequest.toArray(new String[0]),
+                    1);
+        }
+    }
+
+    private void requestPermissionsIfNecessary(String[] permissions) {//needed for OSM permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                permissionsToRequest.add(permission);
+            }
+        }
+        if (permissionsToRequest.size() > 0) {
+            ActivityCompat.requestPermissions(
+                    this.getActivity(),
+                    permissionsToRequest.toArray(new String[0]),
+                    1);
+        }
     }
 
 }
