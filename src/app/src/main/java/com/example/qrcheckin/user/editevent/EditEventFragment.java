@@ -1,8 +1,12 @@
 package com.example.qrcheckin.user.editevent;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +35,7 @@ import com.example.qrcheckin.databinding.FragmentEditEventBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.BuildConfig;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,6 +44,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -58,6 +64,7 @@ public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
     private MapView map;
     private MapController mapController;
+    private LocationManager locationManager;
 
     @Nullable
     @Override
@@ -82,15 +89,29 @@ public class EditEventFragment extends Fragment {
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
 
         //map permissions
-        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
 
-        map=root.findViewById(R.id.osmmap);
+        Configuration.getInstance().setUserAgentValue(BuildConfig.LIBRARY_PACKAGE_NAME);
+
+        map = root.findViewById(R.id.osmmap);
         map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         map.setBuiltInZoomControls(true);
         mapController = (MapController) map.getController();
         mapController.setZoom(13);
-        GeoPoint gPt = new GeoPoint(51500000, -150000);
-        mapController.setCenter(gPt);
+
+        locationManager=(LocationManager)root.getContext().getSystemService(Context.LOCATION_SERVICE);
+        //suppressed because request permissions if necessary fulfills permissions already
+        @SuppressLint("MissingPermission") Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(lastLocation!=null) {
+            GeoPoint gPt = new GeoPoint(lastLocation);
+            mapController.setCenter(gPt);
+            Log.i("Mapping","Successfully retrieved last location! Geopoint set");
+        }else{
+            Log.e("Mapping","Failed to retrieve last location, map defaulting to null island");
+        }
+
+
+
 
 
         // Set event information
