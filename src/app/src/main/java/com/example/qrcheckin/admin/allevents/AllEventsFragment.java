@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.example.qrcheckin.databinding.FragmentEventBinding;
 import com.example.qrcheckin.user.myevent.EventFragment;
 import com.example.qrcheckin.user.myevent.EventViewModel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -60,9 +62,20 @@ public class AllEventsFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event event = (Event) listView.getItemAtPosition(position);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("event", event);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_all_event_to_nav_view_event, bundle);
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Event event = events.get(position);
                 DeleteEventFragment deleteEventFragment = new DeleteEventFragment(event);
                 deleteEventFragment.show(getParentFragmentManager(), "delete event");
+                return true;
             }
         });
 
