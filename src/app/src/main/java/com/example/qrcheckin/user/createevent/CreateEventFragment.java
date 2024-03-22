@@ -164,7 +164,6 @@ public class CreateEventFragment extends Fragment {
             data.put("promote_id", event.getPromoteId());
             data.put("location", event.getLocation());
             data.put("checkin_id", event.getCheckinId());
-            data.put("checkin_amt", 0);
 
             eventsRef.add(data)
                     .addOnSuccessListener(documentReference -> {

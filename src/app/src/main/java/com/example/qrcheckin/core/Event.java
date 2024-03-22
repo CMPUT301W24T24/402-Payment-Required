@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -11,11 +12,20 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * An object that keeps track of the event data
@@ -77,7 +87,6 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
-        this.attendeeAmount = 0;
         initAttendeeAmount();
     }
 
@@ -96,7 +105,7 @@ public class Event implements Serializable {
      * @param geo the boolean value of the location
      * @param limit the limit of the event
      */
-    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees, Integer attendamt) {
+    public Event(String id, User host, String name, String description, String posterRef, Date time, String location, Double latitude, Double longitude, String checkinId, String checkinQR, String promoteId, String promoteQR, Boolean geo, Integer limit, UserList attendees) {
         this.id = id;
         this.host = host;
         this.name = name;
@@ -115,7 +124,7 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
-        this.attendeeAmount = attendamt;
+        initAttendeeAmount();
     }
 
     /**
@@ -151,25 +160,35 @@ public class Event implements Serializable {
         this.attendees = new UserList();
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
-        this.attendeeAmount = 0;
+        initAttendeeAmount();
     }
 
+    /**
+     * sets the attendee amount of the event if its in the database
+     * otherwise it sets the amount to 0
+     */
     public void initAttendeeAmount() {
-        FirebaseFirestore.getInstance().collection("events").document(this.id).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Integer result = task.getResult().get("checkin_amt", Integer.class);
-                            if (result != null) {
-                                attendeeAmount = result;
-                            }
-                        }
-                        else {
-                            attendeeAmount = 0;
-                        }
+        attendeeAmount = 0;
+        FirebaseFirestore.getInstance().collection("checkins").whereEqualTo("event_id", id)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (value != null) {
+                    Set<String> attend = new HashSet<>();
+                    for (QueryDocumentSnapshot doc: value) {
+                        //if (doc.getString("event_id").equals(id)) {
+                            String userid = doc.getString("user_id");
+                            attend.add(userid);
+                        //}
                     }
-                });
+                    attendeeAmount = attend.size();
+                }
+            }
+        });
     }
 
         /**
