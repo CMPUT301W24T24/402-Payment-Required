@@ -14,7 +14,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.AllImagesArrayAdaptor;
+import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentAllImagesBinding;
+
+import java.util.ArrayList;
 
 /**
  * The fragment class for all images which can only be seen by admins
@@ -32,8 +37,15 @@ public class AllImagesFragment extends Fragment {
         binding = FragmentAllImagesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textAllImages;
-        allImagesViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        ArrayList<Event> events = new ArrayList<>();
+        AllImagesArrayAdaptor eventAdapter = new AllImagesArrayAdaptor(getContext(), events, null);
+        ArrayList<User> users = new ArrayList<>();
+        AllImagesArrayAdaptor userAdapter = new AllImagesArrayAdaptor(getContext(), null, users);
+        binding.allImagesEventListView.setAdapter(eventAdapter);
+        binding.allImagesProfileListView.setAdapter(userAdapter);
+
+        // TODO: Add listeners for the lists
+
         return root;
     }
 
