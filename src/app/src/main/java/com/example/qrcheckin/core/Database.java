@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.qrcheckin.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -531,6 +532,27 @@ public class Database {
                 }
             }
         });
+    }
+
+    /**
+     * Sign up the user to the given event
+     * @param user The user to be signed up
+     * @param event The event the user is signing up to
+     */
+    public void signUpUser(User user, Event event) {
+        CollectionReference signupsRef = FirebaseFirestore.getInstance().collection("signUpTable");
+
+        // Add the event to the collection
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("user_id", user.getId());
+        data.put("event_id", event.getId());
+        signupsRef.add(data)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Signed up with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", e.toString());
+                });
     }
 
 }
