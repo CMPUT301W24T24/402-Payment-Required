@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         navProfileName.setText(currentUser.getName());
 
         ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
+        // Set the profile picture of the user to the XML view
         Database db = new Database();
         db.getUserPicture(currentUser, navProfileImage);
 

@@ -39,10 +39,12 @@
         android:name="com.example.qrcheckin.user.editevent.EditEventFragment"
         android:label="Edit Events"
         tools:layout="@layout/fragment_edit_event"
-        />
+        >
         <action
             android:id="@+id/action_nav_edit_event_to_nav_create_notification"
             app:destination="@id/nav_create_notifications"/>
+    </fragment>
+
     <fragment
         android:id="@+id/nav_explore_event"
         android:name="com.example.qrcheckin.user.exploreevent.ExploreEventFragment"
@@ -70,7 +72,7 @@
     <fragment
         android:id="@+id/nav_create_notifications"
         android:name="com.example.qrcheckin.user.createnotification.CreateNotificationFragment"
-        android:label="CreateNotifications"
+        android:label="Create Notification"
         tools:layout="@layout/fragment_create_notification" />
 
     <fragment
@@ -82,25 +84,25 @@
     <fragment
         android:id="@+id/nav_all_images"
         android:name="com.example.qrcheckin.admin.allimages.AllImagesFragment"
-        android:label="@string/nav_all_event"
+        android:label="All Images"
         tools:layout="@layout/fragment_all_images" />
 
     <fragment
         android:id="@+id/nav_all_profile"
         android:name="com.example.qrcheckin.admin.allprofiles.AllProfilesFragment"
-        android:label="@string/nav_all_event"
+        android:label="All Profiles"
         tools:layout="@layout/fragment_all_profiles" />
 
     <fragment
         android:id="@+id/nav_view_event"
         android:name="com.example.qrcheckin.user.viewEvent.ViewEventFragment"
-        android:label="view_event"
+        android:label="Event"
         tools:layout="@layout/fragment_view_event" />
 
     <fragment
         android:id="@+id/nav_create_event"
         android:name="com.example.qrcheckin.user.createevent.CreateEventFragment"
-        android:label="create_event"
+        android:label="Create Event"
         tools:layout="@layout/fragment_create_event">
     </fragment>
 

@@ -1,5 +1,9 @@
 package com.example.qrcheckin.user.hostedevent;
 
+import static com.example.qrcheckin.core.Database.onEventListChanged;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -9,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +22,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.databinding.FragmentHostedEventBinding;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A fragment which contains a list of events the user is hosting
@@ -52,9 +61,14 @@ public class HostedEventFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.hostedEventListView;
-        hostedEventViewModel.initializeAdaptor(getContext());
+//        hostedEventViewModel.initializeAdaptor(getContext());
+        ArrayList<Event> eventList = new ArrayList<>();
+        // TODO: refactor MutableLiveData to only array adaptor
+        MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), eventList));
 
-        hostedEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "hosted");
+        listView.setAdapter(mEventArrayAdaptor.getValue());
+//        hostedEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
         return root;
     }
 
@@ -73,7 +87,6 @@ public class HostedEventFragment extends Fragment {
                 Event event = (Event) listView.getItemAtPosition(position);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
-                // TODO: define it to change to the edit event page
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_host_event_to_nav_edit_event, bundle);
             }
         });
@@ -92,6 +105,7 @@ public class HostedEventFragment extends Fragment {
      */
     @Override
     public void onDestroyView() {
+        Log.d("HostedEventFragment", "onDestroyView");
         super.onDestroyView();
         binding = null;
     }
