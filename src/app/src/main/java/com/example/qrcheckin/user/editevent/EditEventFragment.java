@@ -6,10 +6,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +34,8 @@ import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -60,12 +64,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-public class EditEventFragment extends Fragment {
+public class EditEventFragment extends Fragment implements LocationListener {
     private FragmentEditEventBinding binding;
     private MapView map;
-    private MapController mapController;
     private LocationManager locationManager;
+    final private double MAP_DEFAULT_LATITUDE=53.5265, MAP_DEFAULT_LONGITUDE=-113.5255;
 
+    @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -91,26 +96,28 @@ public class EditEventFragment extends Fragment {
         //map permissions
         requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
 
+        //important for OSM moderation apparently
         Configuration.getInstance().setUserAgentValue(BuildConfig.LIBRARY_PACKAGE_NAME);
 
+        //map config
         map = root.findViewById(R.id.osmmap);
         map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        map.setBuiltInZoomControls(true);
-        mapController = (MapController) map.getController();
-        mapController.setZoom(13);
+        map.getController().setZoom(16);
 
-        locationManager=(LocationManager)root.getContext().getSystemService(Context.LOCATION_SERVICE);
-        //suppressed because request permissions if necessary fulfills permissions already
-        @SuppressLint("MissingPermission") Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(lastLocation!=null) {
-            GeoPoint gPt = new GeoPoint(lastLocation);
-            mapController.setCenter(gPt);
-            Log.i("Mapping","Successfully retrieved last location! Geopoint set");
-        }else{
-            Log.e("Mapping","Failed to retrieve last location, map defaulting to null island");
+        //location manager and setting this up as a location listener
+        locationManager = (LocationManager) root.getContext().getSystemService(Context.LOCATION_SERVICE);
+        Location location = null;
+        for (String provider:locationManager.getProviders(true)){
+            locationManager.requestLocationUpdates(provider, 1000, 0, this);
         }
 
-
+        //on init if loc reads null simply default to uofa
+        if (location == null){
+            location = new Location(LocationManager.GPS_PROVIDER);
+            location.setLatitude(MAP_DEFAULT_LATITUDE);
+            location.setLongitude(MAP_DEFAULT_LONGITUDE);
+            map.getController().animateTo(new GeoPoint(location));
+        }
 
 
 
@@ -250,7 +257,6 @@ public class EditEventFragment extends Fragment {
                     }
                 });
             }
-
             private void openTimeDialog(int hour, int minute) {
                 TimePickerDialog dialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -317,6 +323,11 @@ public class EditEventFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        map.getController().setCenter(new GeoPoint(location));
     }
 
     @Override
