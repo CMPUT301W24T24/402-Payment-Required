@@ -1,20 +1,20 @@
 package com.example.qrcheckin.admin.allimages;
 
+import static com.example.qrcheckin.core.Database.getAllImages;
+
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.example.qrcheckin.R;
-import com.example.qrcheckin.core.AllImagesArrayAdaptor;
+import com.example.qrcheckin.core.ImagesEventArrayAdaptor;
+import com.example.qrcheckin.core.ImagesUserArrayAdaptor;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentAllImagesBinding;
@@ -38,13 +38,13 @@ public class AllImagesFragment extends Fragment {
         View root = binding.getRoot();
 
         ArrayList<Event> events = new ArrayList<>();
-        AllImagesArrayAdaptor eventAdapter = new AllImagesArrayAdaptor(getContext(), events, null);
+        ImagesEventArrayAdaptor eventAdapter = new ImagesEventArrayAdaptor(getContext(), events);
         ArrayList<User> users = new ArrayList<>();
-        AllImagesArrayAdaptor userAdapter = new AllImagesArrayAdaptor(getContext(), null, users);
+        ImagesUserArrayAdaptor userAdapter = new ImagesUserArrayAdaptor(getContext(), users);
+        getAllImages(eventAdapter, userAdapter);
+
         binding.allImagesEventListView.setAdapter(eventAdapter);
         binding.allImagesProfileListView.setAdapter(userAdapter);
-
-        // TODO: Add listeners for the lists
 
         return root;
     }

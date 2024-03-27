@@ -1,7 +1,8 @@
 package com.example.qrcheckin.core;
 
+import static com.example.qrcheckin.core.Database.getAllImagesEventPoster;
+
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,22 +18,19 @@ import java.util.ArrayList;
 /**
  * An array adapter for displaying event information and connecting it with the ui
  */
-public class AllImagesArrayAdaptor extends ArrayAdapter<Event> {
+public class ImagesEventArrayAdaptor extends ArrayAdapter<Event> {
     private ArrayList<Event> events;
-    private ArrayList<User> users;
     private Context context;
 
     /**
      * Constructor for the EventArrayAdaptor
      * @param context the context of the app
      * @param events the list of events
-     * @param users the list of users
      */
-    public AllImagesArrayAdaptor(Context context, ArrayList<Event> events, ArrayList<User> users) {
+    public ImagesEventArrayAdaptor(Context context, ArrayList<Event> events) {
         super(context, 0, events);
         this.context = context;
         this.events = events;
-        this.users = users;
     }
 
     /**
@@ -50,13 +48,12 @@ public class AllImagesArrayAdaptor extends ArrayAdapter<Event> {
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.content_image, parent,false);
         }
-        Bitmap bitmap;
-        if (events == null) {
-            // TODO add events poster getting method
-        } else if (users == null) {
-            Database db = new Database();
-            db.getUserPicture(users.get(position), view.findViewById(R.id.single_image));
-        }
+
+        getAllImagesEventPoster(this, position, view.findViewById(R.id.single_image));
         return view;
+    }
+
+    public ArrayList<Event> getEvents() {
+        return events;
     }
 }
