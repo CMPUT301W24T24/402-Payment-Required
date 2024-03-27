@@ -13,10 +13,10 @@
         <ImageView
             android:id="@+id/single_image"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
             android:layout_gravity="center"
             android:contentDescription="An Image"
-            android:layout_margin="20dp"
+            android:layout_margin="10dp"
             android:scaleType="fitCenter"
             android:src="@mipmap/ic_launcher_round"/>
 
