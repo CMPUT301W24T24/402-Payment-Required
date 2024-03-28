@@ -15,7 +15,7 @@ import com.example.qrcheckin.R;
 
 import java.util.ArrayList;
 
-public class UserArrayAdaptor extends ArrayAdapter<User> {
+public class UserArrayAdaptor extends ArrayAdapter<User> implements {
     interface CreateListener {
         void createUser(int position);
     }
