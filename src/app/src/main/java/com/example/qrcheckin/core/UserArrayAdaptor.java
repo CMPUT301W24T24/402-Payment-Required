@@ -15,7 +15,16 @@ import com.example.qrcheckin.R;
 
 import java.util.ArrayList;
 
-public class UserArrayAdaptor extends ArrayAdapter<User> implements {
+public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnCheckInCountRetrievedListener {
+    /**
+     * Sets the view to the number of users checkins.
+     * @param checkInCount The number of checkins into an event by the user
+     */
+    @Override
+    public void onCheckInCountRetrieved(long checkInCount) {
+
+    }
+
     interface CreateListener {
         void createUser(int position);
     }
@@ -39,6 +48,10 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements {
      * @param convertView the view of the user
      * @param parent the parent of the view
      * @return the view of the user
+     * Reference: Gemini
+     * Prompt: How could I update the database function to be callable in the UserArrayAdaptor class so that I
+     *          could set the text of user_number_of_checkins to the number of time the user has checked into a
+     *          specific event without introducing a new field numCheckIns in the user store?
      */
     @NonNull
     @Override
@@ -51,10 +64,23 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements {
         User user = users.get(position);
         ((ImageView) view.findViewById(R.id.user_profile_image)).setImageBitmap(user.generateProfilePicture());
         ((TextView) view.findViewById(R.id.user_name_text)).setText(user.getName());
-        // TODO: set user number of checkins
-        ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("number of checkins");
         ((TextView) view.findViewById(R.id.user_phone_number_text)).setText(user.getPhone());
+        ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("searching...");
 
-        return view;
+        View finalView = view;
+        Database.getCheckInCountForUser(user.getId(), "", new Database.OnCheckInCountRetrievedListener() {
+            @Override
+            public void onCheckInCountRetrieved(long checkInCount) {
+                if (checkInCount == -1) {
+                    ((TextView) finalView.findViewById(R.id.user_number_of_checkins)).setText("Error getting checkin count");
+                }
+                else {
+                    ((TextView) finalView.findViewById(R.id.user_number_of_checkins)).setText(String.valueOf(checkInCount));
+                }
+
+            }
+        });
+
+        return finalView;
     }
 }

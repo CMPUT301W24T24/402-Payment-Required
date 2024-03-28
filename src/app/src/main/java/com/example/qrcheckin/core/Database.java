@@ -559,7 +559,11 @@ public class Database {
      * Retrieves the number of checkins for a specific user and event
      * @param userId The string id of the user
      * @param eventId The string id of the event
-     * @param listener
+     * @param listener The listener to be used for callback
+     * Reference: Gemini
+     * Prompt: How could I update the database function to be callable in the UserArrayAdaptor class so that I
+     *          could set the text of user_number_of_checkins to the number of time the user has checked into a
+     *          specific event without introducing a new field numCheckIns in the user store?
      */
     public static void getCheckInCountForUser(String userId, String eventId, OnCheckInCountRetrievedListener listener) {
         CollectionReference checkinRef = FirebaseFirestore.getInstance().collection("checkins");
@@ -572,7 +576,7 @@ public class Database {
                         listener.onCheckInCountRetrieved(checkInCount);
                     } else {
                         Log.w("Firestore", "Error getting check-in count", task.getException());
-                        listener.onCheckInCountRetrieved(0); // Handle error
+                        listener.onCheckInCountRetrieved(-1); // Handle error
                     }
                 });
     }
