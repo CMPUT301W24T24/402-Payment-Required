@@ -284,8 +284,7 @@ public class Database {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.e("Firestorage", exception.toString());
-            }
+                Log.e("Firestorage", exception.toString());}
         });
     }
 

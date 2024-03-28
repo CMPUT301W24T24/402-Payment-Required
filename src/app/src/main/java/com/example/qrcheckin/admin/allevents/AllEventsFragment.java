@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.qrcheckin.R;
@@ -26,6 +27,7 @@ import com.example.qrcheckin.user.myevent.EventViewModel;
 public class AllEventsFragment extends Fragment {
 
     private FragmentAllEventsBinding binding;
+    private ListView eventList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,4 +48,5 @@ public class AllEventsFragment extends Fragment {
         binding = null;
     }
 
+    //public void
 }
