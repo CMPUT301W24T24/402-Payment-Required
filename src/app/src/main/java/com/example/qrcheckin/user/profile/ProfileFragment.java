@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,6 +52,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class ProfileFragment extends Fragment {
@@ -62,6 +64,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        root.setLayerType(View.LAYER_TYPE_SOFTWARE, null);  // disables hardware acceleration for the view to prevent large images from crashing the app
 
         // Get the global user instance
         User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
@@ -114,15 +117,10 @@ public class ProfileFragment extends Fragment {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
                         StorageReference storageReference = storage.getReference();
                         Uri imageUri = Uri.parse(binding.profilePicture.getTag().toString());
-                        // Getting the image extension
-                        String fileName = imageUri.getPath();
-                        int dotIndex = fileName.lastIndexOf(".");
-                        String imageExtension = fileName.substring(dotIndex);
-                        String imageName = user.getId() + imageExtension;
-
+                        String imageName = user.getId() ;
                         user.setImageRef("users/" + imageName);
                         StorageReference imageRef = storageReference.child("users/" + imageName);
-                        UploadTask uploadTask = imageRef.putFile(imageUri);
+                        imageRef.putFile(imageUri);
                     }
 
                     //Accessing the users database
@@ -206,6 +204,7 @@ public class ProfileFragment extends Fragment {
                     // update the preview image in the layout
                     binding.profilePicture.setImageURI(selectedImageUri);
                     binding.profilePicture.setTag(selectedImageUri.toString());
+
                 }
             }
         }
