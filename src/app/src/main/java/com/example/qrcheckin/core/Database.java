@@ -26,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.lang.ref.Reference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -280,7 +281,7 @@ public class Database {
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
-                Bitmap bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length), imageView.getWidth(), imageView.getHeight(), false);
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 imageView.setImageBitmap(bmp);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -591,6 +592,101 @@ public class Database {
      */
     public interface OnCheckInCountRetrievedListener {
         void onCheckInCountRetrieved(long checkInCount);
+    public static void getAllImagesUserPicture(ImagesUserArrayAdaptor imagesUserArrayAdaptor, int position, ImageView imageView) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        ArrayList<User> users = imagesUserArrayAdaptor.getUsers();
+        User user = users.get(position);
+        if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            users.remove(position);
+            imagesUserArrayAdaptor.notifyDataSetChanged();
+            return;
+        }
+        storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Log.d("Firestorage", "Image fetched:" + user.getName());
+                Log.d("ImageView", "Width: " + imageView.getWidth() + " Height: " + imageView.getHeight());
+                Log.d("array", imagesUserArrayAdaptor.getUsers().toString());
+                if(imageView.getWidth() == 0) {
+                    // TODO: Figure out why it gets called multiple times
+                    return;
+                }
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+                users.remove(position);
+                imagesUserArrayAdaptor.notifyDataSetChanged();
+            }
+        });
     }
 
-}
+    public static void getAllImagesEventPoster(ImagesEventArrayAdaptor imagesEventArrayAdaptor, int position, ImageView imageView) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        ArrayList<Event> events = imagesEventArrayAdaptor.getEvents();
+        Event event = events.get(position);
+        if (event.getPosterRef() == null || event.getPosterRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            events.remove(position);
+            imagesEventArrayAdaptor.notifyDataSetChanged();
+            return;
+        }
+        storage.getReference().child(event.getPosterRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                if(imageView.getWidth() == 0) {
+                    // TODO: Figure out why it gets called multiple times
+                    return;
+                }
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+                events.remove(position);
+                imagesEventArrayAdaptor.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public static void deleteImage(Event event, ImagesEventArrayAdaptor imagesEventArrayAdaptor) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsRef = db.collection("events");
+        eventsRef.document(event.getId()).update("posterRef", "").addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+                imagesEventArrayAdaptor.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
+    }
+
+    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+                imagesUserArrayAdaptor.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
+    }
+
+}}
