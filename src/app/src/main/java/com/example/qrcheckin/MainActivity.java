@@ -456,6 +456,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                                     showNotification(
                                             "Milestone Reached!",
                                             milestoneNames.get(newDoc.getString("event_id")) + " just got its first attendee!",
+                                            "Milestones",
                                             "Milestones");
                                     break;
                                 case 5:
@@ -463,6 +464,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                                     showNotification(
                                             "Milestone Reached!",
                                             milestoneNames.get(newDoc.getString("event_id")) + " has reached 5 attendees!",
+                                            "Milestones",
                                             "Milestones");
                                     break;
                                 case 10:
@@ -470,6 +472,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                                     showNotification(
                                             "Milestone Reached!",
                                             milestoneNames.get(newDoc.getString("event_id")) + " has reached 10 attendees!",
+                                            "Milestones",
                                             "Milestones");
                                     break;
                                 case 100:
@@ -477,6 +480,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                                     showNotification(
                                             "Milestone Reached!",
                                             milestoneNames.get(newDoc.getString("event_id")) + " has reached 100 attendees! WOW!",
+                                            "Milestones",
                                             "Milestones");
                                     break;
                                 default:
@@ -548,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                         for (DocumentChange document : querySnapshots.getDocumentChanges()) {
                             DocumentSnapshot doc = document.getDocument();
                             // push notification
-                            showNotification( "'" + eventIdToName.get(eventID) + "'" + " Sent you a notification!", doc.getString("message"), "qrchannel");
+                            showNotification( "'" + eventIdToName.get(eventID) + "'" + " Sent you a notification!", doc.getString("message"), "qrchannel", "Event Notifications");
                         }
                         Log.d("Notifications", "received new push notification");
                     }
@@ -568,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * @param title title of the notification message
      * @param message the body of the notification message
      */
-    public void showNotification(String title, String message, String channel_id) {
+    public void showNotification(String title, String message, String channel_id, String channel_name) {
         Log.d("Notifications", "creating notification for: " + title);
         // Pass the intent to switch to the MainActivity
 //        Intent intent = new Intent(this, MainActivity.class);
@@ -594,7 +598,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
         NotificationChannel notificationChannel = new NotificationChannel(
-                channel_id, "Event Notifications",
+                channel_id, channel_name,
                 NotificationManager.IMPORTANCE_HIGH);
 
         notificationManager.createNotificationChannel(notificationChannel);
