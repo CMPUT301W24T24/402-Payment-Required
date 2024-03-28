@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         mileStoneEvents = new ArrayList<>();
         milestoneListener = null;
         milestoneNames = new HashMap<>();
-        milestoneLastUpdate = System.currentTimeMillis() + 1250;
+        milestoneLastUpdate = System.currentTimeMillis() + 1500;
 
         signupListener();
         checkinListener();

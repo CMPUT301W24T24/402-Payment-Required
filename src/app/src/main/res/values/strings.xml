@@ -20,4 +20,5 @@
     <string name="unsign_up">Withdraw Sign Up</string>
     <string name="sign_up">Sign Me Up</string>
     <string name="event_full">Event Already Full</string>
+    <string name="delete_image_warning">Are you sure you want to delete this image?</string>
 </resources>
