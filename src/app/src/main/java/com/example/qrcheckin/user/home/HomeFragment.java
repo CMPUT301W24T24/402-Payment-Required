@@ -113,7 +113,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         ScanOptions options = new ScanOptions();
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
         options.setOrientationLocked(true);
-        options.setPrompt("Scan a QR code to sign in");
+        options.setPrompt("");
         barcodeLauncher.launch(options);
     }
 
