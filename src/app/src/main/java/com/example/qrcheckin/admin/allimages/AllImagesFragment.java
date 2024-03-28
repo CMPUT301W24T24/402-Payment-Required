@@ -54,7 +54,7 @@ public class AllImagesFragment extends Fragment {
                     return;
                 }
                 Event event = events.get(position);
-                DeleteImageFragment deleteImageFragment = new DeleteImageFragment(event, null);
+                DeleteImageFragment deleteImageFragment = new DeleteImageFragment(event, null, eventAdapter);
                 deleteImageFragment.show(getParentFragmentManager(), "deleteImage");
             }
         });
@@ -66,7 +66,7 @@ public class AllImagesFragment extends Fragment {
                     return;
                 }
                 User user = users.get(position);
-                DeleteImageFragment deleteImageFragment = new DeleteImageFragment(null, user);
+                DeleteImageFragment deleteImageFragment = new DeleteImageFragment(null, user, userAdapter);
                 deleteImageFragment.show(getParentFragmentManager(), "deleteImage");
             }
         });

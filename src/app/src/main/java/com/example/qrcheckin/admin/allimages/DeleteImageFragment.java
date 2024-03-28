@@ -10,6 +10,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.ImagesEventArrayAdaptor;
+import com.example.qrcheckin.core.ImagesUserArrayAdaptor;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentDeleteImageBinding;
 
@@ -19,10 +21,18 @@ public class DeleteImageFragment extends DialogFragment {
     private FragmentDeleteImageBinding binding;
     private Event event;
     private User user;
+    private ImagesEventArrayAdaptor eventAdapter;
+    private ImagesUserArrayAdaptor userAdapter;
 
-    public DeleteImageFragment(@Nullable Event event, @Nullable User user) {
+    public DeleteImageFragment(@Nullable Event event, @Nullable User user, @Nullable ImagesEventArrayAdaptor eventAdapter) {
         this.event = event;
         this.user = user;
+        this.eventAdapter = eventAdapter;
+    }
+    public DeleteImageFragment(@Nullable Event event, @Nullable User user, @Nullable ImagesUserArrayAdaptor userAdapter) {
+        this.event = event;
+        this.user = user;
+        this.userAdapter = userAdapter;
     }
 
     @NonNull
@@ -37,9 +47,12 @@ public class DeleteImageFragment extends DialogFragment {
                 .setPositiveButton("Delete", (dialog, which) -> {
                     if (user != null) {
                         Database.deleteImage(user);
+                        userAdapter.notifyDataSetChanged();
                     } else {
                         Database.deleteImage(event);
+                        eventAdapter.notifyDataSetChanged();
                     }
+
                 })
                 .create();
     }
