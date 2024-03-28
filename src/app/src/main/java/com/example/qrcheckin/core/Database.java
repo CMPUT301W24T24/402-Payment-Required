@@ -592,6 +592,118 @@ public class Database {
      */
     public interface OnCheckInCountRetrievedListener {
         void onCheckInCountRetrieved(long checkInCount);
+    }
+
+
+
+    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+                imagesUserArrayAdaptor.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
+    }
+
+
+    public static void getAllImages(ImagesEventArrayAdaptor events, ImagesUserArrayAdaptor users) {
+        CollectionReference usersRef = FirebaseFirestore.getInstance().collection("users");
+        CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("events");
+        usersRef.whereNotEqualTo(
+                "imageRef",
+                null
+        ).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    users.getUsers().clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        User user = new User(doc.getId(),
+                                doc.getString("name"),
+                                doc.getString("email"),
+                                doc.getString("phone"),
+                                doc.getString("homepage"),
+                                Boolean.TRUE.equals(doc.getBoolean("geo")),
+                                Boolean.TRUE.equals(doc.getBoolean("admin")),
+                                doc.getString("imageRef")
+                        );
+                        Log.d("Firestore", "User fetched for Image" + user.getName());
+                        users.getUsers().add(user);
+                        users.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
+        eventsRef.whereNotEqualTo(
+                "posterRef",
+                ""
+        ).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    events.getEvents().clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        DocumentReference hostRef = doc.getDocumentReference("host");
+                        Log.d("FirestoreEventImage", "Event fetched for Image" + doc.getId());
+                        hostRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot userDoc) {
+                                if (userDoc.exists()) {
+                                    User user = new User(userDoc.getId(),
+                                            userDoc.getString("name"),
+                                            userDoc.getString("email"),
+                                            userDoc.getString("phone"),
+                                            userDoc.getString("homepage"),
+                                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
+                                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
+                                            userDoc.getString("imageRef")
+                                    );
+                                    Event event = new Event(doc.getId(),
+                                            user,
+                                            doc.getString("name"),
+                                            doc.getString("description"),
+                                            doc.getString("posterRef"),
+                                            doc.getDate("time"),
+                                            doc.getString("location"),
+                                            doc.getDouble("location_geo_lat"),
+                                            doc.getDouble("location_geo_long"),
+                                            doc.getString("checkin_id"),
+                                            doc.getString("checkin_qr"),
+                                            doc.getString("promote_id"),
+                                            doc.getString("promote_qr"),
+                                            Boolean.TRUE.equals(doc.getBoolean("geo")),
+                                            doc.getLong("limit").intValue(),
+                                            null
+                                    );
+                                    events.getEvents().add(event);
+                                    events.notifyDataSetChanged();
+                                } else {
+                                    Log.e("Firestore", "Host not found");
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
     public static void getAllImagesUserPicture(ImagesUserArrayAdaptor imagesUserArrayAdaptor, int position, ImageView imageView) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         ArrayList<User> users = imagesUserArrayAdaptor.getUsers();
@@ -672,21 +784,4 @@ public class Database {
         });
     }
 
-    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference usersRef = db.collection("users");
-        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d("Firestore", "Image reference deleted");
-                imagesUserArrayAdaptor.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e("Firestore", e.toString());
-            }
-        });
-    }
-
-}}
+}
