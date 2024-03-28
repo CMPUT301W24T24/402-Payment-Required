@@ -149,6 +149,9 @@ public class ProfileFragment extends Fragment {
                                     // Set the profile picture of the user to the XML view
                                     Database database = new Database();
                                     database.getUserPicture(user, navProfileImage);
+
+                                    // Show a toast message to the user for successful profile update
+                                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
