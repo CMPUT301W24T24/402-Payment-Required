@@ -279,7 +279,7 @@ public class Database {
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
-                Bitmap bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length), imageView.getWidth(), imageView.getHeight(), false);
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 imageView.setImageBitmap(bmp);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -608,6 +608,38 @@ public class Database {
                 Log.e("Firestorage", exception.toString());
                 events.remove(position);
                 imagesEventArrayAdaptor.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public static void deleteImage(Event event) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsRef = db.collection("events");
+        eventsRef.document(event.getId()).update("posterRef", "").addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
+    }
+
+    public static void deleteImage(User user) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
             }
         });
     }
