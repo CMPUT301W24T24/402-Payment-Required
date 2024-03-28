@@ -64,7 +64,7 @@
                 android:layout_width="416dp"
                 android:layout_height="44dp"
                 android:layout_marginTop="4dp"
-                android:hint="Write descrtiption for the event"
+                android:hint="Write description for the event"
                 android:textColor="@color/black"
                 android:textSize="17dp"
                 app:layout_constraintEnd_toEndOf="parent"
