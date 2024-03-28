@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="pink">#EF476F</color>
     <color name="lightpink">#FDEFEF</color>
+    <color name="warning_red">#D11919</color>
 </resources>
