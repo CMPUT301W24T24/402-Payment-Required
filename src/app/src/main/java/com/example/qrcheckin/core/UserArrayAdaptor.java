@@ -77,12 +77,15 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
         Database.getCheckInCountForUser(user.getId(), "", new Database.OnCheckInCountRetrievedListener() {
             @Override
             public void onCheckInCountRetrieved(long checkInCount) {
+                String numCheckins;
                 if (checkInCount == -1) {
-                    ((TextView) finalView.findViewById(R.id.user_number_of_checkins)).setText("Error getting checkin count");
+                    numCheckins = "Error getting checkin count";
+                } else if (checkInCount == 1) {
+                    numCheckins = String.valueOf(checkInCount) + " checkin";
+                } else {
+                    numCheckins = String.valueOf(checkInCount) + " checkins";
                 }
-                else {
-                    ((TextView) finalView.findViewById(R.id.user_number_of_checkins)).setText(String.valueOf(checkInCount));
-                }
+                ((TextView) finalView.findViewById(R.id.user_number_of_checkins)).setText(numCheckins);
 
             }
         });
