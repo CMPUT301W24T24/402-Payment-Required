@@ -69,6 +69,7 @@ public class EditEventFragment extends Fragment implements LocationListener {
     private MapView map;
     private LocationManager locationManager;
     final private double MAP_DEFAULT_LATITUDE=53.5265, MAP_DEFAULT_LONGITUDE=-113.5255;
+    private Location eventLocation;
 
     @SuppressLint("MissingPermission")
     @Nullable
@@ -104,20 +105,19 @@ public class EditEventFragment extends Fragment implements LocationListener {
         map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         map.getController().setZoom(16);
 
-        //location manager and setting this up as a location listener
-        locationManager = (LocationManager) root.getContext().getSystemService(Context.LOCATION_SERVICE);
-        Location location = null;
-        for (String provider:locationManager.getProviders(true)){
-            locationManager.requestLocationUpdates(provider, 1000, 0, this);
+        //event location
+        if(event.getLocationGeoLat()!=null&&event.getLocationGeoLong()!=null) {//first try to pull event location if it isnt null
+            eventLocation.setLatitude(event.getLocationGeoLat());
+            eventLocation.setLongitude(event.getLocationGeoLong());
+        }else{//if that doesnt work then pull GPS data
+            locationManager=(LocationManager) root.getContext().getSystemService(Context.LOCATION_SERVICE);
+            eventLocation=new Location(LocationManager.GPS_PROVIDER);
         }
-
-        //on init if loc reads null simply default to uofa
-        if (location == null){
-            location = new Location(LocationManager.GPS_PROVIDER);
-            location.setLatitude(MAP_DEFAULT_LATITUDE);
-            location.setLongitude(MAP_DEFAULT_LONGITUDE);
-            map.getController().animateTo(new GeoPoint(location));
+        if(eventLocation.getLatitude()==0&&eventLocation.getLongitude()==0) {//otherwise if it fails to retreive gps use hardcoded defaults
+            eventLocation.setLatitude(MAP_DEFAULT_LATITUDE);
+            eventLocation.setLongitude(MAP_DEFAULT_LONGITUDE);
         }
+        map.getController().animateTo(new GeoPoint(eventLocation));
 
 
 
@@ -348,35 +348,23 @@ public class EditEventFragment extends Fragment implements LocationListener {
         map.onPause();
     }
 
-    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {//needed for OSM permissions
         ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (int i = 0; i < grantResults.length; i++) {// array to arraylist
+        for (int i = 0; i < grantResults.length; i++)// array to arraylist
             permissionsToRequest.add(permissions[i]);
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this.getActivity(),
-                    permissionsToRequest.toArray(new String[0]),
-                    1);
-        }
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
     }
 
-    private void requestPermissionsIfNecessary(String[] permissions) {//needed for OSM permissions
+    private void requestPermissionsIfNecessary(String[] permissions) {//needed for location permissions
         ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
+        for (String permission : permissions)
+            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)!=PackageManager.PERMISSION_GRANTED)
                 permissionsToRequest.add(permission);
-            }
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this.getActivity(),
-                    permissionsToRequest.toArray(new String[0]),
-                    1);
-        }
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
     }
 
 }

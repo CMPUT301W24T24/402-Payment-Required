@@ -1,5 +1,12 @@
 package com.example.qrcheckin.user.home;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -30,18 +39,21 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The home fragment which contains the QR scanner
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements LocationListener {
 
     private FragmentHomeBinding binding;
+    private Location currentLocation;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
+
 
     /**
      * Creates the view
@@ -55,6 +67,7 @@ public class HomeFragment extends Fragment {
      *
      * @return
      */
+    @SuppressLint("MissingPermission")//requestPermissionIfNecessary corrects for this
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -70,6 +83,16 @@ public class HomeFragment extends Fragment {
                 initQRCodeScanner();
             }
         });
+
+        //req permissions for location
+        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION});//coarse is fine because its accurate to about 100m
+
+        //set this as a listener for location change to assure accuracy
+        LocationManager locationManager = (LocationManager) root.getContext().getSystemService(Context.LOCATION_SERVICE);
+        currentLocation = new Location(LocationManager.GPS_PROVIDER);
+        for (String provider:locationManager.getProviders(true)){
+            locationManager.requestLocationUpdates(provider, 1000, 0, this);
+        }
 
         return root;
     }
@@ -137,9 +160,19 @@ public class HomeFragment extends Fragment {
                         new UserList()
                         );
                 Log.i("QR","Event created successfully");
-                event.checkIn(currentUser);
+                Log.i("Location",currentLocation.getLatitude()+"|"+currentLocation.getLongitude());
 
-                Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
+                if(currentUser.isGeo())//user geo enabled
+                    if (event.checkIn(currentUser,currentLocation.getLatitude(),currentLocation.getLongitude()))//full location check in
+                        Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getActivity(), "Failed to check into "+event.getName()+", you are too far from the event or your GPS is disabled!", Toast.LENGTH_LONG).show();
+                else//user geo disabled
+                    if(event.checkIn(currentUser))//raw check in
+                        Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getActivity(), "Failed to check into "+event.getName()+", geolocation is required for this event, please enable geolocation!", Toast.LENGTH_LONG).show();
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -148,6 +181,31 @@ public class HomeFragment extends Fragment {
             }
         });
 
+    }
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        currentLocation=location;
+    }
+
+    //needed for location permissions
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (int i = 0; i < grantResults.length; i++)// array to arraylist
+            permissionsToRequest.add(permissions[i]);
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
+    }
+
+    private void requestPermissionsIfNecessary(String[] permissions) {//needed for location permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions)
+            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)!=PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(permission);
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
     }
 }
 
