@@ -46,11 +46,9 @@ public class DeleteImageFragment extends DialogFragment {
                 .setNegativeButton("Cancel", (dialog, which) -> {})
                 .setPositiveButton("Delete", (dialog, which) -> {
                     if (user != null) {
-                        Database.deleteImage(user);
-                        userAdapter.notifyDataSetChanged();
+                        Database.deleteImage(user, userAdapter);
                     } else {
-                        Database.deleteImage(event);
-                        eventAdapter.notifyDataSetChanged();
+                        Database.deleteImage(event, eventAdapter);
                     }
 
                 })

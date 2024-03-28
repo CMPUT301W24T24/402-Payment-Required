@@ -612,13 +612,14 @@ public class Database {
         });
     }
 
-    public static void deleteImage(Event event) {
+    public static void deleteImage(Event event, ImagesEventArrayAdaptor imagesEventArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsRef = db.collection("events");
         eventsRef.document(event.getId()).update("posterRef", "").addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Log.d("Firestore", "Image reference deleted");
+                imagesEventArrayAdaptor.notifyDataSetChanged();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -628,13 +629,14 @@ public class Database {
         });
     }
 
-    public static void deleteImage(User user) {
+    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference usersRef = db.collection("users");
         usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Log.d("Firestore", "Image reference deleted");
+                imagesUserArrayAdaptor.notifyDataSetChanged();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
