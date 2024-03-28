@@ -64,7 +64,13 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
         User user = users.get(position);
         ((ImageView) view.findViewById(R.id.user_profile_image)).setImageBitmap(user.generateProfilePicture());
         ((TextView) view.findViewById(R.id.user_name_text)).setText(user.getName());
-        ((TextView) view.findViewById(R.id.user_phone_number_text)).setText(user.getPhone());
+        if (user.getPhone().isEmpty()) {
+            ((TextView) view.findViewById(R.id.user_phone_number_text)).setText("###-###-####");
+        }
+        else {
+            ((TextView) view.findViewById(R.id.user_phone_number_text)).setText(user.getPhone());
+        }
+
         ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("searching...");
 
         View finalView = view;
