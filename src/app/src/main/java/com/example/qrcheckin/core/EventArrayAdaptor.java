@@ -67,7 +67,7 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         // null if attendee counting not implemented yet
         Integer attamt = event.getAttendeeAmount();
         if (attamt != null) {
-            ((TextView) view.findViewById(R.id.event_number_of_attendees_text)).setText("Attendees: " + attamt.toString());
+            ((TextView) view.findViewById(R.id.event_number_of_attendees_text)).setText("Attendees: " + attamt);
         }
 
         return view;

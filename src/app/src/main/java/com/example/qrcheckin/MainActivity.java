@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     private Map<String, Boolean> eventMapCheckin;
     private long notificationListenerLastUpdate;
     private FirebaseFirestore notidb;
+    private ArrayList<String> mileStoneEvents;
+    private ListenerRegistration milestoneListener;
+    private Map<String, String> milestoneNames;
+    private long milestoneLastUpdate;
 
     /**
      * When the app is first opened this is called
@@ -271,9 +275,14 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         eventMapCheckin = new HashMap<>();
         notificationCollections = new HashSet<>();
         notidb = FirebaseFirestore.getInstance();
+        mileStoneEvents = new ArrayList<>();
+        milestoneListener = null;
+        milestoneNames = new HashMap<>();
+        milestoneLastUpdate = System.currentTimeMillis() + 1250;
 
         signupListener();
         checkinListener();
+        milestoneListeners();
     }
 
     /**
@@ -358,6 +367,129 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     }
 
     /**
+     * creates a listener for hosted events to display milestone alerts
+     */
+    private void milestoneListeners() {
+        notidb.collection("events").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.e("Firestore", error.toString());
+                            return;
+                        }
+
+                        if (value != null) {
+
+                            for (DocumentChange doc: value.getDocumentChanges()) {
+                                if (mileStoneEvents.contains(doc.getDocument().getId())) {
+                                    return;
+                                }
+                            }
+
+                            mileStoneEvents.clear();
+                            if (milestoneListener != null) {
+                                milestoneListener.remove();
+                            }
+
+                            for (QueryDocumentSnapshot doc: value) {
+                                if (doc.getDocumentReference("host").getId().equals(currentUser.getId())) {
+                                    mileStoneEvents.add(doc.getId());
+                                    milestoneNames.put(doc.getId(), doc.getString("name"));
+                                }
+                            }
+                            Log.d("Milestone", "creating milestone listener");
+                            createMilestoneListener();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * creates a listener for the checkins table that sends an alert to the user about an attendee milestone reached
+     */
+    private void createMilestoneListener() {
+        milestoneListener = notidb.collection("checkins").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                HashMap<String, HashMap<String, Integer>> milestoneMap = new HashMap<>();
+
+                if (value != null &&
+                        milestoneLastUpdate <= System.currentTimeMillis()) {
+
+                    for (QueryDocumentSnapshot doc: value) {
+                        String eventID = doc.getString("event_id");
+                        if (mileStoneEvents.contains(eventID)) {
+
+                            if (milestoneMap.containsKey(eventID)) {
+
+                                HashMap<String, Integer> upSet = milestoneMap.get(doc.getString("event_id"));
+                                String user = doc.getString("user_id");
+
+                                if (upSet.containsKey(user)) {
+                                    upSet.put(user, upSet.get(user) + 1);
+                                    milestoneMap.put(eventID, upSet);
+
+                                } else {
+                                    upSet.put(user, 1);
+                                    milestoneMap.put(eventID, upSet);
+                                }
+                            } else {
+                                HashMap<String, Integer> upSet = new HashMap<>();
+                                upSet.put(doc.getString("user_id"), 1);
+                                milestoneMap.put(eventID, upSet);
+                            }
+                        }
+                    }
+
+                    for (DocumentChange doc: value.getDocumentChanges()) {
+                        DocumentSnapshot newDoc = doc.getDocument();
+
+                        HashMap<String, Integer> eventMap = milestoneMap.get(newDoc.getString("event_id"));
+                        if ( eventMap != null && eventMap.get(newDoc.getString("user_id")) == 1) {
+                            switch (eventMap.size()) {
+                                case 1:
+                                    Log.d("Milestone", "1 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " just got its first attendee!",
+                                            "Milestones");
+                                    break;
+                                case 5:
+                                    Log.d("Milestone", "5 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " has reached 5 attendees!",
+                                            "Milestones");
+                                    break;
+                                case 10:
+                                    Log.d("Milestone", "10 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " has reached 10 attendees!",
+                                            "Milestones");
+                                    break;
+                                case 100:
+                                    Log.d("Milestone", "100 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " has reached 100 attendees! WOW!",
+                                            "Milestones");
+                                    break;
+                                default:
+                                    return;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * getNames will get the name of all events specified in the list of event IDs.
      * This will also set a listener to each events notification collection
      */
@@ -416,7 +548,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                         for (DocumentChange document : querySnapshots.getDocumentChanges()) {
                             DocumentSnapshot doc = document.getDocument();
                             // push notification
-                            showNotification(eventIdToName.get(eventID), doc.getString("message"));
+                            showNotification( "'" + eventIdToName.get(eventID) + "'" + " Sent you a notification!", doc.getString("message"), "qrchannel");
                         }
                         Log.d("Notifications", "received new push notification");
                     }
@@ -436,15 +568,10 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * @param title title of the notification message
      * @param message the body of the notification message
      */
-    public void showNotification(String title, String message) {
-        title = "'" + title + "'" + " Sent you a notification!";
-
-        Log.d("Notifications", "creating notification for event: " + title);
+    public void showNotification(String title, String message, String channel_id) {
+        Log.d("Notifications", "creating notification for: " + title);
         // Pass the intent to switch to the MainActivity
 //        Intent intent = new Intent(this, MainActivity.class);
-
-        // Assign channel ID
-        String channel_id = "qrchannel";
 
 //        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        // Pass the intent to PendingIntent to start the
