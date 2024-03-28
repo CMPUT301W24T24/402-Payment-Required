@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.example.qrcheckin.core.ImagesEventArrayAdaptor;
 import com.example.qrcheckin.core.ImagesUserArrayAdaptor;
@@ -45,6 +46,30 @@ public class AllImagesFragment extends Fragment {
 
         binding.allImagesEventListView.setAdapter(eventAdapter);
         binding.allImagesProfileListView.setAdapter(userAdapter);
+
+        binding.allImagesEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position < 0 || position >= events.size()) {
+                    return;
+                }
+                Event event = events.get(position);
+                DeleteImageFragment deleteImageFragment = new DeleteImageFragment(event, null);
+                deleteImageFragment.show(getParentFragmentManager(), "deleteImage");
+            }
+        });
+
+        binding.allImagesProfileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position < 0 || position >= users.size()) {
+                    return;
+                }
+                User user = users.get(position);
+                DeleteImageFragment deleteImageFragment = new DeleteImageFragment(null, user);
+                deleteImageFragment.show(getParentFragmentManager(), "deleteImage");
+            }
+        });
 
         return root;
     }
