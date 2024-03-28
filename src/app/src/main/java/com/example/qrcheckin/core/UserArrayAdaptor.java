@@ -62,7 +62,9 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
             view = LayoutInflater.from(context).inflate(R.layout.content_user, parent,false);
         }
         User user = users.get(position);
-        ((ImageView) view.findViewById(R.id.user_profile_image)).setImageBitmap(user.generateProfilePicture());
+        Database db = new Database(context);
+        db.getUserPicture(user, (ImageView) view.findViewById(R.id.user_profile_image));
+
         ((TextView) view.findViewById(R.id.user_name_text)).setText(user.getName());
         if (user.getPhone().isEmpty()) {
             ((TextView) view.findViewById(R.id.user_phone_number_text)).setText("###-###-####");
