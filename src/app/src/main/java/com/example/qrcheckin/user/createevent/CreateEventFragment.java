@@ -1,6 +1,5 @@
 package com.example.qrcheckin.user.createevent;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,9 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,22 +23,18 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qrcheckin.QRCheckInApplication;
+import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
-import com.google.android.gms.maps.MapView;
-import com.google.firebase.Firebase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.w3c.dom.Text;
-
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -51,7 +44,7 @@ public class CreateEventFragment extends Fragment {
     private FragmentCreateEventBinding binding;
     public String checkinId;
     public String promoteId;
-    private static final Pattern validPostalCode=Pattern.compile("[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ] ?[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]");
+    private static final Pattern validPostalCode=Pattern.compile("[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]");
 
     /**
      * Initializes the CreateEventFragment on create
@@ -132,6 +125,25 @@ public class CreateEventFragment extends Fragment {
             CollectionReference eventsRef = db.collection("events");
             CollectionReference usersRef = db.collection("users");
 
+
+            Double locationGeoLat = null;
+            Double locationGeoLong = null;
+            String file=getResources().getString(R.string.postal_code_lookup);
+            String[] lines=file.split("\\r?\\n");
+            for(String line:lines){
+                Log.d("CMPUTLINE",line);
+                if(!Objects.equals(line, "")){
+                    String[] splitLine = line.split(",");
+                    if(Objects.equals(splitLine[0], locationTextView.getText().toString().toUpperCase())){
+                        locationGeoLat=Double.valueOf(splitLine[1]);
+                        locationGeoLong=Double.valueOf(splitLine[2]);
+                        Log.i("Event location",locationGeoLat+"|"+locationGeoLong);
+                        break;
+                    }
+                }
+                Log.e("Event location","Get event location failed, invalid postal code");
+            }
+
             User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
             String titleText = titleTextView.getText().toString();
             String descriptionText = descriptionTextView.getText().toString();
@@ -146,8 +158,6 @@ public class CreateEventFragment extends Fragment {
             String location = locationTextView.getText().toString();
             String checkinQR = null;
             String promoteQR = null;
-            Double locationGeoLat = null;
-            Double locationGeoLong = null;
             Boolean geo = geoCheckBox.isChecked();
             Integer limit = limitNumberPicker.getValue();
 
