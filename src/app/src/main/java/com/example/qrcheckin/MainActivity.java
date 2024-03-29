@@ -380,17 +380,20 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
                         if (value != null) {
 
+                            // prevent event edit from updating milestones
                             for (DocumentChange doc: value.getDocumentChanges()) {
                                 if (mileStoneEvents.contains(doc.getDocument().getId())) {
                                     return;
                                 }
                             }
 
+                            // reset milestone listener and events
                             mileStoneEvents.clear();
                             if (milestoneListener != null) {
                                 milestoneListener.remove();
                             }
 
+                            // get all hosted events
                             for (QueryDocumentSnapshot doc: value) {
                                 if (doc.getDocumentReference("host").getId().equals(currentUser.getId())) {
                                     mileStoneEvents.add(doc.getId());
@@ -417,26 +420,32 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 }
                 HashMap<String, HashMap<String, Integer>> milestoneMap = new HashMap<>();
 
+                // prevent initial alert send
                 if (value != null &&
                         milestoneLastUpdate <= System.currentTimeMillis()) {
 
+                    // go through all checkins
                     for (QueryDocumentSnapshot doc: value) {
                         String eventID = doc.getString("event_id");
+                        // only check events hosted
                         if (mileStoneEvents.contains(eventID)) {
-
+                            // check if event has been mapped yet
                             if (milestoneMap.containsKey(eventID)) {
 
                                 HashMap<String, Integer> upSet = milestoneMap.get(doc.getString("event_id"));
                                 String user = doc.getString("user_id");
 
+                                // increment user checkin
                                 if (upSet.containsKey(user)) {
                                     upSet.put(user, upSet.get(user) + 1);
                                     milestoneMap.put(eventID, upSet);
 
+                                    // user not in event map yet
                                 } else {
                                     upSet.put(user, 1);
                                     milestoneMap.put(eventID, upSet);
                                 }
+                                // event not in map yet
                             } else {
                                 HashMap<String, Integer> upSet = new HashMap<>();
                                 upSet.put(doc.getString("user_id"), 1);
@@ -445,11 +454,15 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                         }
                     }
 
+                    // new document in checkins
                     for (DocumentChange doc: value.getDocumentChanges()) {
                         DocumentSnapshot newDoc = doc.getDocument();
 
                         HashMap<String, Integer> eventMap = milestoneMap.get(newDoc.getString("event_id"));
-                        if ( eventMap != null && eventMap.get(newDoc.getString("user_id")) == 1) {
+
+                        // if event change has duplicates then ignore the checkin since attendees are the same
+                        if (eventMap != null && eventMap.get(newDoc.getString("user_id")) == 1) {
+                            // goto milestone
                             switch (eventMap.size()) {
                                 case 1:
                                     Log.d("Milestone", "1 person milestone reached");

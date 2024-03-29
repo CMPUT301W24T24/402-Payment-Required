@@ -24,16 +24,22 @@ import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentNotificationsBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -294,8 +300,9 @@ public class NotificationsFragment extends Fragment {
                         // create new notification object to be displayed by list of notifications
 
                         String time;
-                        if (doc.getTimestamp("time") != null) {
-                            time = "Sent @ " + doc.getTimestamp("time").toDate().toString();
+                        Timestamp realTime = doc.getTimestamp("time");
+                        if (realTime != null) {
+                            time = "Sent @ " + realTime.toDate().toString();
                         } else {
                             time = "Sent @ TIME UNAVAILABLE";
                         }
@@ -304,7 +311,8 @@ public class NotificationsFragment extends Fragment {
                                 doc.getString("message"),
                                  time,
                                 eventIdToName.get(eventID),
-                                eventID));
+                                eventID,
+                                realTime));
                         notificationsMap.put(eventID, notifList);
                     }
 
@@ -313,9 +321,8 @@ public class NotificationsFragment extends Fragment {
                     for (String nk: notificationsMap.keySet()) {
                         notifications.addAll(notificationsMap.get(nk));
                     }
-                    // future \/ \/ \/
-                    // notifications.sort(); Sort by time of notification
-
+                    // Sort by time of notification
+                    notifications.sort(notificationComparator);
                     // notify ArrayAdapter
                     nArrayAdapter.notifyDataSetChanged();
                 }
@@ -323,4 +330,35 @@ public class NotificationsFragment extends Fragment {
         });
         fireEventNotifs.add(notificationRef);
     }
+
+
+    /**
+     * Reference:
+     * https://ioflood.com/blog/sort-array-java/#:~:text=Java%20provides%20a%20built%2Din,%2C%20string%2C%20or%20custom%20objects.
+     * by Gabriel Ramuglia, Accessed 2024-03-28
+     */
+    Comparator<Notification> notificationComparator = new Comparator<Notification>() {
+        @Override
+        public int compare(Notification o1, Notification o2) {
+            try {
+                long d1 = o1.getRealTime().toDate().getTime();
+                long d2 = o2.getRealTime().toDate().getTime();
+
+                if (d1 < d2) {
+                    return 1;
+                }
+                else if (d1 == d2) {
+                    return 0;
+                }
+                else {
+                    return -1;
+                }
+            }
+            catch (Exception e) {
+                Log.d("Notifications", "comparison error");
+                return 0;
+            }
+
+        }
+    };
 }
