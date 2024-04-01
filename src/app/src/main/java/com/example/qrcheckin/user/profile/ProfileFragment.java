@@ -2,21 +2,14 @@ package com.example.qrcheckin.user.profile;
 
 import static android.content.ContentValues.TAG;
 
-import static androidx.navigation.Navigation.findNavController;
-
-import static com.google.common.reflect.Reflection.getPackageName;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-import android.content.ContentResolver;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.app.Activity;
-import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,22 +18,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentProfileBinding;
-import com.example.qrcheckin.databinding.FragmentViewEventBinding;
-import com.example.qrcheckin.user.viewEvent.ViewEventViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
@@ -51,20 +39,22 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
+    private boolean imageUpdated = false;
+    private Uri updatedImageUri;
+    private boolean imageTooLarge = false;
     int selectPicture = 200;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        root.setLayerType(View.LAYER_TYPE_SOFTWARE, null);  // disables hardware acceleration for the view to prevent large images from crashing the app
 
         // Get the global user instance
         User user = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
@@ -90,10 +80,52 @@ public class ProfileFragment extends Fragment {
             Log.e(TAG, "User is null");
         }
 
+        // Set up the photo picker
+        // Reference: https://developer.android.com/training/data-storage/shared/photopicker Accessed on 2024-03-31
+        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        InputStream imageStream = null;
+                        try {
+                            imageStream = requireContext().getContentResolver().openInputStream(uri);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                        // decode the image stream into a bitmap
+                        Bitmap bmp = BitmapFactory.decodeStream(imageStream);
+
+                        if (bmp.getHeight() > 2048) {
+                            bmp = Bitmap.createScaledBitmap(bmp, bmp.getWidth() * 2048 / bmp.getHeight(), 2048, false);
+                            imageTooLarge = true;
+                        } else if (bmp.getWidth() > 2048) {
+                            bmp = Bitmap.createScaledBitmap(bmp, 2048, bmp.getHeight() * 2048 / bmp.getWidth(), false);
+                            imageTooLarge = true;
+                        }
+
+                        // Convert the bitmap to a URI
+                        // Reference: https://stackoverflow.com/questions/8295773/how-can-i-transform-a-bitmap-into-a-uri Ajay. DragonFire. Accessed on 2024-03-31
+                        if (imageTooLarge) {
+                            Toast.makeText(getContext(), "Image too large, scaled down to 2048x2048", Toast.LENGTH_SHORT).show();
+                            String path = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bmp, "tempImg", null);
+                            uri = Uri.parse(path);
+                        }
+                        imageUpdated = true;
+                        binding.profilePicture.setImageURI(uri);
+                        updatedImageUri = uri;
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+
         binding.editProfilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageChooser();
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build());
             }
         });
 
@@ -113,14 +145,36 @@ public class ProfileFragment extends Fragment {
 
                     // Saving the user's profile picture
                     // Reference: https://medium.com/@everydayprogrammer/uploading-files-to-firebase-storage-in-android-studio-using-java-63f43b4c8d72
-                    if (binding.profilePicture.getTag() != null) {
+                    if (imageUpdated) {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
                         StorageReference storageReference = storage.getReference();
-                        Uri imageUri = Uri.parse(binding.profilePicture.getTag().toString());
-                        String imageName = user.getId() ;
+                        Uri imageUri = updatedImageUri;
+                        String imageName = user.getId();
                         user.setImageRef("users/" + imageName);
                         StorageReference imageRef = storageReference.child("users/" + imageName);
-                        imageRef.putFile(imageUri);
+                        imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Log.d("Firebase", "Profile picture uploaded successfully");
+                                NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
+                                View headerView = navigationView.getHeaderView(0);
+                                ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
+                                // Set the profile picture of the user to the XML view
+                                Database database = new Database();
+                                database.getUserPicture(user, navProfileImage);
+
+                                // Delete the image if it was scaled down
+                                // Reference: https://stackoverflow.com/questions/23716683/android-delete-file-after-images-media-insertimage Nate. Accessed on 2024-03-31
+                                if (imageTooLarge) {
+                                    requireContext().getContentResolver().delete(updatedImageUri, null, null);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Firebase", "Profile picture upload failed", e);
+                            }
+                        });
                     }
 
                     //Accessing the users database
@@ -145,11 +199,6 @@ public class ProfileFragment extends Fragment {
                                     TextView navProfileName = headerView.findViewById(R.id.nav_profile_name);
                                     navProfileName.setText(user.getName());
 
-                                    ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
-                                    // Set the profile picture of the user to the XML view
-                                    Database database = new Database();
-                                    database.getUserPicture(user, navProfileImage);
-
                                     // Show a toast message to the user for successful profile update
                                     Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
                                 }
@@ -165,54 +214,6 @@ public class ProfileFragment extends Fragment {
         });
         return root;
     }
-
-    /**
-     * Opens up the "choose image from gallery" menu
-     * Reference: https://www.geeksforgeeks.org/how-to-select-an-image-from-gallery-in-android/
-     */
-    void imageChooser() {
-        // create an instance of the
-        // intent of the type image
-        Intent i = new Intent();
-        i.setType("image/*");
-        i.setAction(Intent.ACTION_GET_CONTENT);
-
-        // pass the constant to compare it
-        // with the returned requestCode
-        startActivityForResult(Intent.createChooser(i, "Select Picture"), selectPicture);
-    }
-
-    /**
-     * Sets the profile picture to the selected image
-     * Reference: https://www.geeksforgeeks.org/how-to-select-an-image-from-gallery-in-android/
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing you to identify who this
-     *                    result came from.
-     * @param resultCode The integer result code returned by the child activity
-     *                   through its setResult().
-     * @param data An Intent, which can return result data to the caller
-     *               (various data can be attached to Intent "extras").
-     *
-     */
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == Activity.RESULT_OK) {
-            // compare the resultCode with the
-            // SELECT_PICTURE constant
-            if (requestCode == selectPicture) {
-                // Get the url of the image from data
-                Uri selectedImageUri = data.getData();
-                if (null != selectedImageUri) {
-                    // update the preview image in the layout
-                    binding.profilePicture.setImageURI(selectedImageUri);
-                    binding.profilePicture.setTag(selectedImageUri.toString());
-
-                }
-            }
-        }
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
