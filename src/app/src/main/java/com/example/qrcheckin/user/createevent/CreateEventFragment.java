@@ -2,8 +2,6 @@ package com.example.qrcheckin.user.createevent;
 
 import android.media.Image;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -37,12 +34,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.w3c.dom.Text;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 /**
  * Create Event Fragment is a class that creates a CreateEventFragment object
@@ -51,7 +45,6 @@ public class CreateEventFragment extends Fragment {
     private FragmentCreateEventBinding binding;
     public String checkinId;
     public String promoteId;
-    private static final Pattern validPostalCode=Pattern.compile("[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ] ?[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]");
 
     /**
      * Initializes the CreateEventFragment on create
@@ -79,6 +72,8 @@ public class CreateEventFragment extends Fragment {
         EditText descriptionTextView = binding.textCreateEventDescription;
         createEventViewModel.getEventDescription().observe(getViewLifecycleOwner(), descriptionTextView::setHint);
 
+        EditText locationTextView = binding.textCreateEventLocation;
+
         NumberPicker limitNumberPicker = binding.createEventAttendLimit;
         limitNumberPicker.setMinValue(0);
         limitNumberPicker.setMaxValue(1000000000);
@@ -87,12 +82,6 @@ public class CreateEventFragment extends Fragment {
 
         ImageView qrCodeCheckinImageView = binding.imageviewCreateEventCheckinQr;
         ImageView qrCodePromoteImageView = binding.imageviewCreateEventDescriptionQr;
-
-        EditText locationTextView = binding.textCreateEventLocation;//logic below
-        TextView postalCodeTextView = binding.postalCodeWarning;
-        postalCodeTextView.setAlpha(0f);//disable warning until necessary
-
-        Button submitButton=binding.buttonCreateEventSubmit;
 
         Button generateQRCheckinButton = binding.buttonCreateEventGenerateQrCheckin;
         generateQRCheckinButton.setOnClickListener(new View.OnClickListener() {
@@ -183,41 +172,6 @@ public class CreateEventFragment extends Fragment {
 
         });
 
-        locationTextView.addTextChangedListener(new TextWatcher(){
-
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count){}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(geoCheckBox.isChecked()&&!isValidPostalCode(s)){
-                    postalCodeTextView.setAlpha(1f);
-                    submitButton.setClickable(false);
-                    submitButton.setAlpha(.5f);
-                }else{
-                    postalCodeTextView.setAlpha(0f);
-                    submitButton.setClickable(true);
-                    submitButton.setAlpha(1f);
-                }
-            }
-        });
-
-        geoCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked&&!isValidPostalCode(locationTextView.getText())){
-                postalCodeTextView.setAlpha(1f);
-                submitButton.setClickable(false);
-                submitButton.setAlpha(.5f);
-            }else{
-                postalCodeTextView.setAlpha(0f);
-                submitButton.setClickable(true);
-                submitButton.setAlpha(1f);
-            }
-        });
-
         return root;
     }
 
@@ -266,10 +220,6 @@ public class CreateEventFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private boolean isValidPostalCode(CharSequence s) {
-        return validPostalCode.matcher(s.toString().toUpperCase()).matches();
     }
 
 }

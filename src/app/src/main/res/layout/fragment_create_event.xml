@@ -227,27 +227,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_create_event_checkin_qr"/>
 
-            <TextView
-                android:id="@+id/postal_code_warning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Please enter a valid postal code"
-                android:textAlignment="center" />
-
             <EditText
                 android:id="@+id/text_create_event_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp"
+                android:hint="@string/create_event_location"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:hint="Enter postal code for geolocation"
                 android:textAlignment="center"
                 android:textSize="15sp"
+                android:layout_margin="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/checkbox_create_event_geolocation" />
+                app:layout_constraintTop_toBottomOf="@id/checkbox_create_event_geolocation"/>
 
 
             <!-- TODO: Event Location Mapview -->
