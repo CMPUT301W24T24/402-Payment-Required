@@ -166,12 +166,12 @@ public class HomeFragment extends Fragment implements LocationListener {
                     if (event.checkIn(currentUser,currentLocation.getLatitude(),currentLocation.getLongitude()))//full location check in
                         Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
                     else
-                        Toast.makeText(getActivity(), "Failed to check into "+event.getName()+", you are too far from the event or your GPS is disabled!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "You are too far from the event or your GPS is disabled!", Toast.LENGTH_LONG).show();
                 else//user geo disabled
                     if(event.checkIn(currentUser))//raw check in
                         Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
                     else
-                        Toast.makeText(getActivity(), "Failed to check into "+event.getName()+", geolocation is required for this event, please enable geolocation!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Geolocation is required for this event, please enable geolocation!", Toast.LENGTH_LONG).show();
 
             }
         }).addOnFailureListener(new OnFailureListener() {
