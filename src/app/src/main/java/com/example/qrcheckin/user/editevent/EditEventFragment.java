@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.example.qrcheckin.MainActivity;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
@@ -49,10 +50,13 @@ import com.google.firebase.storage.FirebaseStorage;
 
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -64,14 +68,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-public class EditEventFragment extends Fragment implements LocationListener {
+public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
     private MapView map;
-    private LocationManager locationManager;
     final private double MAP_DEFAULT_LATITUDE=53.5265, MAP_DEFAULT_LONGITUDE=-113.5255;
     private Location eventLocation;
+    private DocumentReference docRef;
+    private Marker selectedMarker;
 
-    @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -93,6 +97,7 @@ public class EditEventFragment extends Fragment implements LocationListener {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
+        Button selectLocationButton=binding.selectLocationButton;
 
         //map permissions
         requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
@@ -103,23 +108,30 @@ public class EditEventFragment extends Fragment implements LocationListener {
         //map config
         map = root.findViewById(R.id.osmmap);
         map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        map.setMultiTouchControls(true);
         map.getController().setZoom(16);
 
+        eventLocation=new Location(LocationManager.GPS_PROVIDER);
         //event location
         if(event.getLocationGeoLat()!=null&&event.getLocationGeoLong()!=null) {//first try to pull event location if it isnt null
             eventLocation.setLatitude(event.getLocationGeoLat());
             eventLocation.setLongitude(event.getLocationGeoLong());
-        }else{//if that doesnt work then pull GPS data
-            locationManager=(LocationManager) root.getContext().getSystemService(Context.LOCATION_SERVICE);
-            eventLocation=new Location(LocationManager.GPS_PROVIDER);
         }
         if(eventLocation.getLatitude()==0&&eventLocation.getLongitude()==0) {//otherwise if it fails to retreive gps use hardcoded defaults
             eventLocation.setLatitude(MAP_DEFAULT_LATITUDE);
             eventLocation.setLongitude(MAP_DEFAULT_LONGITUDE);
         }
+        //marker
+        selectedMarker=new Marker(map);
+        selectedMarker.setPosition(new GeoPoint(eventLocation));
+        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        map.getOverlays().add(selectedMarker);
+        map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
 
-
+        selectLocationButton.setOnClickListener(v -> {
+            selectLocation();
+        });
 
         // Set event information
         assert event != null;
@@ -130,9 +142,8 @@ public class EditEventFragment extends Fragment implements LocationListener {
         eventPoster.setImageResource(R.drawable.cat);
 
         //Accessing the events database
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference eventsRef = db.collection("events");
-        DocumentReference docRef = eventsRef.document(event.getId());
+        docRef=FirebaseFirestore.getInstance().collection("events").document(event.getId());
+
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -326,11 +337,6 @@ public class EditEventFragment extends Fragment implements LocationListener {
     }
 
     @Override
-    public void onLocationChanged(@NonNull Location location) {
-        map.getController().setCenter(new GeoPoint(location));
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
@@ -365,6 +371,53 @@ public class EditEventFragment extends Fragment implements LocationListener {
 
         if (permissionsToRequest.size() > 0)
             ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
+    }
+
+    private void selectLocation() {
+        Toast.makeText(getContext(), "Tap a location on the map", Toast.LENGTH_SHORT).show();
+        MapEventsReceiver receiver = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                eventLocation.setLatitude(p.getLatitude());
+                eventLocation.setLongitude(p.getLongitude());
+
+                //marker
+                if(selectedMarker!=null)
+                    map.getOverlays().remove(selectedMarker);
+                selectedMarker=new Marker(map);
+                selectedMarker.setPosition(p);
+                selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                map.getOverlays().add(selectedMarker);
+                map.invalidate(); //refresh
+                map.getController().animateTo(p);
+
+                HashMap<String, Object> data = new HashMap<>();
+                data.put("location_geo_lat", p.getLatitude());
+                data.put("location_geo_long", p.getLongitude());
+
+                docRef.update(data)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("firestore", "update the lat and lon sucessfully");
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Firestore", e.toString());
+                            }
+                        });
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        };
+        map.getOverlays().add(new MapEventsOverlay(receiver));
     }
 
 }
