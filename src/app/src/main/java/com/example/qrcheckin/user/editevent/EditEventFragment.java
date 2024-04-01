@@ -37,6 +37,8 @@ import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.example.qrcheckin.user.attendeessignedup.AttendeesSignedUpFragment;
+import com.example.qrcheckin.user.createevent.CreateEventViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -49,6 +51,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 
+
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -57,6 +60,7 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -182,8 +186,7 @@ public class EditEventFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
-                //TODO: create an id to navigate from edit to see_signUps
-                Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_attendee_sign_up, bundle);
             }
         });
 
