@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.qrcheckin.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -23,7 +24,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -321,6 +324,7 @@ public class Database {
         });
 
     }
+
     /**
      * Fetch the host of an event and add the event to the eventList
      * only works with onEventListChanged
@@ -456,6 +460,328 @@ public class Database {
             }
         });
 
+    }
+
+    /**
+     * Gets the list of users signed up to an event
+     * @param userList The empty list that is to be filled with users
+     * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdaptor
+     * @param currentEventID The id of the current event
+     */
+    public static void getUsersSignedUpToEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEventID) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
+        CollectionReference userRef = FirebaseFirestore.getInstance().collection("users");
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    userList.clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (Objects.equals(doc.getString("event_id"), currentEventID)) {
+                            String userId = doc.getString("user_id");
+                            DocumentReference userDoc = userRef.document(userId);
+                            Log.d("Firestore", "Document Reference " + userDoc);
+                            Log.d("Firestore", "User fetched " + userId);
+                            if (userDoc == null) {
+                                Log.d("Firestore", "User " + userId +" not found");
+                            }
+                            else {
+                                fetchUser(doc, userDoc, mUserArrayAdaptor, userList);
+                            }
+                        }
+                    }
+                    Log.d("Firestore", "User list changed " + userList.size());
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Fetches the current user signed up to an event
+     * @param doc The signup document
+     * @param userRef The reference to the user
+     * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdapter
+     * @param userList The user list to be updated
+     */
+    private static void fetchUser(QueryDocumentSnapshot doc, DocumentReference userRef, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, ArrayList<User> userList) {
+        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot userDoc) {
+                if (userDoc.exists()) {
+                    User user = new User(userDoc.getId(),
+                            userDoc.getString("name"),
+                            userDoc.getString("email"),
+                            userDoc.getString("phone"),
+                            userDoc.getString("homepage"),
+                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
+                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
+                            userDoc.getString("imageRef")
+                    );
+
+                    Log.d("Firestore", "User fetched " + user.getName());
+                    if (!userList.contains(user)) {
+                        userList.add(user);
+                    }
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
+                } else {
+                    Log.e("Firestore", "User not found");
+                }
+            }
+        });
+    }
+
+    /**
+     * Sign up the user to the given event
+     * @param user The user to be signed up
+     * @param event The event the user is signing up to
+     */
+    public void signUpUser(User user, Event event) {
+        CollectionReference signupsRef = FirebaseFirestore.getInstance().collection("signUpTable");
+
+        // Add the event to the collection
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("user_id", user.getId());
+        data.put("event_id", event.getId());
+        signupsRef.add(data)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Signed up with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", e.toString());
+                });
+    }
+
+    /**
+     * Retrieves the number of checkins for a specific user and event
+     * @param userId The string id of the user
+     * @param eventId The string id of the event
+     * @param listener The listener to be used for callback
+     * Reference: Gemini
+     * Prompt: How could I update the database function to be callable in the UserArrayAdaptor class so that I
+     *          could set the text of user_number_of_checkins to the number of time the user has checked into a
+     *          specific event without introducing a new field numCheckIns in the user store?
+     */
+    public static void getCheckInCountForUser(String userId, String eventId, OnCheckInCountRetrievedListener listener) {
+        CollectionReference checkinRef = FirebaseFirestore.getInstance().collection("checkins");
+        checkinRef.whereEqualTo("event_id", eventId)
+                .whereEqualTo("user_id", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        long checkInCount = task.getResult().size();
+                        listener.onCheckInCountRetrieved(checkInCount);
+                    } else {
+                        Log.w("Firestore", "Error getting check-in count", task.getException());
+                        listener.onCheckInCountRetrieved(-1); // Handle error
+                    }
+                });
+    }
+
+
+    /**
+     * Used so the UserArrayAdaptor can handle the retrieved check-in count in its onCheckInCountRetrieved method
+     * Reference: Gemini
+     * Prompt: How could I update the database function to be callable in the UserArrayAdaptor class so that I
+     *          could set the text of user_number_of_checkins to the number of time the user has checked into a
+     *          specific event without introducing a new field numCheckIns in the user store?
+     */
+    public interface OnCheckInCountRetrievedListener {
+        void onCheckInCountRetrieved(long checkInCount);
+    }
+
+
+
+    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+                imagesUserArrayAdaptor.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
+    }
+
+
+    public static void getAllImages(ImagesEventArrayAdaptor events, ImagesUserArrayAdaptor users) {
+        CollectionReference usersRef = FirebaseFirestore.getInstance().collection("users");
+        CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("events");
+        usersRef.whereNotEqualTo(
+                "imageRef",
+                null
+        ).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    users.getUsers().clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        User user = new User(doc.getId(),
+                                doc.getString("name"),
+                                doc.getString("email"),
+                                doc.getString("phone"),
+                                doc.getString("homepage"),
+                                Boolean.TRUE.equals(doc.getBoolean("geo")),
+                                Boolean.TRUE.equals(doc.getBoolean("admin")),
+                                doc.getString("imageRef")
+                        );
+                        Log.d("Firestore", "User fetched for Image" + user.getName());
+                        users.getUsers().add(user);
+                        users.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
+        eventsRef.whereNotEqualTo(
+                "posterRef",
+                ""
+        ).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    events.getEvents().clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        DocumentReference hostRef = doc.getDocumentReference("host");
+                        Log.d("FirestoreEventImage", "Event fetched for Image" + doc.getId());
+                        hostRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot userDoc) {
+                                if (userDoc.exists()) {
+                                    User user = new User(userDoc.getId(),
+                                            userDoc.getString("name"),
+                                            userDoc.getString("email"),
+                                            userDoc.getString("phone"),
+                                            userDoc.getString("homepage"),
+                                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
+                                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
+                                            userDoc.getString("imageRef")
+                                    );
+                                    Event event = new Event(doc.getId(),
+                                            user,
+                                            doc.getString("name"),
+                                            doc.getString("description"),
+                                            doc.getString("posterRef"),
+                                            doc.getDate("time"),
+                                            doc.getString("location"),
+                                            doc.getDouble("location_geo_lat"),
+                                            doc.getDouble("location_geo_long"),
+                                            doc.getString("checkin_id"),
+                                            doc.getString("checkin_qr"),
+                                            doc.getString("promote_id"),
+                                            doc.getString("promote_qr"),
+                                            Boolean.TRUE.equals(doc.getBoolean("geo")),
+                                            doc.getLong("limit").intValue(),
+                                            null
+                                    );
+                                    events.getEvents().add(event);
+                                    events.notifyDataSetChanged();
+                                } else {
+                                    Log.e("Firestore", "Host not found");
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    public static void getAllImagesUserPicture(ImagesUserArrayAdaptor imagesUserArrayAdaptor, int position, ImageView imageView) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        ArrayList<User> users = imagesUserArrayAdaptor.getUsers();
+        User user = users.get(position);
+        if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            users.remove(position);
+            imagesUserArrayAdaptor.notifyDataSetChanged();
+            return;
+        }
+        storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Log.d("Firestorage", "Image fetched:" + user.getName());
+                Log.d("ImageView", "Width: " + imageView.getWidth() + " Height: " + imageView.getHeight());
+                Log.d("array", imagesUserArrayAdaptor.getUsers().toString());
+                if(imageView.getWidth() == 0) {
+                    // TODO: Figure out why it gets called multiple times
+                    return;
+                }
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+                users.remove(position);
+                imagesUserArrayAdaptor.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public static void getAllImagesEventPoster(ImagesEventArrayAdaptor imagesEventArrayAdaptor, int position, ImageView imageView) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        ArrayList<Event> events = imagesEventArrayAdaptor.getEvents();
+        Event event = events.get(position);
+        if (event.getPosterRef() == null || event.getPosterRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            events.remove(position);
+            imagesEventArrayAdaptor.notifyDataSetChanged();
+            return;
+        }
+        storage.getReference().child(event.getPosterRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                if(imageView.getWidth() == 0) {
+                    // TODO: Figure out why it gets called multiple times
+                    return;
+                }
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+                events.remove(position);
+                imagesEventArrayAdaptor.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public static void deleteImage(Event event, ImagesEventArrayAdaptor imagesEventArrayAdaptor) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsRef = db.collection("events");
+        eventsRef.document(event.getId()).update("posterRef", "").addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+                imagesEventArrayAdaptor.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
     }
 
 }
