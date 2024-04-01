@@ -278,7 +278,7 @@ public class Database {
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
-                Bitmap bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length), imageView.getWidth(), imageView.getHeight(), false);
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 imageView.setImageBitmap(bmp);
             }
         }).addOnFailureListener(new OnFailureListener() {
