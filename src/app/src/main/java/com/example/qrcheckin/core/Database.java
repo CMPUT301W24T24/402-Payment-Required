@@ -475,18 +475,21 @@ public class Database {
                 if (querySnapshots != null) {
                     users.getUsers().clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
-                        User user = new User(doc.getId(),
-                                doc.getString("name"),
-                                doc.getString("email"),
-                                doc.getString("phone"),
-                                doc.getString("homepage"),
-                                Boolean.TRUE.equals(doc.getBoolean("geo")),
-                                Boolean.TRUE.equals(doc.getBoolean("admin")),
-                                doc.getString("imageRef")
-                        );
-                        Log.d("Firestore", "User fetched for Image" + user.getName());
-                        users.getUsers().add(user);
-                        users.notifyDataSetChanged();
+                        if (!Objects.requireNonNull(doc.getString("imageRef")).isEmpty()) {
+                            User user = new User(doc.getId(),
+                                    doc.getString("name"),
+                                    doc.getString("email"),
+                                    doc.getString("phone"),
+                                    doc.getString("homepage"),
+                                    Boolean.TRUE.equals(doc.getBoolean("geo")),
+                                    Boolean.TRUE.equals(doc.getBoolean("admin")),
+                                    doc.getString("imageRef")
+                            );
+                            Log.d("Firestore", "User fetched for Image" + user.getName());
+
+                            users.getUsers().add(user);
+                            users.notifyDataSetChanged();
+                        }
                     }
                 }
             }
@@ -505,44 +508,46 @@ public class Database {
                     events.getEvents().clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         DocumentReference hostRef = doc.getDocumentReference("host");
-                        Log.d("FirestoreEventImage", "Event fetched for Image" + doc.getId());
-                        hostRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot userDoc) {
-                                if (userDoc.exists()) {
-                                    User user = new User(userDoc.getId(),
-                                            userDoc.getString("name"),
-                                            userDoc.getString("email"),
-                                            userDoc.getString("phone"),
-                                            userDoc.getString("homepage"),
-                                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
-                                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
-                                            userDoc.getString("imageRef")
-                                    );
-                                    Event event = new Event(doc.getId(),
-                                            user,
-                                            doc.getString("name"),
-                                            doc.getString("description"),
-                                            doc.getString("posterRef"),
-                                            doc.getDate("time"),
-                                            doc.getString("location"),
-                                            doc.getDouble("location_geo_lat"),
-                                            doc.getDouble("location_geo_long"),
-                                            doc.getString("checkin_id"),
-                                            doc.getString("checkin_qr"),
-                                            doc.getString("promote_id"),
-                                            doc.getString("promote_qr"),
-                                            Boolean.TRUE.equals(doc.getBoolean("geo")),
-                                            doc.getLong("limit").intValue(),
-                                            null
-                                    );
-                                    events.getEvents().add(event);
-                                    events.notifyDataSetChanged();
-                                } else {
-                                    Log.e("Firestore", "Host not found");
+                        if (doc.getString("posterRef") != null) {
+                            Log.d("FirestoreEventImage", "Event fetched for Image" + doc.getId());
+                            hostRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot userDoc) {
+                                    if (userDoc.exists()) {
+                                        User user = new User(userDoc.getId(),
+                                                userDoc.getString("name"),
+                                                userDoc.getString("email"),
+                                                userDoc.getString("phone"),
+                                                userDoc.getString("homepage"),
+                                                Boolean.TRUE.equals(userDoc.getBoolean("geo")),
+                                                Boolean.TRUE.equals(userDoc.getBoolean("admin")),
+                                                userDoc.getString("imageRef")
+                                        );
+                                        Event event = new Event(doc.getId(),
+                                                user,
+                                                doc.getString("name"),
+                                                doc.getString("description"),
+                                                doc.getString("posterRef"),
+                                                doc.getDate("time"),
+                                                doc.getString("location"),
+                                                doc.getDouble("location_geo_lat"),
+                                                doc.getDouble("location_geo_long"),
+                                                doc.getString("checkin_id"),
+                                                doc.getString("checkin_qr"),
+                                                doc.getString("promote_id"),
+                                                doc.getString("promote_qr"),
+                                                Boolean.TRUE.equals(doc.getBoolean("geo")),
+                                                doc.getLong("limit").intValue(),
+                                                null
+                                        );
+                                        events.getEvents().add(event);
+                                        events.notifyDataSetChanged();
+                                    } else {
+                                        Log.e("Firestore", "Host not found");
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
             }
@@ -553,12 +558,6 @@ public class Database {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         ArrayList<User> users = imagesUserArrayAdaptor.getUsers();
         User user = users.get(position);
-        if (user.getImageRef() == null || user.getImageRef().isEmpty()) {
-            Log.e("Firestorage", "No picture reference");
-            users.remove(position);
-            imagesUserArrayAdaptor.notifyDataSetChanged();
-            return;
-        }
         storage.getReference().child(user.getImageRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
@@ -586,12 +585,6 @@ public class Database {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         ArrayList<Event> events = imagesEventArrayAdaptor.getEvents();
         Event event = events.get(position);
-        if (event.getPosterRef() == null || event.getPosterRef().isEmpty()) {
-            Log.e("Firestorage", "No picture reference");
-            events.remove(position);
-            imagesEventArrayAdaptor.notifyDataSetChanged();
-            return;
-        }
         storage.getReference().child(event.getPosterRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
