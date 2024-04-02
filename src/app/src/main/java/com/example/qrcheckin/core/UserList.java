@@ -36,7 +36,7 @@ public class UserList implements Serializable {
      * @return
      * The list of users attending the event
      */
-    public List<User> getUsers() {
+    public ArrayList<User> getUsers() {
         return users;
     }
 
