@@ -91,11 +91,17 @@
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/create_event_attend_limit" />
 
-            <NumberPicker
+            <EditText
                 android:id="@+id/create_event_attend_limit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="100dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:inputType="number"
+                android:textAlignment="textStart"
+                android:textSize="15sp"
+                android:layout_margin="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/create_event_attend_limit_description_text"/>

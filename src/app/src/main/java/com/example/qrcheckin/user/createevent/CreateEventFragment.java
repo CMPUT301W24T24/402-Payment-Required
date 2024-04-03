@@ -1,5 +1,7 @@
 package com.example.qrcheckin.user.createevent;
 
+import static java.lang.Integer.MAX_VALUE;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -99,9 +101,7 @@ public class CreateEventFragment extends Fragment {
 
         EditText locationTextView = binding.textCreateEventLocation;
 
-        NumberPicker limitNumberPicker = binding.createEventAttendLimit;
-        limitNumberPicker.setMinValue(0);
-        limitNumberPicker.setMaxValue(1000000000);
+        EditText limitEditText = binding.createEventAttendLimit;
 
         CheckBox geoCheckBox = binding.checkboxCreateEventGeolocation;
 
@@ -193,7 +193,14 @@ public class CreateEventFragment extends Fragment {
             Double locationGeoLat = eventLocation.getLatitude();
             Double locationGeoLong = eventLocation.getLongitude();
             Boolean geo = geoCheckBox.isChecked();
-            Integer limit = limitNumberPicker.getValue();
+            Integer limit;
+            if (limitEditText.getText().toString().isEmpty()) {
+                limit = MAX_VALUE;
+            } else {
+                limit = Integer.valueOf(limitEditText.getText().toString());
+            }
+
+
 
 
             Event event = new Event(user, titleText, descriptionText, posterRef, time, location, locationGeoLat, locationGeoLong, checkinId, checkinQR, promoteId, promoteQR, geo, limit);
