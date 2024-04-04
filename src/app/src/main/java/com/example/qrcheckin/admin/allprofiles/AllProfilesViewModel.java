@@ -24,4 +24,5 @@ public class AllProfilesViewModel extends ViewModel {
     public MutableLiveData<ProfileArrayAdapter> getProfileList() {
         return mProfileArrayAdapter;
     }
+
 }

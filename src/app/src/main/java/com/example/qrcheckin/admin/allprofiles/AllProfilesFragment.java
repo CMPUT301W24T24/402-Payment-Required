@@ -36,7 +36,6 @@ import java.util.Objects;
 
 /**
  * The fragment class for all profiles which can only be seen by admins
- * This has not been worked on yet
  */
 public class AllProfilesFragment extends Fragment {
 
@@ -52,7 +51,7 @@ public class AllProfilesFragment extends Fragment {
     private int position = ListView.INVALID_POSITION;
 
     /**
-     *
+     * Create the view with all the profiles
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,
      * @param container If non-null, this is the parent view that the fragment's
@@ -61,7 +60,7 @@ public class AllProfilesFragment extends Fragment {
      * @param savedInstanceState If non-null, this fragment is being re-constructed
      * from a previous saved state as given here.
      *
-     * @return
+     * @return the view of allProfilesFragment
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -85,6 +84,7 @@ public class AllProfilesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AllProfilesFragment.this.position = position;
+                Toast.makeText(requireContext(), "Please click the floating button to delete the selected profile", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -100,8 +100,8 @@ public class AllProfilesFragment extends Fragment {
             }
 
             /**
-             *
-             * @param position
+             * Delete the selected profile
+             * @param position the position of the profile, which needs deleting
              */
             private void deleteProfile(int position) {
                 User profileDelete = profileDataList.get(position);
@@ -124,7 +124,7 @@ public class AllProfilesFragment extends Fragment {
     }
 
     /**
-     * Get all the users from the Fi
+     * Get all the users from the Firestore database
      */
     private void getAllUsers() {
         profileDataList.clear();
