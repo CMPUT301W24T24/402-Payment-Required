@@ -1,6 +1,7 @@
 package com.example.qrcheckin.core;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -64,6 +65,10 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
     }
 
     /**
@@ -100,6 +105,10 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
     }
 
     /**
@@ -134,6 +143,10 @@ public class Event implements Serializable {
         this.limit = limit;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
     }
 
         /**
@@ -198,6 +211,7 @@ public class Event implements Serializable {
 
     /**
      * The method returns the id of the event
+     *
      * @return The id of the event
      */
     public String getId() {
