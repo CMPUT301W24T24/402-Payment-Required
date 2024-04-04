@@ -2,6 +2,7 @@ package com.example.qrcheckin.core;
 
 import android.graphics.Bitmap;
 import android.util.Log;
+<<<<<<< HEAD
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+=======
+>>>>>>> 155047d16ab3931ba3976218fa12b6fcaddec76e
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -87,7 +90,14 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+<<<<<<< HEAD
         initAttendeeAmount();
+=======
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
+>>>>>>> 155047d16ab3931ba3976218fa12b6fcaddec76e
     }
 
     /**
@@ -124,7 +134,14 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+<<<<<<< HEAD
         initAttendeeAmount();
+=======
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
+>>>>>>> 155047d16ab3931ba3976218fa12b6fcaddec76e
     }
 
     /**
@@ -160,6 +177,7 @@ public class Event implements Serializable {
         this.attendees = new UserList();
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+<<<<<<< HEAD
         initAttendeeAmount();
     }
 
@@ -189,6 +207,12 @@ public class Event implements Serializable {
                 }
             }
         });
+=======
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
+>>>>>>> 155047d16ab3931ba3976218fa12b6fcaddec76e
     }
 
         /**
@@ -253,6 +277,7 @@ public class Event implements Serializable {
 
     /**
      * The method returns the id of the event
+     *
      * @return The id of the event
      */
     public String getId() {

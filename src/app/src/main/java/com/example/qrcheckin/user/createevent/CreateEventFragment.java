@@ -1,5 +1,10 @@
 package com.example.qrcheckin.user.createevent;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,22 +23,36 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qrcheckin.QRCheckInApplication;
+import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
-import com.google.android.gms.maps.MapView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.BuildConfig;
 import com.google.firebase.Firebase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,6 +64,12 @@ public class CreateEventFragment extends Fragment {
     private FragmentCreateEventBinding binding;
     public String checkinId;
     public String promoteId;
+
+    //mapping
+    final private double MAP_DEFAULT_LATITUDE=53.5265, MAP_DEFAULT_LONGITUDE=-113.5255;
+    private Location eventLocation;
+    private MapView map;
+    private Marker selectedMarker;
 
     /**
      * Initializes the CreateEventFragment on create
@@ -103,6 +128,36 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
+        //map permissions
+        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+
+        //important for OSM moderation apparently
+        Configuration.getInstance().setUserAgentValue(BuildConfig.LIBRARY_PACKAGE_NAME);
+
+        //map config
+        map=root.findViewById(R.id.osmmap);
+        map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        map.setMultiTouchControls(true);
+        map.getController().setZoom(16);
+
+        eventLocation=new Location(LocationManager.GPS_PROVIDER);
+        //event location
+        if(eventLocation.getLatitude()==0&&eventLocation.getLongitude()==0) {//otherwise if it fails to retreive gps use hardcoded defaults
+            eventLocation.setLatitude(MAP_DEFAULT_LATITUDE);
+            eventLocation.setLongitude(MAP_DEFAULT_LONGITUDE);
+        }
+        //marker
+        selectedMarker=new Marker(map);
+        selectedMarker.setPosition(new GeoPoint(eventLocation));
+        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        map.getOverlays().add(selectedMarker);
+        map.invalidate(); //refresh
+        map.getController().animateTo(new GeoPoint(eventLocation));
+
+        binding.selectNewLocationButton.setOnClickListener(v -> {
+            selectLocation();
+        });
+
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
             // TODO: check that checkinId and promoteID are not the same
@@ -135,8 +190,8 @@ public class CreateEventFragment extends Fragment {
             String location = locationTextView.getText().toString();
             String checkinQR = null;
             String promoteQR = null;
-            Double locationGeoLat = null;
-            Double locationGeoLong = null;
+            Double locationGeoLat = eventLocation.getLatitude();
+            Double locationGeoLong = eventLocation.getLongitude();
             Boolean geo = geoCheckBox.isChecked();
 
             // set limit
@@ -228,6 +283,68 @@ public class CreateEventFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {//needed for OSM display
+        super.onResume();
+        map.onResume();
+    }
+
+    @Override
+    public void onPause() {//needed for OSM display
+        super.onPause();
+        map.onPause();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {//needed for OSM permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (int i = 0; i < grantResults.length; i++)// array to arraylist
+            permissionsToRequest.add(permissions[i]);
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
+    }
+
+    private void requestPermissionsIfNecessary(String[] permissions) {//needed for location permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions)
+            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)!= PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(permission);
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
+    }
+
+    private void selectLocation() {
+        Toast.makeText(getContext(), "Tap a location on the map", Toast.LENGTH_SHORT).show();
+        MapEventsReceiver mReceive = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                eventLocation.setLatitude(p.getLatitude());
+                eventLocation.setLongitude(p.getLongitude());
+
+                //marker
+                if(selectedMarker!=null)
+                    map.getOverlays().remove(selectedMarker);
+                selectedMarker=new Marker(map);
+                selectedMarker.setPosition(p);
+                selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                map.getOverlays().add(selectedMarker);
+                map.invalidate(); //refresh
+                map.getController().animateTo(p);
+
+                Toast.makeText(getContext(), "Successfully set location!", Toast.LENGTH_SHORT).show();
+
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        };
+        map.getOverlays().add(new MapEventsOverlay(mReceive));
     }
 
 }
