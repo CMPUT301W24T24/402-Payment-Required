@@ -502,7 +502,7 @@ public class Database {
     }
 
     /**
-     * Fetches the current user signed up to an event
+     * Fetches the current user signed up or checked into an event
      * @param doc The signup document
      * @param userRef The reference to the user
      * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdapter
@@ -784,4 +784,42 @@ public class Database {
         });
     }
 
+    /**
+     * Gets the list of users checked into an event
+     * @param userList The empty list that is to be filled with users
+     * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdaptor
+     * @param currentEventID The id of the current event
+     */
+    public static void getUsersCheckedIntoEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEventID) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("checkins");
+        CollectionReference userRef = FirebaseFirestore.getInstance().collection("users");
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    userList.clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (Objects.equals(doc.getString("event_id"), currentEventID)) {
+                            String userId = doc.getString("user_id");
+                            DocumentReference userDoc = userRef.document(userId);
+                            Log.d("Firestore", "Document Reference " + userDoc);
+                            Log.d("Firestore", "User fetched " + userId);
+                            if (userDoc == null) {
+                                Log.d("Firestore", "User " + userId +" not found");
+                            }
+                            else {
+                                fetchUser(doc, userDoc, mUserArrayAdaptor, userList);
+                            }
+                        }
+                    }
+                    Log.d("Firestore", "User list changed " + userList.size());
+                }
+
+            }
+        });
+    }
 }

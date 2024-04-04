@@ -43,6 +43,9 @@
             android:id="@+id/action_nav_edit_event_to_nav_attendee_sign_up"
             app:destination="@id/nav_attendees_signed_up" />
         <action
+            android:id="@+id/action_nav_edit_event_to_nav_attendee_check_in"
+            app:destination="@id/nav_attendees_checked_in" />
+        <action
             android:id="@+id/action_nav_edit_event_to_nav_create_notification"
             app:destination="@id/nav_create_notifications"/>
     </fragment>
@@ -115,6 +118,16 @@
         tools:layout="@layout/fragment_attendees_signed_up">
         <action
             android:id="@+id/action_nav_attendeessignedup_to_nav_view_profile"
+            app:destination="@id/nav_profile" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_attendees_checked_in"
+        android:name="com.example.qrcheckin.user.attendeescheckedin.AttendeesCheckedInFragment"
+        android:label="attendees_checked_in"
+        tools:layout="@layout/fragment_attendees_checked_in">
+        <action
+            android:id="@+id/action_nav_attendeescheckedin_to_nav_view_profile"
             app:destination="@id/nav_profile" />
     </fragment>
 
