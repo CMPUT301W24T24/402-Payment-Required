@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentViewEventBinding;
@@ -49,6 +51,12 @@ public class ViewEventFragment extends Fragment {
         binding.viewEventTitle.setText(event.getName());
         binding.viewEventDate.setText(event.getTime().toString());
         binding.viewEventDescription.setText(event.getDescription());
+
+        ImageView eventPoster = binding.viewEventPoster;
+        if (event.getPosterRef() != null) {
+            Database dbPoster = new Database();
+            dbPoster.getEventPicture(event, eventPoster);
+        }
 
         // set the button to sign up or un-sign up
         if (event.isCurrentUserSignedUp()) {

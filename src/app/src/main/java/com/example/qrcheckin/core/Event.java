@@ -1,6 +1,9 @@
 package com.example.qrcheckin.core;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -523,6 +526,8 @@ public class Event implements Serializable {
     public void setCurrentUserCheckedIn(Boolean currentUserCheckedIn) {
         this.currentUserCheckedIn = currentUserCheckedIn;
     }
+
+
 
 }
 

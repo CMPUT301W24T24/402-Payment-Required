@@ -2,7 +2,11 @@ package com.example.qrcheckin.user.editevent;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +19,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +30,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
@@ -37,10 +45,14 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 
 import org.checkerframework.checker.units.qual.A;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,6 +62,9 @@ import java.util.HashMap;
 
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
+    private boolean imageUpdated = false;
+    private Uri updatedImageUri;
+    private boolean imageTooLarge = false;
 
     @Nullable
     @Override
@@ -79,7 +94,10 @@ public class EditEventFragment extends Fragment {
         editEventDescription.setText(event.getDescription());
         editEventAttendLimit.setText(String.valueOf(event.getLimit()));
         //set poster
-        eventPoster.setImageResource(R.drawable.cat);
+        if (event.getPosterRef() != null) {
+            Database dbPoster = new Database();
+            dbPoster.getEventPicture(event, eventPoster);
+        }
 
         //Accessing the events database
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -116,6 +134,53 @@ public class EditEventFragment extends Fragment {
             }
         });
 
+        // Set up the photo picker
+        // Reference: https://developer.android.com/training/data-storage/shared/photopicker Accessed on 2024-03-31
+        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        InputStream imageStream = null;
+                        try {
+                            imageStream = requireContext().getContentResolver().openInputStream(uri);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                        // decode the image stream into a bitmap
+                        Bitmap bmp = BitmapFactory.decodeStream(imageStream);
+
+                        if (bmp.getHeight() > 2048) {
+                            bmp = Bitmap.createScaledBitmap(bmp, bmp.getWidth() * 2048 / bmp.getHeight(), 2048, false);
+                            imageTooLarge = true;
+                        } else if (bmp.getWidth() > 2048) {
+                            bmp = Bitmap.createScaledBitmap(bmp, 2048, bmp.getHeight() * 2048 / bmp.getWidth(), false);
+                            imageTooLarge = true;
+                        }
+
+                        // Convert the bitmap to a URI
+                        // Reference: https://stackoverflow.com/questions/8295773/how-can-i-transform-a-bitmap-into-a-uri Ajay. DragonFire. Accessed on 2024-03-31
+                        if (imageTooLarge) {
+                            Toast.makeText(getContext(), "Image too large, scaled down to 2048x2048", Toast.LENGTH_SHORT).show();
+                            String path = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bmp, "tempImg", null);
+                            uri = Uri.parse(path);
+                        }
+                        imageUpdated = true;
+                        binding.editEventProfile.setImageURI(uri);
+                        updatedImageUri = uri;
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+        binding.updateEventPoster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build());
+            }
+        });
         //see a list of attendees
         showSignUps.setOnClickListener(new View.OnClickListener() {
 
@@ -176,9 +241,34 @@ public class EditEventFragment extends Fragment {
                                 Log.e("Firestore", e.toString());
                             }
                         });
+
+                if (imageUpdated) {
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReference();
+                    Uri imageUri = updatedImageUri;
+                    StorageReference imageRef = storageRef.child(event.getPosterRef());
+
+                    imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Log.d("Firebase", "Event poster uploaded successfully");
+
+
+                            // Delete the image if it was scaled down
+                            // Reference: https://stackoverflow.com/questions/23716683/android-delete-file-after-images-media-insertimage Nate. Accessed on 2024-03-31
+                            if (imageTooLarge) {
+                                requireContext().getContentResolver().delete(updatedImageUri, null, null);
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("Firebase", "Event poster upload failed", e);
+                        }
+                    });
+                }
             }
         });
-
 
         // Set OnClickListener for changeTime
         changeTimeButton.setOnClickListener(new View.OnClickListener() {

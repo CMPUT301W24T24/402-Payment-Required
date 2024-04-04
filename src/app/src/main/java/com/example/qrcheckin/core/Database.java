@@ -293,6 +293,24 @@ public class Database {
         });
     }
 
+    public void getEventPicture(Event event, ImageView imageView) {
+        if (event.getPosterRef() == null || event.getPosterRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            return;
+        }
+        storage.getReference().child(event.getPosterRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+            }
+        });
+    }
     /**
      * This static function is used to set on event listeners to the list of events from the database
      * It's used to update the list of events in the EventArrayAdaptor in all three explore, my and hosted events
