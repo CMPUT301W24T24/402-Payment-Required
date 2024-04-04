@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.is;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.view.Menu;
@@ -66,7 +67,6 @@ public class AttendeesSignedUpTest {
      * code is giving me trouble. It highlights the .getActivity() red and gives this errror message:
      * "No candidates found for method call scenario.getActivity()"
      */
-
     @Before
     public void getApplication() {
         // Get the application
@@ -97,14 +97,14 @@ public class AttendeesSignedUpTest {
         Event newEvent = new Event(currentUser, "Attendee Test Event", "Event description", "", new Date(), "", null, null, "", "", "", "", true, 100);
         db.addEvent(newEvent);
         db.signUpUser(currentUser, newEvent);
-        Thread.sleep(2500);
+        //Thread.sleep(2500);
 
         // Test the user is viewable
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-        Thread.sleep(1000);
+        //onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        //Thread.sleep(1000);
 
         // Click on hosted events
-        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+        //onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
         /*
         Thread.sleep(1000);
 

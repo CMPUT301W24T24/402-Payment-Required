@@ -496,6 +496,11 @@ public class Database {
                         }
                     }
                     Log.d("Firestore", "User list changed " + userList.size());
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
+                }
+                if (querySnapshots == null || querySnapshots.isEmpty()) {
+                    userList.clear();
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
                 }
 
             }
