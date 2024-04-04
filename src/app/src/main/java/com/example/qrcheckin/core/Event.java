@@ -211,6 +211,7 @@ public class Event implements Serializable {
 
     /**
      * The method returns the id of the event
+     *
      * @return The id of the event
      */
     public String getId() {
