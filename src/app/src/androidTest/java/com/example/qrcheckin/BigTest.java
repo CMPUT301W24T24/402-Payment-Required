@@ -17,6 +17,11 @@ import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.contrib.NavigationViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiObject;
+import androidx.test.uiautomator.UiObjectNotFoundException;
+import androidx.test.uiautomator.UiSelector;
 
 import org.checkerframework.checker.units.qual.N;
 import org.junit.Rule;
@@ -33,9 +38,15 @@ public class BigTest {
     // prompt: how do I create a unit test with Junit that interacts
     // with my navigation view in mainactivity from any fragment
     @Test
-    public void testBigNavigation() throws InterruptedException {
+    public void testBigNavigation() throws InterruptedException, UiObjectNotFoundException {
 
         Thread.sleep(1000);
+
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         // Click on a navigation item
