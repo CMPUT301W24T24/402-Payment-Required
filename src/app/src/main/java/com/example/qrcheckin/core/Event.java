@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -88,6 +89,10 @@ public class Event implements Serializable {
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
         initAttendeeAmount();
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
     }
 
     /**
@@ -125,6 +130,10 @@ public class Event implements Serializable {
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
         initAttendeeAmount();
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
     }
 
     /**
@@ -189,6 +198,10 @@ public class Event implements Serializable {
                 }
             }
         });
+        if(this.geo) {
+            Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
+            assert this.location!=null;
+        }
     }
 
         /**
@@ -253,6 +266,7 @@ public class Event implements Serializable {
 
     /**
      * The method returns the id of the event
+     *
      * @return The id of the event
      */
     public String getId() {
