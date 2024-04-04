@@ -132,10 +132,6 @@ public class EditEventFragment extends Fragment {
         map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
 
-        selectLocationButton.setOnClickListener(v -> {
-            selectLocation();
-        });
-
         // Set event information
         assert event != null;
         editEventTitle.setText(event.getName());
