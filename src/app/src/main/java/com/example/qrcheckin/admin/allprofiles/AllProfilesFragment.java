@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -83,6 +85,10 @@ public class AllProfilesFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                listView.clearChoices();
+                view.setBackgroundColor(getResources().getColor(R.color.pink));
+                Animation zoomAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.zoom_in);
+                view.startAnimation(zoomAnimation);
                 AllProfilesFragment.this.position = position;
                 Toast.makeText(requireContext(), "Please click the floating button to delete the selected profile", Toast.LENGTH_LONG).show();
             }
