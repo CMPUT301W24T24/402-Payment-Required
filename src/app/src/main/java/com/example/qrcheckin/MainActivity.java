@@ -23,9 +23,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.qrcheckin.core.Database;
+import com.example.qrcheckin.core.MapSetUp;
 import com.example.qrcheckin.core.Notification;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.ActivityMainBinding;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         getDeviceUser(this);
 
+        //Set up the map view
     }
 
     /**
@@ -176,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         navProfileName.setText(currentUser.getName());
 
         ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
+        // Set the profile picture of the user to the XML view
         Database db = new Database();
         db.getUserPicture(currentUser, navProfileImage);
 
@@ -390,4 +394,5 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         notificationManager.notify(0, builder.build());
     }
+
 }

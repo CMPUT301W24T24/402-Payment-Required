@@ -36,12 +36,17 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         this.context = context;
     }
 
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
+
     /**
      * Get the view of the event
      * @param position the position of the event
      * @param convertView the view of the event
      * @param parent the parent of the view
      * @return the view of the event
+     * References: https://developer.android.com/reference/android/view/View#setTag(java.lang.Object) Oracle Referenced: 2024-03-30
      */
     @NonNull
     @Override
@@ -59,6 +64,9 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         ((TextView) view.findViewById(R.id.event_date_time_text)).setText(event.getTime().toString());
         ((TextView) view.findViewById(R.id.event_status_check_in_text)).setText(event.isCurrentUserCheckedIn() ? "Checked In" : "Not Checked In");
         ((TextView) view.findViewById(R.id.event_status_sign_up_text)).setText(event.isCurrentUserSignedUp() ? "Signed Up" : "Not Signed Up");
+
+        // Set a uniquely identifiable tag for the event
+        view.setTag(event.getId());
 
         return view;
     }

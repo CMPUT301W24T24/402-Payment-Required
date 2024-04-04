@@ -6,3 +6,5 @@
 - [Firestore](https://firebase.google.com/docs/firestore)
 - [Sharing Images](https://www.geeksforgeeks.org/how-to-share-image-of-your-app-with-another-app-in-android/)
 
+- [Uploading images to android](https://www.geeksforgeeks.org/how-to-select-an-image-from-gallery-in-android/)
+- [Uploading images to firestore](https://medium.com/@everydayprogrammer/uploading-files-to-firebase-storage-in-android-studio-using-java-63f43b4c8d72)
