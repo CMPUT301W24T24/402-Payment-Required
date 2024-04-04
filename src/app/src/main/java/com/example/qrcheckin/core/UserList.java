@@ -69,4 +69,5 @@ public class UserList implements Serializable {
         }
         users.remove(user);
     }
+
 }
