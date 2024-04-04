@@ -19,6 +19,9 @@ import java.util.List;
 
 public class ProfileArrayAdapter extends ArrayAdapter<User> {
 
+
+    int selectedPosition = -1;
+
     interface CreateProfileListener {
         void createProfile(int position);
     }
@@ -73,8 +76,22 @@ public class ProfileArrayAdapter extends ArrayAdapter<User> {
             profileEmail.setText(user.getEmail());
         }
 
+//        ViewGroup rootView = (ViewGroup) view.findViewById(R.id.profileCardView);  // Replace with your ID
+
+//        // Set background based on selected position
+//        if (selectedPosition == position) {
+//            rootView.setBackgroundColor(context.getResources().getColor(R.color.pink));
+//        } else {
+//            rootView.setBackgroundColor(context.getResources().getColor(android.R.color.transparent));
+//        }
+
         Database database = new Database();
         database.getUserPicture(user, profilePic);
         return view;
     }
+
+//    public void setSelectedPosition(int position, boolean isSelected) {
+//        selectedPosition = position;
+//        notifyDataSetChanged();  // Notify adapter about data change
+    //}
 }
