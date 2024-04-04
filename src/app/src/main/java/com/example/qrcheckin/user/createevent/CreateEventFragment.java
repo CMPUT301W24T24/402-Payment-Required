@@ -33,10 +33,14 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+
+import io.grpc.util.TransmitStatusRuntimeExceptionInterceptor;
 
 /**
  * Create Event Fragment is a class that creates a CreateEventFragment object
@@ -105,9 +109,6 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
-            // TODO: check that checkinId and promoteID are not the same
-
-
             if (titleTextView.getText().toString().isEmpty()) {
                 Toast.makeText(getContext(), "Please enter a Title", Toast.LENGTH_SHORT).show();
                 return;
@@ -118,6 +119,8 @@ public class CreateEventFragment extends Fragment {
             if (promoteId == null) {
                 promoteId = generateQRCode();
             }
+
+
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             CollectionReference eventsRef = db.collection("events");
@@ -180,43 +183,69 @@ public class CreateEventFragment extends Fragment {
     /**
      * This function generates a random alphanumeric string of length n
      * Reference: https://www.geeksforgeeks.org/generate-random-string-of-given-size-in-java/ Rajput-Ji Accessed March 8 2024
+     * Reference: https://chat.openai.com/c/12e422eb-0289-44e5-ba5e-5b87443c3946 ChatGPT Accessed April 4, 2024
      * @param n - the length of the alphanumeric string
      * @return - the alphanumeric string
      */
     public String getAlphaNumericString(int n) {
+        String QRstring;
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsRef = db.collection("events");
 
-        // choose a Character random from this String
-        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                + "0123456789"
-                + "abcdefghijklmnopqrstuvxyz";
+        ArrayList<String> existingIds = new ArrayList<String>();
 
-        // create StringBuffer size of AlphaNumericString
-        StringBuilder sb = new StringBuilder(n);
+        // Fetch all existing promote_ids and checkin_ids in the fireStore database
+        eventsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String promoID = document.getString("promote_id");
+                    String checkinID = document.getString("checkin_id");
+                    if (promoID != null) existingIds.add(promoID);
+                    if (checkinID != null) existingIds.add(checkinID);
+                }
+            }
+        });
 
-        for (int i = 0; i < n; i++) {
+        // Generate a new alphanumeric string until it's unique
+        while (true) {
+            // Choose a Character random from this String
+            String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
+            // Create StringBuilder size of AlphaNumericString
+            StringBuilder sb = new StringBuilder(n);
 
-            // generate a random number between
-            // 0 to AlphaNumericString variable length
-            int index
-                    = (int) (AlphaNumericString.length()
-                    * Math.random());
+            // Generate a random alphanumeric string of length n
+            for (int i = 0; i < n; i++) {
+                int index = (int) (AlphaNumericString.length() * Math.random());
+                sb.append(AlphaNumericString.charAt(index));
+            }
 
-            // add Character one by one in end of sb
-            sb.append(AlphaNumericString
-                    .charAt(index));
+            QRstring = sb.toString();
+
+            // If the generated string doesn't exist in the existing IDs set, break the loop
+            if (!existingIds.contains(QRstring)) {
+                break;
+            }
         }
-        String QRstring = sb.toString();
 
         return QRstring;
     }
 
-    /**
-     * This generates a checkin QR code
-     * @return - the QR code string data
-     */
+
+
+        /**
+         * This generates a checkin QR code
+         * @return - the QR code string data
+         */
     public String generateQRCode() {
         QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-        String randomString = getAlphaNumericString(20);
+        String randomString = null;
+        //Check that the checkinID will not be the same as the promoteID
+        while (true) {
+            randomString = getAlphaNumericString(20);
+            if (randomString != null && (!randomString.equals(checkinId)) && (!randomString.equals(promoteId))) {
+                break;
+            }
+        }
         return QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(randomString, 400, 400));
     }
 
