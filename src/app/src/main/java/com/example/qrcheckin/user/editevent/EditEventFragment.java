@@ -5,11 +5,14 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,11 +30,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.qrcheckin.MainActivity;
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
@@ -71,6 +76,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
@@ -79,6 +86,7 @@ public class EditEventFragment extends Fragment {
     private Location eventLocation;
     private DocumentReference docRef;
     private Marker selectedMarker;
+    private Drawable personCircle;
 
     @Nullable
     @Override
@@ -126,10 +134,30 @@ public class EditEventFragment extends Fragment {
             eventLocation.setLongitude(MAP_DEFAULT_LONGITUDE);
         }
         //marker
+        personCircle=DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.person_circle));
+        DrawableCompat.setTint(personCircle, ContextCompat.getColor(getContext(), android.R.color.holo_green_dark));
+        Database.fetchGeoPointsForEvent(event.getId(), new Database.OnGeoPointsFetchedListener() {
+            @Override
+            public void onGeoPointsFetched(List<GeoPoint> geoPoints) {
+                for(GeoPoint geoPoint : geoPoints){
+                    Marker newMarker=new Marker(map);
+                    newMarker.setPosition(geoPoint);
+                    newMarker.setIcon(personCircle);
+                    newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                    map.getOverlays().add(newMarker);
+                }
+            }
+            @Override
+            public void onGeoPointsFetchFailed(Exception e) {
+                Log.e("CheckinDots", "Error fetching GeoPoints " + e.getMessage());
+            }
+        });
+
         selectedMarker=new Marker(map);
         selectedMarker.setPosition(new GeoPoint(eventLocation));
-        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         map.getOverlays().add(selectedMarker);
+
         map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
 
@@ -389,7 +417,7 @@ public class EditEventFragment extends Fragment {
                     map.getOverlays().remove(selectedMarker);
                 selectedMarker=new Marker(map);
                 selectedMarker.setPosition(p);
-                selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 map.getOverlays().add(selectedMarker);
                 map.invalidate(); //refresh
                 map.getController().animateTo(p);
