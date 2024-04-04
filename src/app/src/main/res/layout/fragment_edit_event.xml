@@ -40,7 +40,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_event_profile" />
 
-
         <EditText
             android:id="@+id/edit_event_description"
             android:layout_width="416dp"
@@ -55,56 +54,15 @@
             app:layout_constraintTop_toBottomOf="@+id/edit_event_title" />
 
         <LinearLayout
-            android:id="@+id/linearlayout_edit_event_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/edit_event_description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp">
-
-            <TextView
-                android:id="@+id/edit_event_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Date"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/edit_event_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:layout_marginStart="16dp" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/edit_event_change_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#EF476F"
-            android:text="CHANGE TIME"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearlayout_edit_event_time" />
-
-        <LinearLayout
             android:id="@+id/LinearLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_event_change_time">
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_description">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -128,13 +86,64 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/linearlayout_edit_event_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/LinearLayout2">
 
+            <TextView
+                android:id="@+id/edit_event_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/edit_event_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Time"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/edit_event_change_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#EF476F"
+            android:text="CHANGE TIME"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout_edit_event_time" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/edit_event_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#577264"
+            android:text="UPDATE"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/LinearLayout2"
+            app:srcCompat="@android:drawable/ic_menu_edit" />
         <LinearLayout
             android:id="@+id/linearlayout3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/LinearLayout2"
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_change_time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp">
@@ -163,52 +172,33 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearlayout4"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/edit_event_notify_attendees"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/linearlayout3"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="#BCB7B7"
+            android:text="NOTIFY ATTENDEES"
+            android:textColor="@color/black"
+            android:textSize="15dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp">
-
-            <Button
-                android:id="@+id/edit_event_notify_attendees"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:backgroundTint="#BCB7B7"
-                android:text="NOTIFY ATTENDEES"
-                android:textSize="15dp"
-                android:layout_weight="1" />
-            <Space
-                android:layout_width="30dp"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/edit_event_export_event_code"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:backgroundTint="#5A5858"
-                android:text="EXPORT EVENT QR CODE"
-                android:textSize="15dp"
-                android:layout_weight="1"
-                android:visibility="invisible"/>
-        </LinearLayout>
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout3" />
 
         <TextView
             android:id="@+id/edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Check-In Code"
             android:textColor="@color/black"
             android:textSize="25dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.452"
+            app:layout_constraintHorizontal_bias="0.492"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearlayout4" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_notify_attendees" />
 
         <ImageView
             android:id="@+id/edit_event_check_in_code"
@@ -221,32 +211,55 @@
 
         <Button
             android:id="@+id/edit_event_export_checkin_code"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="#5A5858"
-            android:text="EXPORT CHECK IN QR CODE"
+            android:text="EXPORT CHECKIN QR CODE"
             android:textColor="@color/white"
             android:textSize="15dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_event_check_in_code"
-            android:visibility="invisible"/>
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_check_in_code" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/edit_event_update"
+        <TextView
+            android:id="@+id/edit2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_weight="1"
-            android:backgroundTint="#AEA8A8"
-            android:text="UPDATE"
-            app:layout_constraintBottom_toTopOf="@+id/edit_event_export_checkin_code"
+            android:layout_marginTop="8dp"
+            android:text="Promo Code"
+            android:textColor="@color/black"
+            android:textSize="25dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:srcCompat="@android:drawable/ic_menu_edit"
-            app:layout_constraintStart_toEndOf="@+id/edit_event_check_in_code" />
+            app:layout_constraintHorizontal_bias="0.492"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_export_checkin_code" />
 
+        <ImageView
+            android:id="@+id/edit_event_promo_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit2"
+            tools:src="@tools:sample/avatars" />
+
+        <Button
+            android:id="@+id/edit_event_export_event_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:backgroundTint="#5A5858"
+            android:text="EXPORT PROMO QR CODE"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_promo_code" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
+

@@ -2,11 +2,13 @@ package com.example.qrcheckin.user.editevent;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -82,6 +84,8 @@ public class EditEventFragment extends Fragment {
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
 
+        ImageView promoCode = binding.editEventPromoCode;
+
         // Set event information
         assert event != null;
         editEventTitle.setText(event.getName());
@@ -121,12 +125,17 @@ public class EditEventFragment extends Fragment {
                         String check_inId = documentSnapshot.getString("checkin_id");
                         checkInCode.setImageBitmap(QRCodeGenerator.generateQRCode(check_inId, 800, 800));
                         checkInCode.setVisibility(View.VISIBLE);
+
+                        //generate promo code for PromoCode
+                        String promoID = documentSnapshot.getString("promote_id");
+                        promoCode.setImageBitmap((QRCodeGenerator.generateQRCode(promoID, 800, 800)));
+                        promoCode.setVisibility(View.VISIBLE);
                     }
                 }
             }
         });
 
-        /**
+        /*
          * Allow user to go to the see the list of SignUps
          */
         showSignUps.setOnClickListener(new View.OnClickListener() {
@@ -134,7 +143,6 @@ public class EditEventFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
-                //TODO: create an id to navigate from edit to see_signUps
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, bundle);
             }
         });
@@ -146,10 +154,10 @@ public class EditEventFragment extends Fragment {
                 Bundle args = new Bundle();
                 args.putString("eventId", event.getId());
                 (new EditEventFragment()).setArguments(args);
-                //TODO: navigate to the notify -> link in the navigation bar
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_view_event, args);
             }
         });
+        
 
         //set OnClickListener for editInformation
         editEventUpdate.setOnClickListener(new View.OnClickListener(){
@@ -188,6 +196,7 @@ public class EditEventFragment extends Fragment {
                                 Log.e("Firestore", e.toString());
                             }
                         });
+                Toast.makeText(getContext(), "You have update the event title, event limit and event description", Toast.LENGTH_SHORT).show();
             }
         });
 
