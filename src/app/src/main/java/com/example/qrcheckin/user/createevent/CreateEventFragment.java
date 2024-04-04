@@ -29,17 +29,13 @@ import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
-import com.google.android.gms.maps.MapView;
-import com.google.firebase.Firebase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -51,6 +47,7 @@ public class CreateEventFragment extends Fragment {
     public String checkinId;
     public String promoteId;
     private boolean pickCheckin;
+    private ListenerRegistration validateIdListener;
 
     /**
      * Initializes the CreateEventFragment on create
@@ -284,8 +281,7 @@ public class CreateEventFragment extends Fragment {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         // for check in qr code
         if (pickCheckin) {
-            // TODO: remove snapshot listener after the id is validated
-            cr.whereEqualTo("checkin_id", id).addSnapshotListener((value, error) -> {
+            validateIdListener = cr.whereEqualTo("checkin_id", id).addSnapshotListener((value, error) -> {
                 if (value == null || value.isEmpty()) {
                     checkinId = id;
                     binding.imageviewCreateEventCheckinQr.setImageBitmap(QRCodeGenerator.generateQRCode(checkinId, 800, 800));
@@ -296,11 +292,12 @@ public class CreateEventFragment extends Fragment {
                 if (error != null) {
                     Log.e("Firestore", error.toString());
                 }
+                removeListener();
             });
 
         // for promote qr code
         } else {
-            ListenerRegistration a = cr.whereEqualTo("promote_id", id).addSnapshotListener((value, error) -> {
+            validateIdListener = cr.whereEqualTo("promote_id", id).addSnapshotListener((value, error) -> {
                 if (value == null || value.isEmpty()) {
                     promoteId = id;
                     binding.imageviewCreateEventDescriptionQr.setImageBitmap(QRCodeGenerator.generateQRCode(promoteId, 800, 800));
@@ -311,8 +308,13 @@ public class CreateEventFragment extends Fragment {
                 if (error != null) {
                     Log.e("Firestore", error.toString());
                 }
+                removeListener();
             });
         }
+    }
+
+    private void removeListener(){
+        validateIdListener.remove();
     }
 
     @Override
