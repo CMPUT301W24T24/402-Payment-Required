@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.lang.ref.Reference;
 import java.util.ArrayList;
@@ -605,6 +606,8 @@ public class Database {
     public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference usersRef = db.collection("users");
+        StorageReference imgRef = FirebaseStorage.getInstance().getReference().child(user.getImageRef());
+        imgRef.delete();
         usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
@@ -769,6 +772,8 @@ public class Database {
     public static void deleteImage(Event event, ImagesEventArrayAdaptor imagesEventArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsRef = db.collection("events");
+        StorageReference imgRef = FirebaseStorage.getInstance().getReference().child(event.getPosterRef());
+        imgRef.delete();
         eventsRef.document(event.getId()).update("posterRef", "").addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
