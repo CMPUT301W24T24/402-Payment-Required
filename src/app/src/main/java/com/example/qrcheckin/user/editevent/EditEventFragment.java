@@ -101,6 +101,7 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
+        ImageView promoCode = binding.editEventPromoCode;
 
         //map permissions
         requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
@@ -164,7 +165,7 @@ public class EditEventFragment extends Fragment {
                     if (timestamp != null) {
                         // Convert the timestamp to a Date object
                         Date date = timestamp.toDate();
-                        // Create a SimpleDateFormat instance for your desired format
+                        // Create a SimpleDateFormat instance for format
                         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy"); // Example: "March 8, 2024"
                         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a"); // Example: "8:10 AM"
                         // Extract the formatted date and time strings
@@ -180,6 +181,10 @@ public class EditEventFragment extends Fragment {
                         String check_inId = documentSnapshot.getString("checkin_id");
                         checkInCode.setImageBitmap(QRCodeGenerator.generateQRCode(check_inId, 800, 800));
                         checkInCode.setVisibility(View.VISIBLE);
+                        //get PromoCode
+                        String promoID = documentSnapshot.getString("promote_id");
+                        promoCode.setImageBitmap(QRCodeGenerator.generateQRCode(promoID, 800, 800));
+                        promoCode.setVisibility(View.VISIBLE);
                     }
                 }
             }
