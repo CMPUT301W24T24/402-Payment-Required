@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -17,9 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.qrcheckin.R;
@@ -33,16 +30,16 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * The fragment class for all profiles which can only be seen by admins
  */
 public class AllProfilesFragment extends Fragment {
 
-    private FragmentAllProfilesBinding binding;
+    protected FragmentAllProfilesBinding binding;
     private ListView listView;
     ArrayList<User> profileDataList;
     ProfileArrayAdapter profileArrayAdapter;
@@ -52,7 +49,7 @@ public class AllProfilesFragment extends Fragment {
     private FloatingActionButton deleteCityButton;
     private CollectionReference checkinsRef;
     private CollectionReference signupsRef;
-    private Database database;
+    private Database database = new Database();;
 
     private int position = ListView.INVALID_POSITION;
 
@@ -82,7 +79,6 @@ public class AllProfilesFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         profileDataList = new ArrayList<>();
-        database = new Database();
         eventsRef = db.collection("events");
         checkinsRef = db.collection("checkins");
         signupsRef = db.collection("signUpTable");
@@ -94,9 +90,7 @@ public class AllProfilesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Animation zoomAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.zoom_in);
                 view.startAnimation(zoomAnimation);
-
                 profileArrayAdapter.setSelectedPosition(position, true);
-
                 AllProfilesFragment.this.position = position;
                 Toast.makeText(requireContext(), "Please click the floating button to delete the selected profile", Toast.LENGTH_LONG).show();
             }
@@ -124,8 +118,14 @@ public class AllProfilesFragment extends Fragment {
                 User profileDelete = profileDataList.get(position);
                 profileDataList.remove(position);
                 profileArrayAdapter.notifyDataSetChanged();
-                //delete the user to the FireStore Collection
-
+                listView.setAdapter(profileArrayAdapter);
+                //delete the user in the FireStore Collection
+                String userId = profileDelete.getId();
+                DocumentReference ownerRef = usersRef.document(userId);
+                String refString = ownerRef.getPath();
+                Log.d("Document Reference Path", refString);
+                //Create the document reference
+                deleteRelatedEvents(ownerRef);
                 usersRef.document(profileDelete.getId())
                         .delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -134,9 +134,51 @@ public class AllProfilesFragment extends Fragment {
                                 Log.d("Firestore", "DocumentSnapshot successfully deleted!");
                             }
                         });
-
+                //delete the checkins and signups with userID
+                deleteCheckInsAndSignUps(userId);
                 position = ListView.INVALID_POSITION;
 
+            }
+
+            /**
+             * Delete all the checkins and sign ups related to the user
+             * @param userId the id of the user profile
+             */
+            private void deleteCheckInsAndSignUps(String userId) {
+                //delete signUps
+                signupsRef.whereEqualTo("user_id", userId).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot doc: queryDocumentSnapshots) {
+                                    doc.getReference().delete();
+                                }
+                            }
+                        });
+                //delete checkIns
+                checkinsRef.whereEqualTo("user_id", userId).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot doc: queryDocumentSnapshots) {
+                                    doc.getReference().delete();
+                                }
+                            }
+                        });
+            }
+
+            /**
+             * Delete all related events that the profile has created and is the owner of
+             * @param userRef DocumentReference referencing a profile
+             */
+            private void deleteRelatedEvents(DocumentReference userRef) {
+                eventsRef.whereEqualTo("host", userRef).get()
+                        .addOnSuccessListener(queryDocumentSnapshots -> {
+                            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                Database.deleteEvent(doc.getId());
+                            }
+                        })
+                        .addOnFailureListener(e -> Log.e("Firestore", "Error getting events for deletion", e));
             }
         });
         return root;
