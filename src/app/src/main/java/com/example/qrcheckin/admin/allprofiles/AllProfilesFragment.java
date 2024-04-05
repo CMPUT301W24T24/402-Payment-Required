@@ -111,6 +111,7 @@ public class AllProfilesFragment extends Fragment {
                 }
             }
 
+
             /**
              * Delete the selected profile
              * @param position the position of the profile, which needs deleting
@@ -119,93 +120,21 @@ public class AllProfilesFragment extends Fragment {
                 User profileDelete = profileDataList.get(position);
                 profileDataList.remove(position);
                 profileArrayAdapter.notifyDataSetChanged();
-
-                String userID = profileDelete.getId();
-                DocumentReference userRef = usersRef.document(userID);
-
-                ////Delete the signups and the checkins with the corresponding value
-                checkinsRef.whereEqualTo("user_id", userID).get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot checkinDocument : task.getResult()) {
-                            // Delete the checkin document
-                            checkinsRef.document(checkinDocument.getId()).delete()
-                                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Checkin successfully deleted"))
-                                    .addOnFailureListener(e -> Log.d("Firestore", "Error deleting checkin", e));
-                        }
-                    } else {
-                        Log.d("Firestore", "Error getting checkin documents: ", task.getException());
-                    }
-                });
-
-                signupsRef.whereEqualTo("user_id", userID).get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot checkinDocument : task.getResult()) {
-                            // Delete the signup document
-                            signupsRef.document(checkinDocument.getId()).delete()
-                                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Checkin successfully deleted"))
-                                    .addOnFailureListener(e -> Log.d("Firestore", "Error deleting checkin", e));
-                        }
-                    } else {
-                        Log.d("Firestore", "Error getting checkin documents: ", task.getException());
-                    }
-                });
-
-
-                ///////Delete corresponding information related to userRef
-                eventsRef.whereEqualTo("host", userRef).get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot eventDocument : task.getResult()) {
-                            // Delete the event
-                            eventsRef.document(eventDocument.getId()).delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d("Firestore", "Event successfully deleted");
-
-                                        // Delete corresponding checkins for the event
-                                        checkinsRef.whereEqualTo("event_id", eventDocument.getId())
-                                                .get().addOnCompleteListener(checkinsTask -> {
-                                                    if (checkinsTask.isSuccessful()) {
-                                                        for (QueryDocumentSnapshot checkinDocument : checkinsTask.getResult()) {
-                                                            // Delete the checkin
-                                                            checkinsRef.document(checkinDocument.getId()).delete()
-                                                                    .addOnSuccessListener(checkinVoid -> Log.d("Firestore", "Checkin successfully deleted"))
-                                                                    .addOnFailureListener(e -> Log.d("Firestore", "Error deleting checkin", e));
-                                                        }
-                                                    } else {
-                                                        Log.d("Firestore", "Error getting checkin documents: ", checkinsTask.getException());
-                                                    }
-                                                });
-
-                                        // Delete corresponding signups for the event
-                                        signupsRef.whereEqualTo("event_id", eventDocument.getId())
-                                                .get().addOnCompleteListener(signupsTask -> {
-                                                    if (signupsTask.isSuccessful()) {
-                                                        for (QueryDocumentSnapshot signupDocument : signupsTask.getResult()) {
-                                                            signupsRef.document(signupDocument.getId()).delete()
-                                                                    .addOnSuccessListener(signupVoid -> Log.d("Firestore", "Signup successfully deleted"))
-                                                                    .addOnFailureListener(e -> Log.d("Firestore", "Error deleting signup", e));
-                                                        }
-                                                    } else {
-                                                        Log.d("Firestore", "Error getting signup documents: ", signupsTask.getException());
-                                                    }
-                                                });
-                                    })
-                                    .addOnFailureListener(e -> Log.d("Firestore", "Error deleting event", e));
-                        }
-                    } else {
-                        Log.d("Firestore", "Error getting documents: ", task.getException());
-                    }
-                });
-
-                // Delete the user from the Firestore Collection
-                usersRef.document(userID)
+                position = ListView.INVALID_POSITION;
+                //delete the user to the FireStore Collection
+                usersRef.document(profileDelete.getId())
                         .delete()
-                        .addOnSuccessListener(aVoid -> Log.d("Firestore", "User successfully deleted"))
-                        .addOnFailureListener(e -> Log.d("Firestore", "Error deleting user", e));
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                            }
+                        });
             }
-
         });
         return root;
     }
+            
 
     /**
      * Get all the users from the Firestore database
