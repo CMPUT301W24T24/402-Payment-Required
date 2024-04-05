@@ -101,7 +101,6 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
-        Button selectLocationButton=binding.selectLocationButton;
 
         //map permissions
         requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
@@ -132,10 +131,6 @@ public class EditEventFragment extends Fragment {
         map.getOverlays().add(selectedMarker);
         map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
-
-        selectLocationButton.setOnClickListener(v -> {
-            selectLocation();
-        });
 
         // Set event information
         assert event != null;

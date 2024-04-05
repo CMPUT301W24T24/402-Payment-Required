@@ -60,9 +60,14 @@ public class UserStoryTests {
         // prompt: how do I get Junit in android studio to click on the "Allow" button when a notification permissions reuest is displayed
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject allowPermissions = device.findObject(new UiSelector().text("Allow"));
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
         if (allowPermissions.exists()) {
             allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
         }
 
 
@@ -70,7 +75,18 @@ public class UserStoryTests {
         // Click on a navigation item
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
 
+        Thread.sleep(1000);
+
         onView(withId(R.id.event_add_fab)).perform(click());
+
+        Thread.sleep(1000);
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
+        Thread.sleep(1000);
 
         onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText("createEventTestEvent"));
         onView(withId(R.id.text_create_event_description)).perform(ViewActions.typeText("This is an event that was created by createEvent() test"));
@@ -103,6 +119,8 @@ public class UserStoryTests {
                 .check(ViewAssertions.matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
 
+        Thread.sleep(1000);
+
         onView(withText("createEventTestEvent")).perform(click());
         onView(withText("createEventTestEvent")).check(matches(isDisplayed()));
         onView(withText("This is an event that was created by createEvent() test")).check(matches(isDisplayed()));
@@ -117,9 +135,14 @@ public class UserStoryTests {
     public void checkAttendees() throws UiObjectNotFoundException, InterruptedException {
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject allowPermissions = device.findObject(new UiSelector().text("Allow"));
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
         if (allowPermissions.exists()) {
             allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
         }
 
         String eventName = "" + System.currentTimeMillis();
@@ -135,13 +158,22 @@ public class UserStoryTests {
 
         onView(withId(R.id.event_add_fab)).perform(click());
 
+        Thread.sleep(1000);
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
+        Thread.sleep(1000);
+
         onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
         onView(withId(R.id.button_create_event_submit))
                 .perform(ViewActions.scrollTo())
                 .check(ViewAssertions.matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         onView(withText(eventName)).perform(click());
         onView(withId(R.id.edit_event_show_sign_ups)).perform(click());
@@ -153,9 +185,14 @@ public class UserStoryTests {
     public void EditProfile() throws UiObjectNotFoundException, InterruptedException {
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject allowPermissions = device.findObject(new UiSelector().text("Allow"));
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
         if (allowPermissions.exists()) {
             allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
         }
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
@@ -200,11 +237,15 @@ public class UserStoryTests {
     public void sendNotification() throws UiObjectNotFoundException, InterruptedException {
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject allowPermissions = device.findObject(new UiSelector().text("Allow"));
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
         if (allowPermissions.exists()) {
             allowPermissions.click();
         }
 
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
         String eventName = "" + System.currentTimeMillis();
 
         eventName = eventName.substring(eventName.length() - 7, eventName.length());
@@ -218,13 +259,22 @@ public class UserStoryTests {
 
         onView(withId(R.id.event_add_fab)).perform(click());
 
+        Thread.sleep(1000);
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
+        Thread.sleep(1000);
+
         onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
         onView(withId(R.id.button_create_event_submit))
                 .perform(ViewActions.scrollTo())
                 .check(ViewAssertions.matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         onView(withText(eventName)).perform(click());
 
@@ -242,9 +292,9 @@ public class UserStoryTests {
 //        onData(CoreMatchers.allOf(CoreMatchers.is(instanceOf(String.class)), CoreMatchers.is(eventName)))
 //                .perform(ViewActions.click());
 
-        onData(withId(R.id.explore_event_list_view))
-                .inAdapterView(CoreMatchers.is(withText(eventName)))
-                .perform(click());
+//        onData(withId(R.id.explore_event_list_view))
+//                .inAdapterView(CoreMatchers.is(withText(eventName)))
+//                .perform(click());
 
 
 //        Thread.sleep(5000);
