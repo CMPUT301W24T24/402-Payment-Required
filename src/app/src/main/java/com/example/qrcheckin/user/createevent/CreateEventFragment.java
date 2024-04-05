@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Create Event Fragment is a class that creates a CreateEventFragment object
@@ -47,7 +48,7 @@ public class CreateEventFragment extends Fragment {
     public String checkinId;
     public String promoteId;
     private boolean pickCheckin;
-    private ListenerRegistration validateIdListener;
+    private ListenerRegistration validatePromoteIdListener, validateCheckInIdListener;
 
     /**
      * Initializes the CreateEventFragment on create
@@ -281,40 +282,80 @@ public class CreateEventFragment extends Fragment {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         // for check in qr code
         if (pickCheckin) {
-            validateIdListener = cr.whereEqualTo("checkin_id", id).addSnapshotListener((value, error) -> {
-                if (value == null || value.isEmpty()) {
-                    checkinId = id;
-                    binding.imageviewCreateEventCheckinQr.setImageBitmap(QRCodeGenerator.generateQRCode(checkinId, 800, 800));
-                    binding.imageviewCreateEventCheckinQr.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(getContext(), "This QR code cannot be used", Toast.LENGTH_SHORT).show();
-                }
-                if (error != null) {
-                    Log.e("Firestore", error.toString());
-                }
-                removeListener();
-            });
-
+            validateCheckInId(id, true, true);
         // for promote qr code
         } else {
-            validateIdListener = cr.whereEqualTo("promote_id", id).addSnapshotListener((value, error) -> {
-                if (value == null || value.isEmpty()) {
-                    promoteId = id;
-                    binding.imageviewCreateEventDescriptionQr.setImageBitmap(QRCodeGenerator.generateQRCode(promoteId, 800, 800));
-                    binding.imageviewCreateEventDescriptionQr.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(getContext(), "This QR code cannot be used", Toast.LENGTH_SHORT).show();
-                }
-                if (error != null) {
-                    Log.e("Firestore", error.toString());
-                }
-                removeListener();
-            });
+            validatePromoteId(id, true, true);
         }
     }
 
-    private void removeListener(){
-        validateIdListener.remove();
+    private void validatePromoteId (String id, boolean setID, boolean showToast) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
+        validateCheckInIdListener = cr.whereEqualTo("checkin_id", id).addSnapshotListener((value, error) -> {
+            if ((value == null || value.isEmpty()) && !Objects.equals(id, checkinId)) {
+                // CHECK FOR PROMOTE ID
+                validatePromoteIdListener = cr.whereEqualTo("promote_id", id).addSnapshotListener((value2, error2) -> {
+                    if (value2 == null || value2.isEmpty()) {
+                        if (setID) {
+                            promoteId = id;
+                            binding.imageviewCreateEventDescriptionQr.setImageBitmap(QRCodeGenerator.generateQRCode(promoteId, 800, 800));
+                            binding.imageviewCreateEventDescriptionQr.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+                    }
+                    if (error2 != null) {
+                        Log.e("Firestore", error2.toString());
+                    }
+                    removeListener(true);
+                });
+
+            } else {
+                if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+            }
+            if (error != null) {
+                Log.e("Firestore", error.toString());
+            }
+            removeListener(false);
+        });
+    }
+
+    private void validateCheckInId (String id, boolean setID, boolean showToast) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
+        validatePromoteIdListener = cr.whereEqualTo("promote_id", id).addSnapshotListener((value, error) -> {
+            if ((value == null || value.isEmpty()) && !Objects.equals(id, promoteId)) {
+                // CHECK FOR CHECKIN ID
+                validateCheckInIdListener = cr.whereEqualTo("checkin_id", id).addSnapshotListener((value2, error2) -> {
+                    if (value2 == null || value2.isEmpty()) {
+                        if (setID) {
+                            checkinId = id;
+                            binding.imageviewCreateEventCheckinQr.setImageBitmap(QRCodeGenerator.generateQRCode(checkinId, 800, 800));
+                            binding.imageviewCreateEventCheckinQr.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+                    }
+                    if (error2 != null) {
+                        Log.e("Firestore", error2.toString());
+                    }
+                    removeListener(false);
+                });
+            } else {
+                if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+            }
+            if (error != null) {
+                Log.e("Firestore", error.toString());
+            }
+            removeListener(true);
+        });
+    }
+
+    private void removeListener(boolean promote){
+        if (promote) {
+            validatePromoteIdListener.remove();
+        } else {
+            validateCheckInIdListener.remove();
+        }
     }
 
     @Override
