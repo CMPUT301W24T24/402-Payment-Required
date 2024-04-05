@@ -741,8 +741,7 @@ public class Database {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Log.e("Firestorage", exception.toString());
-                users.remove(position);
-                imagesUserArrayAdaptor.notifyDataSetChanged();
+                imageView.setImageResource(R.drawable.unable);
             }
         });
     }
@@ -765,8 +764,7 @@ public class Database {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Log.e("Firestorage", exception.toString());
-                events.remove(position);
-                imagesEventArrayAdaptor.notifyDataSetChanged();
+                imageView.setImageResource(R.drawable.unable);
             }
         });
     }
