@@ -655,6 +655,7 @@ public class Database {
                             users.notifyDataSetChanged();
                         }
                     }
+                    users.notifyDataSetChanged();
                 }
             }
         });
@@ -713,6 +714,7 @@ public class Database {
                             });
                         }
                     }
+                    events.notifyDataSetChanged();
                 }
             }
         });
