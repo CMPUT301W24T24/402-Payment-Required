@@ -101,7 +101,7 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
-        Button selectLocationButton=binding.selectLocationButton;
+        ImageView promoCode = binding.editEventPromoCode;
 
         //map permissions
         requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
@@ -133,15 +133,22 @@ public class EditEventFragment extends Fragment {
         map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
 
-        selectLocationButton.setOnClickListener(v -> {
-            selectLocation();
-        });
-
         // Set event information
         assert event != null;
         editEventTitle.setText(event.getName());
         editEventDescription.setText(event.getDescription());
-        editEventAttendLimit.setText(String.valueOf(event.getLimit()));
+
+        // set event attendee limit
+        Integer eventLimit = event.getLimit();
+        String eventLimitText;
+        if (eventLimit == 0) {
+            eventLimitText = "unlimited";
+            editEventAttendLimit.setHint(eventLimitText);
+        } else {
+            eventLimitText = eventLimit.toString();
+            editEventAttendLimit.setText(eventLimitText);
+        }
+
         //set poster
         eventPoster.setImageResource(R.drawable.cat);
 
@@ -158,7 +165,7 @@ public class EditEventFragment extends Fragment {
                     if (timestamp != null) {
                         // Convert the timestamp to a Date object
                         Date date = timestamp.toDate();
-                        // Create a SimpleDateFormat instance for your desired format
+                        // Create a SimpleDateFormat instance for format
                         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy"); // Example: "March 8, 2024"
                         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a"); // Example: "8:10 AM"
                         // Extract the formatted date and time strings
@@ -174,6 +181,10 @@ public class EditEventFragment extends Fragment {
                         String check_inId = documentSnapshot.getString("checkin_id");
                         checkInCode.setImageBitmap(QRCodeGenerator.generateQRCode(check_inId, 800, 800));
                         checkInCode.setVisibility(View.VISIBLE);
+                        //get PromoCode
+                        String promoID = documentSnapshot.getString("promote_id");
+                        promoCode.setImageBitmap(QRCodeGenerator.generateQRCode(promoID, 800, 800));
+                        promoCode.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -215,13 +226,13 @@ public class EditEventFragment extends Fragment {
                     return;
                 }
                 if (editEventAttendLimit.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter event limit", Toast.LENGTH_SHORT).show();
-                    return;
+                    event.setLimit(0);
+                } else {
+                    event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
                 }
                 event.setName(String.valueOf(editEventTitle.getText()));
                 event.setDescription(String.valueOf(editEventDescription.getText()));
-                event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
-                //access the firebase and databse and update
+                //access the firebase and database and update
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("description", event.getDescription());
                 data.put("limit", event.getLimit());
