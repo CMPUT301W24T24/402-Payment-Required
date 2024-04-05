@@ -220,13 +220,17 @@ public class User implements Serializable {
         return bitmap;
     }
     private int hashedColor(Character s) {
-        String colorString = "#";
+        StringBuilder colorString = new StringBuilder();
         int ascii = (int) s;
-        colorString += Integer.toHexString(ascii % 255);
-        colorString += Integer.toHexString((ascii * 5 + 12) % 255);
-        colorString += Integer.toHexString((ascii * 7 + 3) % 255);
+        colorString.append(Integer.toHexString(ascii % 255));
+        colorString.append(Integer.toHexString((ascii * 5 + 12) % 255));
+        colorString.append(Integer.toHexString((ascii * 7 + 3) % 255));
+        for (int i = colorString.length(); i < 6; i++) {
+            colorString.insert(0, "0");
+        }
+        colorString.insert(0, "#");
 
-        return Color.parseColor(colorString);
+        return Color.parseColor(colorString.toString());
     }
 
     /**
