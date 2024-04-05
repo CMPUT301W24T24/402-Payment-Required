@@ -20,28 +20,38 @@ import android.widget.TextView;
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.core.Notification;
 import com.example.qrcheckin.core.NotificationArrayAdapter;
+import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentNotificationsBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * NotificationsFragment is the Fragment displayed when a user wants to view
  * a list of all the notifications for events they have signed up for
  */
 public class NotificationsFragment extends Fragment {
-
     /**
      * ListView of notifications being listed
      */
@@ -70,10 +80,6 @@ public class NotificationsFragment extends Fragment {
      */
     private ArrayList<Notification> notifications;    // update from links
     /**
-     * eventsMap maps the ID of an event to the name of it.
-     */
-    private Map<String, String> eventsMap;
-    /**
      * db is a FirestoreFirebase object
      */
     private FirebaseFirestore db;
@@ -82,6 +88,14 @@ public class NotificationsFragment extends Fragment {
      */
     private String currentUser;
 
+    private Map<String, String> eventIdToName;
+    private Set<ListenerRegistration> notificationCollections;
+    private Map<String, Boolean> eventMap;
+    private Map<String, Boolean> eventMapSignup;
+    private Map<String, Boolean> eventMapCheckin;
+    private FirebaseFirestore notidb;
+    private ListenerRegistration signups;
+    private ListenerRegistration checkins;
     /**
      * onCreateView initializes the attributes the Notification Fragment uses
      * and sets listeners to the notification collections in case of new notifications
@@ -116,10 +130,9 @@ public class NotificationsFragment extends Fragment {
         // get User
         currentUser = ((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser().getId();
 
-        eventsMap = new HashMap<>();
 
         // get names of events in database and set listeners to them
-        getEventNames();
+        createNotificationListeners();
         return root;
     }
 
@@ -129,66 +142,120 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        checkins.remove();
+        signups.remove();
         binding = null;
     }
 
     /**
-     * getEventNames queries the Firestore and gets events the user has signed up for
-     * and stores them in eventList for the next step in getNames(eventList)
+     * Creates listeners on the notification collection of each event
+     * the user has signed up for
      */
-    private void getEventNames() {
+    public void createNotificationListeners() {
+        eventMap = new HashMap<>();
+        eventIdToName = new HashMap<>();
+        eventMapSignup = new HashMap<>();
+        eventMapCheckin = new HashMap<>();
+        notificationCollections = new HashSet<>();
+        notidb = FirebaseFirestore.getInstance();
 
-        ArrayList<String> eventList = new ArrayList<>();
-
-        db.collection("signUpTable")
-                .whereEqualTo("user_id", currentUser).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                        // iterate through events the user has signed up for
-                        List<DocumentSnapshot> signupDocs = queryDocumentSnapshots.getDocuments();
-                        for (DocumentSnapshot signupDoc: signupDocs) {
-                            eventList.add((String) signupDoc.get("event_id"));
-                        }
-                        Log.d("Firestore", "successful signup get." +
-                                " signups: " + eventList.toString() +
-                                ", # events signed up: " + signupDocs.size() +
-                                ", user_id " + currentUser);
-
-                        // get the names and add listeners of each event
-                        getNames(eventList);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("Firestore", "unsuccessful signup get" +
-                                " user_id " + currentUser);
-                    }
-                });
+        signupListener();
+        checkinListener();
     }
 
     /**
-     * getNames(eventList) will attach listeners to each event in eventList.
-     * eventsMap will also set each eventID to its name.
-     * Finally, setListener(event) will be called and set the listener for the event
-     *
-     * @param eventList the list of events that will have listeners set on their
-     *                  notification collections
+     * creates listener for the signup table to display notifications for relevant events
      */
-    private void getNames(ArrayList<String> eventList) {
+    public void signupListener() {
+        signups = notidb.collection("signUpTable").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
 
+                try {
+                    eventMapSignup.clear();
+                    // add each event the user has signed up for
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (doc.get("user_id").toString().equals(currentUser) ) {
+
+                            // add event to list
+                            String event = doc.get("event_id").toString();
+                            eventMapSignup.put(event, Boolean.FALSE);
+                        }
+                    }
+                    eventMap.clear();
+                    eventMap.putAll(eventMapCheckin);
+                    eventMap.putAll(eventMapSignup);
+
+                    // get names of events and set listeners
+                    for (ListenerRegistration notiRef: notificationCollections) {
+                        notiRef.remove();
+                    }
+                    Log.d("Notifications", "removed notification listeners");
+                    notificationCollections.clear();
+                    getNames();
+
+                } catch (Exception e) {
+                    Log.d("Notifications", e.toString());
+                }
+            }
+        });
+    }
+
+    /**
+     * creates listener for the checkin table to display notifications for relevant events
+     */
+    public void checkinListener() {
+        checkins = notidb.collection("checkins").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+
+                try {
+                    eventMapCheckin.clear();
+                    // add each event the user has signed up for
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (doc.get("user_id").toString().equals(currentUser) ) {
+
+                            // add event to list
+                            String event = doc.get("event_id").toString();
+                            eventMapCheckin.put(event, Boolean.FALSE);
+                        }
+                    }
+                    eventMap.clear();
+                    eventMap.putAll(eventMapCheckin);
+                    eventMap.putAll(eventMapSignup);
+
+                    // get names of events and set listeners
+
+                    for (ListenerRegistration notiRef: notificationCollections) {
+                        notiRef.remove();
+                    }
+                    Log.d("Notifications", "removed notification listeners");
+                    notificationCollections.clear();
+                    getNames();
+
+                } catch (Exception e) {
+                    Log.d("Notifications", e.toString());
+                }
+            }
+        });
+    }
+
+    /**
+     * getNames will get the name of all events specified in the list of event IDs.
+     * This will also set a listener to each events notification collection
+     */
+    private void getNames() {
         // for each signed up event
-        for (String event: eventList) {
-            db.collection("events").document(event).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        Log.d("Notifications", "Amount of listeners: " + eventMap.size());
+
+        for (String event: eventMap.keySet()) {
+            notidb.collection("events").document(event).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                    // map the eventID to its name for later reference
-                    eventsMap.put(event, documentSnapshot.getString("name"));
+                    eventIdToName.put(event, documentSnapshot.getString("name"));
                     Log.d("Firestore", "successful event name get");
 
-                    // set listener for event
+                    // next step in listener setup
                     setListener(event);
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -225,17 +292,27 @@ public class NotificationsFragment extends Fragment {
                     return;
                 }
 
-                // run through all notifications and set them to a temporary map
+                // run through all notifications
                 if (querySnapshots != null) {
                     ArrayList<Notification> notifList = new ArrayList<>();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
 
                         // create new notification object to be displayed by list of notifications
+
+                        String time;
+                        Timestamp realTime = doc.getTimestamp("time");
+                        if (realTime != null) {
+                            time = "Sent @ " + realTime.toDate().toString();
+                        } else {
+                            time = "Sent @ TIME UNAVAILABLE";
+                        }
+
                         notifList.add(new Notification(
                                 doc.getString("message"),
-                                 "Sent @ " + doc.getTimestamp("time").toDate().toString(),
-                                eventsMap.get(eventID),
-                                eventID));
+                                 time,
+                                eventIdToName.get(eventID),
+                                eventID,
+                                realTime));
                         notificationsMap.put(eventID, notifList);
                     }
 
@@ -244,9 +321,8 @@ public class NotificationsFragment extends Fragment {
                     for (String nk: notificationsMap.keySet()) {
                         notifications.addAll(notificationsMap.get(nk));
                     }
-                    // future \/ \/ \/
-                    // notifications.sort(); Sort by time of notification
-
+                    // Sort by time of notification
+                    notifications.sort(notificationComparator);
                     // notify ArrayAdapter
                     nArrayAdapter.notifyDataSetChanged();
                 }
@@ -254,4 +330,35 @@ public class NotificationsFragment extends Fragment {
         });
         fireEventNotifs.add(notificationRef);
     }
+
+
+    /**
+     * Reference:
+     * https://ioflood.com/blog/sort-array-java/#:~:text=Java%20provides%20a%20built%2Din,%2C%20string%2C%20or%20custom%20objects.
+     * by Gabriel Ramuglia, Accessed 2024-03-28
+     */
+    Comparator<Notification> notificationComparator = new Comparator<Notification>() {
+        @Override
+        public int compare(Notification o1, Notification o2) {
+            try {
+                long d1 = o1.getRealTime().toDate().getTime();
+                long d2 = o2.getRealTime().toDate().getTime();
+
+                if (d1 < d2) {
+                    return 1;
+                }
+                else if (d1 == d2) {
+                    return 0;
+                }
+                else {
+                    return -1;
+                }
+            }
+            catch (Exception e) {
+                Log.d("Notifications", "comparison error");
+                return 0;
+            }
+
+        }
+    };
 }

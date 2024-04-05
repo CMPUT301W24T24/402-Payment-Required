@@ -99,9 +99,9 @@ public class CreateEventFragment extends Fragment {
 
         EditText locationTextView = binding.textCreateEventLocation;
 
-        NumberPicker limitNumberPicker = binding.createEventAttendLimit;
-        limitNumberPicker.setMinValue(0);
-        limitNumberPicker.setMaxValue(1000000000);
+        EditText limitNumberPicker = binding.createEventAttendLimit;
+        // limitNumberPicker.setMinValue(0);
+        // limitNumberPicker.setMaxValue(1000000000);
 
         CheckBox geoCheckBox = binding.checkboxCreateEventGeolocation;
 
@@ -193,7 +193,15 @@ public class CreateEventFragment extends Fragment {
             Double locationGeoLat = eventLocation.getLatitude();
             Double locationGeoLong = eventLocation.getLongitude();
             Boolean geo = geoCheckBox.isChecked();
-            Integer limit = limitNumberPicker.getValue();
+
+            // set limit
+            Integer limit = 0;
+            Integer inputLimitLength = limitNumberPicker.getText().length();
+            if (inputLimitLength != 0){
+                limit = Integer.parseInt(limitNumberPicker.getText().toString());
+            }
+
+            Log.d("testlol", "limit= " + limit);
 
 
             Event event = new Event(user, titleText, descriptionText, posterRef, time, location, locationGeoLat, locationGeoLong, checkinId, checkinQR, promoteId, promoteQR, geo, limit);
