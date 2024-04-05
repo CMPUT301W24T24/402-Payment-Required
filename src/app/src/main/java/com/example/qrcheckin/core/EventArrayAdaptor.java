@@ -1,6 +1,7 @@
 package com.example.qrcheckin.core;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,17 +72,24 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         }
 
         Event event = events.get(position);
+
+        // set the text details of the event
+        ((TextView) view.findViewById(R.id.event_name_text)).setText(event.getName());
+        ((TextView) view.findViewById(R.id.event_date_time_text)).setText(event.getTime().toString());
+        
         if (!allEvent) {
             // set the text details of the event
-            ((TextView) view.findViewById(R.id.event_name_text)).setText(event.getName());
-            ((TextView) view.findViewById(R.id.event_date_time_text)).setText(event.getTime().toString());
             ((TextView) view.findViewById(R.id.event_status_check_in_text)).setText(event.isCurrentUserCheckedIn() ? "Checked In" : "Not Checked In");
             ((TextView) view.findViewById(R.id.event_status_sign_up_text)).setText(event.isCurrentUserSignedUp() ? "Signed Up" : "Not Signed Up");
         } else {
             // set the text details of the event
-            ((TextView) view.findViewById(R.id.all_event_name_text)).setText(event.getName());
-            ((TextView) view.findViewById(R.id.all_event_date_time_text)).setText(event.getTime().toString());
             ((TextView) view.findViewById(R.id.all_event_host_name_text)).setText(event.getHost().getName());
+        }
+    
+        // null if attendee counting not implemented yet
+        Integer attamt = event.getAttendeeAmount();
+        if (attamt != null) {
+            ((TextView) view.findViewById(R.id.event_number_of_attendees_text)).setText("Attendees: " + attamt);
         }
 
         // Set a uniquely identifiable tag for the event

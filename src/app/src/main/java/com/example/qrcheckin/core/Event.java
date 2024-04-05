@@ -3,8 +3,30 @@ package com.example.qrcheckin.core;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import android.util.Log;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * An object that keeps track of the event data
@@ -28,6 +50,7 @@ public class Event implements Serializable {
     private UserList attendees;
     private Boolean currentUserSignedUp;
     private Boolean currentUserCheckedIn;
+    private Integer attendeeAmount;
 
    
 
@@ -65,6 +88,7 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        initAttendeeAmount();
         if(this.geo) {
             Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
             assert this.location!=null;
@@ -105,6 +129,7 @@ public class Event implements Serializable {
         this.attendees = attendees;
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        initAttendeeAmount();
         if(this.geo) {
             Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
             assert this.location!=null;
@@ -141,8 +166,38 @@ public class Event implements Serializable {
         this.promoteQR = promoteQR;
         this.geo = geo;
         this.limit = limit;
+        this.attendees = new UserList();
         this.currentUserSignedUp = false;
         this.currentUserCheckedIn = false;
+        initAttendeeAmount();
+    }
+
+    /**
+     * sets the attendee amount of the event if its in the database
+     * otherwise it sets the amount to 0
+     */
+    public void initAttendeeAmount() {
+        attendeeAmount = 0;
+        FirebaseFirestore.getInstance().collection("checkins").whereEqualTo("event_id", id)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (value != null) {
+                    Set<String> attend = new HashSet<>();
+                    for (QueryDocumentSnapshot doc: value) {
+                        //if (doc.getString("event_id").equals(id)) {
+                            String userid = doc.getString("user_id");
+                            attend.add(userid);
+                        //}
+                    }
+                    attendeeAmount = attend.size();
+                }
+            }
+        });
         if(this.geo) {
             Log.e("LOCATION ERROR","Event created, and its geo is enabled but location is null");
             assert this.location!=null;
@@ -268,6 +323,18 @@ public class Event implements Serializable {
     public void setAttendees(UserList attendees) {
         this.attendees = attendees;
     }
+
+    /**
+     * A method that returns the current number of attendees at an event
+     * @return number of users currently attending event (checked in)
+     */
+    public Integer getAttendeeAmount() {return this.attendeeAmount;}
+
+    /**
+     * A method that sets the current number of attendees at an event
+     * @param amount the amount of attendees at the event
+     */
+    public void setAttendeeAmount(Integer amount) { this.attendeeAmount = amount;}
 
     /**
      * A method sets the id of the event

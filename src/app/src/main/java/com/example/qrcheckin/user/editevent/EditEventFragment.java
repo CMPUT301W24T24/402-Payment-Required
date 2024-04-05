@@ -101,7 +101,6 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
-        Button selectLocationButton=binding.selectLocationButton;
 
         //map permissions
         requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
@@ -133,15 +132,22 @@ public class EditEventFragment extends Fragment {
         map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
 
-        selectLocationButton.setOnClickListener(v -> {
-            selectLocation();
-        });
-
         // Set event information
         assert event != null;
         editEventTitle.setText(event.getName());
         editEventDescription.setText(event.getDescription());
-        editEventAttendLimit.setText(String.valueOf(event.getLimit()));
+
+        // set event attendee limit
+        Integer eventLimit = event.getLimit();
+        String eventLimitText;
+        if (eventLimit == 0) {
+            eventLimitText = "unlimited";
+            editEventAttendLimit.setHint(eventLimitText);
+        } else {
+            eventLimitText = eventLimit.toString();
+            editEventAttendLimit.setText(eventLimitText);
+        }
+
         //set poster
         eventPoster.setImageResource(R.drawable.cat);
 
@@ -215,13 +221,13 @@ public class EditEventFragment extends Fragment {
                     return;
                 }
                 if (editEventAttendLimit.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter event limit", Toast.LENGTH_SHORT).show();
-                    return;
+                    event.setLimit(0);
+                } else {
+                    event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
                 }
                 event.setName(String.valueOf(editEventTitle.getText()));
                 event.setDescription(String.valueOf(editEventDescription.getText()));
-                event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
-                //access the firebase and databse and update
+                //access the firebase and database and update
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("description", event.getDescription());
                 data.put("limit", event.getLimit());
