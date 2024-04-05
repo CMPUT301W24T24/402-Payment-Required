@@ -94,6 +94,9 @@ public class AllProfilesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Animation zoomAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.zoom_in);
                 view.startAnimation(zoomAnimation);
+
+                profileArrayAdapter.setSelectedPosition(position, true);
+
                 AllProfilesFragment.this.position = position;
                 Toast.makeText(requireContext(), "Please click the floating button to delete the selected profile", Toast.LENGTH_LONG).show();
             }
@@ -106,6 +109,7 @@ public class AllProfilesFragment extends Fragment {
             public void onClick(View v) {
                 if (position != ListView.INVALID_POSITION) {
                     deleteProfile(position);
+
                 } else {
                     Toast.makeText(requireContext(), "No profile is selected for deletion", Toast.LENGTH_LONG).show();
                 }
@@ -120,8 +124,8 @@ public class AllProfilesFragment extends Fragment {
                 User profileDelete = profileDataList.get(position);
                 profileDataList.remove(position);
                 profileArrayAdapter.notifyDataSetChanged();
-                position = ListView.INVALID_POSITION;
                 //delete the user to the FireStore Collection
+
                 usersRef.document(profileDelete.getId())
                         .delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -130,6 +134,9 @@ public class AllProfilesFragment extends Fragment {
                                 Log.d("Firestore", "DocumentSnapshot successfully deleted!");
                             }
                         });
+
+                position = ListView.INVALID_POSITION;
+
             }
         });
         return root;
