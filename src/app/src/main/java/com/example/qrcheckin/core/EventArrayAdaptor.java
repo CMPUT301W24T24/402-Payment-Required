@@ -57,6 +57,7 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
      * @param convertView the view of the event
      * @param parent the parent of the view
      * @return the view of the event
+     * References: https://developer.android.com/reference/android/view/View#setTag(java.lang.Object) Oracle Referenced: 2024-03-30
      */
     @NonNull
     @Override
@@ -82,6 +83,9 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
             ((TextView) view.findViewById(R.id.all_event_date_time_text)).setText(event.getTime().toString());
             ((TextView) view.findViewById(R.id.all_event_host_name_text)).setText(event.getHost().getName());
         }
+
+        // Set a uniquely identifiable tag for the event
+        view.setTag(event.getId());
 
         return view;
     }

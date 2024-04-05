@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 
 /**
@@ -218,12 +220,30 @@ public class User implements Serializable {
         return bitmap;
     }
     private int hashedColor(Character s) {
-        String colorString = "#";
+        StringBuilder colorString = new StringBuilder();
         int ascii = (int) s;
-        colorString += Integer.toHexString(ascii % 255);
-        colorString += Integer.toHexString((ascii * 5 + 12) % 255);
-        colorString += Integer.toHexString((ascii * 7 + 3) % 255);
+        colorString.append(Integer.toHexString(ascii % 255));
+        colorString.append(Integer.toHexString((ascii * 5 + 12) % 255));
+        colorString.append(Integer.toHexString((ascii * 7 + 3) % 255));
+        for (int i = colorString.length(); i < 6; i++) {
+            colorString.insert(0, "0");
+        }
+        colorString.insert(0, "#");
 
-        return Color.parseColor(colorString);
+        return Color.parseColor(colorString.toString());
+    }
+
+    /**
+     * Checks if this object equals another object by comparing user id's
+     * Reference: https://stackoverflow.com/questions/62718310/how-to-use-the-arraylist-contain-to-check-the-object-in-java Chakraborty Abhinaba. Accessed 2024-03-19
+     * @param obj The object to compare against
+     * @return The boolean result of the comparison
+     */
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this.getClass() == obj.getClass()) {
+            return this.getId() == ((User) obj).getId();
+        }
+        return false;
     }
 }
