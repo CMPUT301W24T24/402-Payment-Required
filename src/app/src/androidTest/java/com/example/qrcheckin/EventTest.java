@@ -6,7 +6,12 @@ import static org.junit.Assert.assertTrue;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.util.Log;
+
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
@@ -21,7 +26,7 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 import java.util.Optional;
 
-@RunWith(AndroidJUnit4.class) //TODO: check with dependency to do
+@RunWith(AndroidJUnit4.class)
 
 
 public class EventTest {
@@ -29,8 +34,12 @@ public class EventTest {
     public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<MainActivity>(MainActivity.class);
 
     QRCheckInApplication app;
+    Database db;
+    User currentUser;
+
+
     @Before
-    public void getApplication() {
+    public void getApplication() throws InterruptedException {
 
         // Get the application
         Log.d("QRCheckIn", "getApplication");
@@ -43,17 +52,22 @@ public class EventTest {
         if (app == null) {
             Log.d("QRCheckIn", "The app is null");
         }
+        Thread.sleep(2500);
+
+        db = new Database();
+        currentUser = app.getCurrentUser();
     }
 
     public Event getMockEvent() {
         return new Event(currentUser, "Event for unit test", "", "", new Date(), "",0.00, 0.00, "", "", "", "", true, 100);
     }
 
-    Database db = new Database();
-    User currentUser = app.getCurrentUser();
+
 
     @Test
-    public void checkInTest() {
+    public void checkInTest() throws InterruptedException {
+        Thread.sleep(2500);
+        currentUser = app.getCurrentUser();
         Event mockEvent = getMockEvent();
         db.addEvent(mockEvent);
         Boolean checkInVerification = mockEvent.checkIn(currentUser, 0.00, 0.00);
