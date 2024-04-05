@@ -109,7 +109,6 @@ public class CreateEventFragment extends Fragment {
 
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
-            // TODO: check that checkinId and promoteID are not the same
             if (titleTextView.getText().toString().isEmpty()) {
                 Toast.makeText(getContext(), "Please enter a Title", Toast.LENGTH_SHORT).show();
                 return;
@@ -270,7 +269,14 @@ public class CreateEventFragment extends Fragment {
      */
     public String generateQRCode() {
         QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-        String randomString = getAlphaNumericString(20);
+        String randomString = null;
+        //Check that the checkinID will not be the same as the promoteID
+        while (true) {
+            randomString = getAlphaNumericString(20);
+            if (randomString != null && (!randomString.equals(checkinId)) && (!randomString.equals(promoteId))) {
+                break;
+            }
+        }
         return QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(randomString, 400, 400));
     }
 
