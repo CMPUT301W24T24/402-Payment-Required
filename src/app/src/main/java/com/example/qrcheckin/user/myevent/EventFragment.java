@@ -1,5 +1,8 @@
 package com.example.qrcheckin.user.myevent;
 
+import static com.example.qrcheckin.core.Database.onEventListChanged;
+
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -15,12 +18,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.databinding.FragmentEventBinding;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
+/**
+ * Fragment which contains a list of the events a user has checked into
+ */
 public class EventFragment extends Fragment {
 
     private FragmentEventBinding binding;
@@ -35,9 +44,14 @@ public class EventFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.eventListView;
-        eventViewModel.initializeAdaptor(getContext());
+//        eventViewModel.initializeAdaptor(getContext());
+        ArrayList<Event> events = new ArrayList<>();
+        // TODO: refactor MutableLiveData to only array adaptor
+        MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(getContext(), events));
 
-        eventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "my");
+        listView.setAdapter(mEventArrayAdaptor.getValue());
+//        eventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
         return root;
     }

@@ -1,5 +1,8 @@
 package com.example.qrcheckin.user.exploreevent;
 
+import static com.example.qrcheckin.core.Database.onEventListChanged;
+
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -15,17 +18,35 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.EventArrayAdaptor;
 import com.example.qrcheckin.databinding.FragmentExploreEventBinding;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
+/**
+ * The fragment for exploring available events
+ */
 public class ExploreEventFragment extends Fragment {
 
     private FragmentExploreEventBinding binding;
     private ListView listView;
 
+    /**
+     * Creates the view
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -36,13 +57,24 @@ public class ExploreEventFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.exploreEventListView;
-        exploreEventViewModel.initializeAdaptor(getContext());
+//        exploreEventViewModel.initializeAdaptor(getContext());
+        ArrayList<Event> events = new ArrayList<>();
+        // TODO: refactor MutableLiveData to only array adaptor
+        MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), events));
 
-        exploreEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore");
+        listView.setAdapter(mEventArrayAdaptor.getValue());
+//        exploreEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
         return root;
     }
 
+    /**
+     * When the view is created
+     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
