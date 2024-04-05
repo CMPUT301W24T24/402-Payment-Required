@@ -47,6 +47,7 @@ public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private boolean imageUpdated = false;
+    private boolean clearedImage = false;
     private Uri updatedImageUri;
     private boolean imageTooLarge = false;
     int selectPicture = 200;
@@ -129,6 +130,15 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        binding.removeProfilePictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.profilePicture.setImageBitmap(user.generateProfilePicture());
+                clearedImage = true;
+                imageUpdated = true;
+            }
+        });
+
         binding.profileSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,31 +160,39 @@ public class ProfileFragment extends Fragment {
                         StorageReference storageReference = storage.getReference();
                         Uri imageUri = updatedImageUri;
                         String imageName = user.getId();
-                        user.setImageRef("users/" + imageName);
-                        StorageReference imageRef = storageReference.child("users/" + imageName);
-                        imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Log.d("Firebase", "Profile picture uploaded successfully");
-                                NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
-                                View headerView = navigationView.getHeaderView(0);
-                                ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
-                                // Set the profile picture of the user to the XML view
-                                Database database = new Database();
-                                database.getUserPicture(user, navProfileImage);
+                        if (!clearedImage) {
+                            user.setImageRef("users/" + imageName);
+                            StorageReference imageRef = storageReference.child("users/" + imageName);
+                            imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    Log.d("Firebase", "Profile picture uploaded successfully");
+                                    NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
+                                    View headerView = navigationView.getHeaderView(0);
+                                    ImageView navProfileImage = headerView.findViewById(R.id.nav_profile_pic);
+                                    // Set the profile picture of the user to the XML view
+                                    Database database = new Database();
+                                    database.getUserPicture(user, navProfileImage);
 
-                                // Delete the image if it was scaled down
-                                // Reference: https://stackoverflow.com/questions/23716683/android-delete-file-after-images-media-insertimage Nate. Accessed on 2024-03-31
-                                if (imageTooLarge) {
-                                    requireContext().getContentResolver().delete(updatedImageUri, null, null);
+                                    // Delete the image if it was scaled down
+                                    // Reference: https://stackoverflow.com/questions/23716683/android-delete-file-after-images-media-insertimage Nate. Accessed on 2024-03-31
+                                    if (imageTooLarge) {
+                                        requireContext().getContentResolver().delete(updatedImageUri, null, null);
+                                    }
                                 }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("Firebase", "Profile picture upload failed", e);
+                                }
+                            });
+                        } else {
+                            if (user.getImageRef() != null) {
+                                StorageReference imageRef = storageReference.child(user.getImageRef());
+                                imageRef.delete();
+                                user.setImageRef(null);
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("Firebase", "Profile picture upload failed", e);
-                            }
-                        });
+                        }
                     }
 
                     //Accessing the users database
