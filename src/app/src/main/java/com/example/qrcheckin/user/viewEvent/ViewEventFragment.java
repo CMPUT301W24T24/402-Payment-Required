@@ -18,7 +18,10 @@ import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentViewEventBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -26,7 +29,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 
 /**
- * A fragment which is acrtivitated when an event is clicked on
+ * A fragment which is activated when an event is clicked on
  */
 public class ViewEventFragment extends Fragment {
     private FragmentViewEventBinding binding;
@@ -50,14 +53,37 @@ public class ViewEventFragment extends Fragment {
         binding.viewEventDate.setText(event.getTime().toString());
         binding.viewEventDescription.setText(event.getDescription());
 
-        // set the button to sign up or un-sign up
-        if (event.isCurrentUserSignedUp()) {
-            setUnSignUpButton();
-            binding.viewEventSignUp.setText(R.string.unsign_up);
-        } else {
-            setSignUpButton();
-            binding.viewEventSignUp.setText(R.string.sign_up);
-        }
+        FirebaseFirestore.getInstance()
+                .collection("signUpTable").whereEqualTo("event_id", event.getId())
+                .count().get(AggregateSource.SERVER)
+                .addOnSuccessListener(new OnSuccessListener<AggregateQuerySnapshot>() {
+                    @Override
+                    public void onSuccess(AggregateQuerySnapshot aggregateQuerySnapshot) {
+                        long currentEventAttendeeAmount = aggregateQuerySnapshot.getCount();
+                        Integer limit = event.getLimit();
+
+                        // set the button to sign up or un-sign up
+                        if (event.isCurrentUserSignedUp()) {
+                            setUnSignUpButton();
+                            binding.viewEventSignUp.setText(R.string.unsign_up);
+                        }
+                        else if (limit <= currentEventAttendeeAmount && limit != 0) {
+
+                            binding.viewEventSignUp.setText(R.string.event_full);
+                            binding.viewEventSignUp.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.d("Signup", "Event full, no signup created");
+                                }
+                            });
+                        }
+                        else {
+                            setSignUpButton();
+                            binding.viewEventSignUp.setText(R.string.sign_up);
+                        }
+
+                    }
+                });
 
         // Handle the "Attend Event" button click
 
@@ -72,7 +98,6 @@ public class ViewEventFragment extends Fragment {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             CollectionReference signupsRef = db.collection("signUpTable");
 
-            // Add the event to the collection
             HashMap<String, Object> data = new HashMap<>();
             data.put("user_id", user.getId());
             data.put("event_id", event.getId());
@@ -86,7 +111,31 @@ public class ViewEventFragment extends Fragment {
                     .addOnFailureListener(e -> {
                         Log.e("Firestore", e.toString());
                     });
+
         });
+
+        FirebaseFirestore.getInstance()
+                .collection("signUpTable").whereEqualTo("event_id", event.getId())
+                .count().get(AggregateSource.SERVER)
+                .addOnSuccessListener(new OnSuccessListener<AggregateQuerySnapshot>() {
+                    @Override
+                    public void onSuccess(AggregateQuerySnapshot aggregateQuerySnapshot) {
+                        long currentEventAttendeeAmount = aggregateQuerySnapshot.getCount();
+                        Integer limit = event.getLimit();
+
+                        if (limit <= currentEventAttendeeAmount && limit != 0) {
+
+                            binding.viewEventSignUp.setText(R.string.event_full);
+                            binding.viewEventSignUp.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.d("Signup", "Event full, no signup created");
+                                }
+                            });
+                        }
+                    }
+                });
+
     }
 
     /**
