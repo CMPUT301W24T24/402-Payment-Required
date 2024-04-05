@@ -111,6 +111,27 @@ public class ViewEventFragment extends Fragment {
                     .addOnFailureListener(e -> {
                         Log.e("Firestore", e.toString());
                     });
+            FirebaseFirestore.getInstance()
+                    .collection("signUpTable").whereEqualTo("event_id", event.getId())
+                    .count().get(AggregateSource.SERVER)
+                    .addOnSuccessListener(new OnSuccessListener<AggregateQuerySnapshot>() {
+                        @Override
+                        public void onSuccess(AggregateQuerySnapshot aggregateQuerySnapshot) {
+                            long currentEventAttendeeAmount = aggregateQuerySnapshot.getCount();
+                            Integer limit = event.getLimit();
+
+                            if (limit <= currentEventAttendeeAmount && limit != 0) {
+
+                                binding.viewEventSignUp.setText(R.string.event_full);
+                                binding.viewEventSignUp.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Log.d("Signup", "Event full, no signup created");
+                                    }
+                                });
+                            }
+                        }
+                    });
 
         });
     }

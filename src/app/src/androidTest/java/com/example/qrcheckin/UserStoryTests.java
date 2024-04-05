@@ -173,7 +173,7 @@ public class UserStoryTests {
                 .check(ViewAssertions.matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
 
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
         onView(withText(eventName)).perform(click());
         onView(withId(R.id.edit_event_show_sign_ups)).perform(click());
