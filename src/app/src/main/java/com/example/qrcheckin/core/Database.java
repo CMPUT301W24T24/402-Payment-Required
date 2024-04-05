@@ -196,11 +196,12 @@ public class Database {
      */
     public void addEvent(@NonNull Event event){
         HashMap<String, Object> data = new HashMap<>();
-        data.put("host", event.getOwner().getId());
+        DocumentReference hostReference = db.collection("users").document(event.getOwner().getId());
+        data.put("host", hostReference);
         data.put("name", event.getName());
         data.put("description", event.getDescription());
         data.put("posterRef", null);
-        data.put("time", null);
+        data.put("time", event.getTime());
         data.put("location", null);
         data.put("location_geo_lat", event.getLocationGeoLat());
         data.put("location_geo_long", event.getLocationGeoLong());
@@ -209,7 +210,7 @@ public class Database {
         data.put("promote_id", null);
         data.put("promote_qr", null);
         data.put("geo", null);
-        data.put("limit", null);
+        data.put("limit", event.getLimit());
         eventsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     event.setId(documentReference.getId());
@@ -495,6 +496,11 @@ public class Database {
                         }
                     }
                     Log.d("Firestore", "User list changed " + userList.size());
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
+                }
+                if (querySnapshots == null || querySnapshots.isEmpty()) {
+                    userList.clear();
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
                 }
 
             }
