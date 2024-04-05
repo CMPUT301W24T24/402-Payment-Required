@@ -2,6 +2,8 @@ package com.example.qrcheckin.user.createnotification;
 
 import static com.google.firebase.messaging.Constants.MessagePayloadKeys.SENDER_ID;
 
+import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
@@ -12,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavAction;
