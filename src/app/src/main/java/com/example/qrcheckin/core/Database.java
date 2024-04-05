@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.qrcheckin.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -194,11 +196,12 @@ public class Database {
      */
     public void addEvent(@NonNull Event event){
         HashMap<String, Object> data = new HashMap<>();
-        data.put("host", event.getOwner().getId());
+        DocumentReference hostReference = db.collection("users").document(event.getOwner().getId());
+        data.put("host", hostReference);
         data.put("name", event.getName());
         data.put("description", event.getDescription());
         data.put("posterRef", null);
-        data.put("time", null);
+        data.put("time", event.getTime());
         data.put("location", null);
         data.put("location_geo_lat", event.getLocationGeoLat());
         data.put("location_geo_long", event.getLocationGeoLong());
@@ -207,7 +210,7 @@ public class Database {
         data.put("promote_id", null);
         data.put("promote_qr", null);
         data.put("geo", null);
-        data.put("limit", null);
+        data.put("limit", event.getLimit());
         eventsRef.add(data)
                 .addOnSuccessListener(documentReference -> {
                     event.setId(documentReference.getId());
@@ -322,6 +325,7 @@ public class Database {
         });
 
     }
+
     /**
      * Fetch the host of an event and add the event to the eventList
      * only works with onEventListChanged
@@ -458,6 +462,163 @@ public class Database {
         });
 
     }
+
+    /**
+     * Gets the list of users signed up to an event
+     * @param userList The empty list that is to be filled with users
+     * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdaptor
+     * @param currentEventID The id of the current event
+     */
+    public static void getUsersSignedUpToEvent(ArrayList<User> userList, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, String currentEventID) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
+        CollectionReference userRef = FirebaseFirestore.getInstance().collection("users");
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) {
+                    userList.clear();
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (Objects.equals(doc.getString("event_id"), currentEventID)) {
+                            String userId = doc.getString("user_id");
+                            DocumentReference userDoc = userRef.document(userId);
+                            Log.d("Firestore", "Document Reference " + userDoc);
+                            Log.d("Firestore", "User fetched " + userId);
+                            if (userDoc == null) {
+                                Log.d("Firestore", "User " + userId +" not found");
+                            }
+                            else {
+                                fetchUser(doc, userDoc, mUserArrayAdaptor, userList);
+                            }
+                        }
+                    }
+                    Log.d("Firestore", "User list changed " + userList.size());
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
+                }
+                if (querySnapshots == null || querySnapshots.isEmpty()) {
+                    userList.clear();
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Fetches the current user signed up to an event
+     * @param doc The signup document
+     * @param userRef The reference to the user
+     * @param mUserArrayAdaptor The MutableLiveData of the UserArrayAdapter
+     * @param userList The user list to be updated
+     */
+    private static void fetchUser(QueryDocumentSnapshot doc, DocumentReference userRef, MutableLiveData<UserArrayAdaptor> mUserArrayAdaptor, ArrayList<User> userList) {
+        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot userDoc) {
+                if (userDoc.exists()) {
+                    User user = new User(userDoc.getId(),
+                            userDoc.getString("name"),
+                            userDoc.getString("email"),
+                            userDoc.getString("phone"),
+                            userDoc.getString("homepage"),
+                            Boolean.TRUE.equals(userDoc.getBoolean("geo")),
+                            Boolean.TRUE.equals(userDoc.getBoolean("admin")),
+                            userDoc.getString("imageRef")
+                    );
+
+                    Log.d("Firestore", "User fetched " + user.getName());
+                    if (!userList.contains(user)) {
+                        userList.add(user);
+                    }
+                    Objects.requireNonNull(mUserArrayAdaptor.getValue()).notifyDataSetChanged();
+                } else {
+                    Log.e("Firestore", "User not found");
+                }
+            }
+        });
+    }
+
+    /**
+     * Sign up the user to the given event
+     * @param user The user to be signed up
+     * @param event The event the user is signing up to
+     */
+    public void signUpUser(User user, Event event) {
+        CollectionReference signupsRef = FirebaseFirestore.getInstance().collection("signUpTable");
+
+        // Add the event to the collection
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("user_id", user.getId());
+        data.put("event_id", event.getId());
+        signupsRef.add(data)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Signed up with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", e.toString());
+                });
+    }
+
+    /**
+     * Retrieves the number of checkins for a specific user and event
+     * @param userId The string id of the user
+     * @param eventId The string id of the event
+     * @param listener The listener to be used for callback
+     * Reference: Gemini
+     * Prompt: How could I update the database function to be callable in the UserArrayAdaptor class so that I
+     *          could set the text of user_number_of_checkins to the number of time the user has checked into a
+     *          specific event without introducing a new field numCheckIns in the user store?
+     */
+    public static void getCheckInCountForUser(String userId, String eventId, OnCheckInCountRetrievedListener listener) {
+        CollectionReference checkinRef = FirebaseFirestore.getInstance().collection("checkins");
+        checkinRef.whereEqualTo("event_id", eventId)
+                .whereEqualTo("user_id", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        long checkInCount = task.getResult().size();
+                        listener.onCheckInCountRetrieved(checkInCount);
+                    } else {
+                        Log.w("Firestore", "Error getting check-in count", task.getException());
+                        listener.onCheckInCountRetrieved(-1); // Handle error
+                    }
+                });
+    }
+
+
+    /**
+     * Used so the UserArrayAdaptor can handle the retrieved check-in count in its onCheckInCountRetrieved method
+     * Reference: Gemini
+     * Prompt: How could I update the database function to be callable in the UserArrayAdaptor class so that I
+     *          could set the text of user_number_of_checkins to the number of time the user has checked into a
+     *          specific event without introducing a new field numCheckIns in the user store?
+     */
+    public interface OnCheckInCountRetrievedListener {
+        void onCheckInCountRetrieved(long checkInCount);
+    }
+
+
+
+    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("Firestore", "Image reference deleted");
+                imagesUserArrayAdaptor.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Firestore", e.toString());
+            }
+        });
+    }
+
 
     public static void getAllImages(ImagesEventArrayAdaptor events, ImagesUserArrayAdaptor users) {
         CollectionReference usersRef = FirebaseFirestore.getInstance().collection("users");
@@ -620,23 +781,6 @@ public class Database {
             public void onSuccess(Void unused) {
                 Log.d("Firestore", "Image reference deleted");
                 imagesEventArrayAdaptor.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e("Firestore", e.toString());
-            }
-        });
-    }
-
-    public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference usersRef = db.collection("users");
-        usersRef.document(user.getId()).update("imageRef", null).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d("Firestore", "Image reference deleted");
-                imagesUserArrayAdaptor.notifyDataSetChanged();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
