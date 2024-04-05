@@ -370,6 +370,7 @@ public class Database {
                     );
                     Log.d("Firestore", "Host fetched " + user.getName());
                     switch(type) {
+                        // TODO: add "all" type and modify explore to show only current and future events
                         case "explore":
                             getCurrentUserCheckedIns(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
                             getCurrentUserSignedUps(event, mEventArrayAdaptor, currentUserId, Boolean.FALSE, eventList);
@@ -463,6 +464,44 @@ public class Database {
             }
         });
 
+    }
+    public static void deleteEvent(String id) {
+        // Delete the event
+        FirebaseFirestore.getInstance().collection("events").document(id).delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Firestore", e.toString());
+                    }
+                });
+
+        // Delete the related check ins
+        FirebaseFirestore.getInstance().collection("checkins").whereEqualTo("event_id", id).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot doc: queryDocumentSnapshots) {
+                            doc.getReference().delete();
+                        }
+                    }
+                });
+
+        // Delete the related sign ups
+        FirebaseFirestore.getInstance().collection("signUpTable").whereEqualTo("event_id", id).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot doc: queryDocumentSnapshots) {
+                            doc.getReference().delete();
+                        }
+                    }
+                });
     }
 
     /**
