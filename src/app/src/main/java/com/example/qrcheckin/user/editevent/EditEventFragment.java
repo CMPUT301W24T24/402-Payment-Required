@@ -201,6 +201,17 @@ public class EditEventFragment extends Fragment {
             }
         });
 
+        //see a list of attendees
+        showCheckIns.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("event", (Serializable) event);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_attendee_check_in, bundle);
+            }
+        });
+
         //notify atendees
         notify.setOnClickListener(new View.OnClickListener() {
             @Override
