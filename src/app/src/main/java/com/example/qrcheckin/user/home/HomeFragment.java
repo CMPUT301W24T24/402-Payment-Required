@@ -85,7 +85,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         });
 
         //req permissions for location
-        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION});//coarse is fine because its accurate to about 100m
+        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.POST_NOTIFICATIONS});//coarse is fine because its accurate to about 100m
 
         //set this as a listener for location change to assure accuracy
         LocationManager locationManager = (LocationManager) root.getContext().getSystemService(Context.LOCATION_SERVICE);
