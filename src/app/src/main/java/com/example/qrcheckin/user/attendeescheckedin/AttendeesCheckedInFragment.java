@@ -38,15 +38,15 @@ public class AttendeesCheckedInFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        AttendeesSignedUpViewModel attendeesSignedUpViewModel =
-                new ViewModelProvider(this).get(AttendeesSignedUpViewModel.class);
+        AttendeesCheckedInViewModel attendeesCheckedInViewModel =
+                new ViewModelProvider(this).get(AttendeesCheckedInViewModel.class);
 
         binding = FragmentAttendeesCheckedInBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         listView = binding.attendeesCheckedInListView;
-        attendeesSignedUpViewModel.initializeAdaptor(getContext(), getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null);
-        attendeesSignedUpViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
+        attendeesCheckedInViewModel.initializeAdaptor(getContext(), getArguments().getSerializable("event") != null ? (Event) getArguments().getSerializable("event") : null);
+        attendeesCheckedInViewModel.getUserList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
         textView = binding.checkinListEmptyTextView;
         listView.setEmptyView(textView);

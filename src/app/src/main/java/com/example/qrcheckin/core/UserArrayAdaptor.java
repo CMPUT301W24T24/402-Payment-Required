@@ -29,6 +29,7 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
         void createUser(int position);
     }
     private ArrayList<User> users;
+    private Event event;
     private Context context;
 
     /**
@@ -36,9 +37,10 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
      * @param context The context of the app
      * @param users The list of users
      */
-    public UserArrayAdaptor(Context context, ArrayList<User> users) {
+    public UserArrayAdaptor(Context context, ArrayList<User> users, Event event) {
         super(context, 0, users);
         this.users = users;
+        this.event = event;
         this.context = context;
     }
 
@@ -76,7 +78,7 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
         ((TextView) view.findViewById(R.id.user_number_of_checkins)).setText("searching...");
 
         View finalView = view;
-        Database.getCheckInCountForUser(user.getId(), "", new Database.OnCheckInCountRetrievedListener() {
+        Database.getCheckInCountForUser(user.getId(), event.getId(), new Database.OnCheckInCountRetrievedListener() {
             @Override
             public void onCheckInCountRetrieved(long checkInCount) {
                 String numCheckins;
