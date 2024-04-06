@@ -810,6 +810,8 @@ public class Database {
         });
     }
 
+
+
     public static void deleteImage(Event event, ImagesEventArrayAdaptor imagesEventArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsRef = db.collection("events");

@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 public class AllEventsFragment extends Fragment {
 
     private FragmentAllEventsBinding binding;
+
     private ListView listView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -87,4 +89,5 @@ public class AllEventsFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }
