@@ -191,12 +191,12 @@
                 android:id="@+id/edit_event_export_event_code"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                android:layout_weight="1"
                 android:backgroundTint="#5A5858"
                 android:text="EXPORT EVENT QR CODE"
+                android:textColor="@color/white"
                 android:textSize="15dp"
-                android:layout_weight="1"
-                android:visibility="invisible"/>
+                android:visibility="visible" />
         </LinearLayout>
 
         <TextView
@@ -215,10 +215,17 @@
             android:id="@+id/edit_event_check_in_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit"
             tools:src="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/promote_code"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/edit_event_export_checkin_code"
@@ -229,11 +236,11 @@
             android:text="EXPORT CHECK IN QR CODE"
             android:textColor="@color/white"
             android:textSize="15dp"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_event_check_in_code"
-            android:visibility="invisible"/>
+            app:layout_constraintTop_toBottomOf="@+id/edit_event_check_in_code" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_event_update"
