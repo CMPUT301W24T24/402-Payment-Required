@@ -1,10 +1,17 @@
 package com.example.qrcheckin.user.editevent;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,23 +21,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.Manifest;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.qrcheckin.MainActivity;
 import com.example.qrcheckin.R;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.databinding.FragmentEditEventBinding;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.example.qrcheckin.user.attendeessignedup.AttendeesSignedUpFragment;
 import com.example.qrcheckin.user.createevent.CreateEventViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.BuildConfig;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,17 +51,34 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 
+
+import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.checkerframework.checker.units.qual.A;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
+    private MapView map;
+    final private double MAP_DEFAULT_LATITUDE=53.5265, MAP_DEFAULT_LONGITUDE=-113.5255;
+    private Location eventLocation;
+    private DocumentReference docRef;
+    private Marker selectedMarker;
 
     @Nullable
     @Override
@@ -72,19 +101,60 @@ public class EditEventFragment extends Fragment {
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
+        ImageView promoCode = binding.editEventPromoCode;
+
+        //map permissions
+        requestPermissionsIfNecessary(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+
+        //important for OSM moderation apparently
+        Configuration.getInstance().setUserAgentValue(BuildConfig.LIBRARY_PACKAGE_NAME);
+
+        //map config
+        map = root.findViewById(R.id.osmmap);
+        map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        map.setMultiTouchControls(true);
+        map.getController().setZoom(16);
+
+        eventLocation=new Location(LocationManager.GPS_PROVIDER);
+        //event location
+        if(event.getLocationGeoLat()!=null&&event.getLocationGeoLong()!=null) {//first try to pull event location if it isnt null
+            eventLocation.setLatitude(event.getLocationGeoLat());
+            eventLocation.setLongitude(event.getLocationGeoLong());
+        }
+        if(eventLocation.getLatitude()==0&&eventLocation.getLongitude()==0) {//otherwise if it fails to retreive gps use hardcoded defaults
+            eventLocation.setLatitude(MAP_DEFAULT_LATITUDE);
+            eventLocation.setLongitude(MAP_DEFAULT_LONGITUDE);
+        }
+        //marker
+        selectedMarker=new Marker(map);
+        selectedMarker.setPosition(new GeoPoint(eventLocation));
+        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        map.getOverlays().add(selectedMarker);
+        map.invalidate(); //refresh
+        map.getController().animateTo(new GeoPoint(eventLocation));
 
         // Set event information
         assert event != null;
         editEventTitle.setText(event.getName());
         editEventDescription.setText(event.getDescription());
-        editEventAttendLimit.setText(String.valueOf(event.getLimit()));
+
+        // set event attendee limit
+        Integer eventLimit = event.getLimit();
+        String eventLimitText;
+        if (eventLimit == 0) {
+            eventLimitText = "unlimited";
+            editEventAttendLimit.setHint(eventLimitText);
+        } else {
+            eventLimitText = eventLimit.toString();
+            editEventAttendLimit.setText(eventLimitText);
+        }
+
         //set poster
         eventPoster.setImageResource(R.drawable.cat);
 
         //Accessing the events database
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference eventsRef = db.collection("events");
-        DocumentReference docRef = eventsRef.document(event.getId());
+        docRef=FirebaseFirestore.getInstance().collection("events").document(event.getId());
+
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -95,7 +165,7 @@ public class EditEventFragment extends Fragment {
                     if (timestamp != null) {
                         // Convert the timestamp to a Date object
                         Date date = timestamp.toDate();
-                        // Create a SimpleDateFormat instance for your desired format
+                        // Create a SimpleDateFormat instance for format
                         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy"); // Example: "March 8, 2024"
                         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a"); // Example: "8:10 AM"
                         // Extract the formatted date and time strings
@@ -111,6 +181,10 @@ public class EditEventFragment extends Fragment {
                         String check_inId = documentSnapshot.getString("checkin_id");
                         checkInCode.setImageBitmap(QRCodeGenerator.generateQRCode(check_inId, 800, 800));
                         checkInCode.setVisibility(View.VISIBLE);
+                        //get PromoCode
+                        String promoID = documentSnapshot.getString("promote_id");
+                        promoCode.setImageBitmap(QRCodeGenerator.generateQRCode(promoID, 800, 800));
+                        promoCode.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -124,6 +198,17 @@ public class EditEventFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("event", (Serializable) event);
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_attendee_sign_up, bundle);
+            }
+        });
+
+        //see a list of attendees
+        showCheckIns.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("event", (Serializable) event);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_attendee_check_in, bundle);
             }
         });
 
@@ -152,13 +237,13 @@ public class EditEventFragment extends Fragment {
                     return;
                 }
                 if (editEventAttendLimit.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter event limit", Toast.LENGTH_SHORT).show();
-                    return;
+                    event.setLimit(0);
+                } else {
+                    event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
                 }
                 event.setName(String.valueOf(editEventTitle.getText()));
                 event.setDescription(String.valueOf(editEventDescription.getText()));
-                event.setLimit(Integer.valueOf(String.valueOf(editEventAttendLimit.getText())));
-                //access the firebase and databse and update
+                //access the firebase and database and update
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("description", event.getDescription());
                 data.put("limit", event.getLimit());
@@ -208,7 +293,6 @@ public class EditEventFragment extends Fragment {
                     }
                 });
             }
-
             private void openTimeDialog(int hour, int minute) {
                 TimePickerDialog dialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -281,6 +365,84 @@ public class EditEventFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {//needed for OSM display
+        super.onResume();
+        map.onResume();
+    }
+
+    @Override
+    public void onPause() {//needed for OSM display
+        super.onPause();
+        map.onPause();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {//needed for OSM permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (int i = 0; i < grantResults.length; i++)// array to arraylist
+            permissionsToRequest.add(permissions[i]);
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
+    }
+
+    private void requestPermissionsIfNecessary(String[] permissions) {//needed for location permissions
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions)
+            if (ContextCompat.checkSelfPermission(this.getActivity(), permission)!=PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(permission);
+
+        if (permissionsToRequest.size() > 0)
+            ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
+    }
+
+    private void selectLocation() {
+        Toast.makeText(getContext(), "Tap a location on the map", Toast.LENGTH_SHORT).show();
+        MapEventsReceiver receiver = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                eventLocation.setLatitude(p.getLatitude());
+                eventLocation.setLongitude(p.getLongitude());
+
+                //marker
+                if(selectedMarker!=null)
+                    map.getOverlays().remove(selectedMarker);
+                selectedMarker=new Marker(map);
+                selectedMarker.setPosition(p);
+                selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                map.getOverlays().add(selectedMarker);
+                map.invalidate(); //refresh
+                map.getController().animateTo(p);
+
+                HashMap<String, Object> data = new HashMap<>();
+                data.put("location_geo_lat", p.getLatitude());
+                data.put("location_geo_long", p.getLongitude());
+
+                docRef.update(data)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("firestore", "update the lat and lon sucessfully");
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Firestore", e.toString());
+                            }
+                        });
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        };
+        map.getOverlays().add(new MapEventsOverlay(receiver));
     }
 
 }

@@ -1,9 +1,13 @@
 package com.example.qrcheckin;
 
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -15,6 +19,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,9 +28,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.qrcheckin.core.Database;
+import com.example.qrcheckin.core.MapSetUp;
 import com.example.qrcheckin.core.Notification;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.ActivityMainBinding;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
@@ -35,6 +42,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -47,8 +55,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * The main activity class which contains the navigation bar and starts the user on the Home fragment
@@ -59,7 +70,16 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     private ActivityMainBinding binding;
     private User currentUser;
     private Map<String, String> eventIdToName;
+    private Set<ListenerRegistration> notificationCollections;
+    private Map<String, Boolean> eventMap;
+    private Map<String, Boolean> eventMapSignup;
+    private Map<String, Boolean> eventMapCheckin;
     private long notificationListenerLastUpdate;
+    private FirebaseFirestore notidb;
+    private ArrayList<String> mileStoneEvents;
+    private ListenerRegistration milestoneListener;
+    private Map<String, String> milestoneNames;
+    private long milestoneLastUpdate;
 
     /**
      * When the app is first opened this is called
@@ -72,8 +92,6 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -81,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
+
 
         // set up the app bar configuration
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -101,8 +120,19 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
         menu.findItem(R.id.nav_all_images).setVisible(false);
         menu.findItem(R.id.nav_all_profile).setVisible(false);
 
+        // asks user to turn on notifications
+        // https://stackoverflow.com/a/76108866
+        // by Akshay Karande, Accessed 17 March, 2024
+        int permissionState = ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS);
+        // If the permission is not granted, request it.
+        if (permissionState == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+        }
+
+
         getDeviceUser(this);
 
+        //Set up the map view
     }
 
     /**
@@ -184,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
         // set the notification listeners for event user is signed up for
         createNotificationListeners();
+
         if (currentUser.isAdmin()) {
             Menu menu = navigationView.getMenu();
             menu.findItem(R.id.nav_all_event).setVisible(true);
@@ -240,38 +271,239 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * the user has signed up for
      */
     public void createNotificationListeners() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        ArrayList<String> eventList = new ArrayList<>();
+        eventMap = new HashMap<>();
         eventIdToName = new HashMap<>();
-        db.collection("signUpTable").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        eventMapSignup = new HashMap<>();
+        eventMapCheckin = new HashMap<>();
+        notificationCollections = new HashSet<>();
+        notidb = FirebaseFirestore.getInstance();
+        mileStoneEvents = new ArrayList<>();
+        milestoneListener = null;
+        milestoneNames = new HashMap<>();
+        milestoneLastUpdate = System.currentTimeMillis() + 1500;
+
+        signupListener();
+        checkinListener();
+        milestoneListeners();
+    }
+
+    /**
+     * creates listener for the signup table to display notifications for relevant events
+     */
+    public void signupListener() {
+        notidb.collection("signUpTable").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
 
                 try {
-                    Log.d("Notifications", "creating notification listeners. Documents in SignUpTable: " + querySnapshots.size());
-
+                    eventMapSignup.clear();
                     // add each event the user has signed up for
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         if (doc.get("user_id").toString().equals(currentUser.getId()) ) {
 
                             // add event to list
                             String event = doc.get("event_id").toString();
-                            Log.d("Notifications", "creating listener for event: " + event);
-                            eventList.add(event);
+                            eventMapSignup.put(event, Boolean.FALSE);
+                        }
+                    }
+                    eventMap.clear();
+                    eventMap.putAll(eventMapCheckin);
+                    eventMap.putAll(eventMapSignup);
+
+                    // set up timer to enable new notification sending.
+                    notificationListenerLastUpdate = System.currentTimeMillis() + 1500;
+                    // get names of events and set listeners
+                    for (ListenerRegistration notiRef: notificationCollections) {
+                        notiRef.remove();
+                    }
+                    Log.d("Notifications", "removed notification listeners");
+                    notificationCollections.clear();
+                    getNames();
+
+                } catch (Exception e) {
+                    Log.d("Notifications", e.toString());
+                }
+            }
+        });
+    }
+
+    /**
+     * creates listener for the checkin table to display notifications for relevant events
+     */
+    public void checkinListener() {
+        notidb.collection("checkins").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+
+                try {
+                    eventMapCheckin.clear();
+                    // add each event the user has signed up for
+                    for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (doc.get("user_id").toString().equals(currentUser.getId()) ) {
+
+                            // add event to list
+                            String event = doc.get("event_id").toString();
+                            eventMapCheckin.put(event, Boolean.FALSE);
+                        }
+                    }
+                    eventMap.clear();
+                    eventMap.putAll(eventMapCheckin);
+                    eventMap.putAll(eventMapSignup);
+
+                    // set up timer to enable new notification sending.
+                    notificationListenerLastUpdate = System.currentTimeMillis() + 1500;
+                    // get names of events and set listeners
+
+                    for (ListenerRegistration notiRef: notificationCollections) {
+                        notiRef.remove();
+                    }
+                    Log.d("Notifications", "removed notification listeners");
+                    notificationCollections.clear();
+                    getNames();
+
+                } catch (Exception e) {
+                    Log.d("Notifications", e.toString());
+                }
+            }
+        });
+    }
+
+    /**
+     * creates a listener for hosted events to display milestone alerts
+     */
+    private void milestoneListeners() {
+        notidb.collection("events").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.e("Firestore", error.toString());
+                            return;
+                        }
+
+                        if (value != null) {
+
+                            // prevent event edit from updating milestones
+                            for (DocumentChange doc: value.getDocumentChanges()) {
+                                if (mileStoneEvents.contains(doc.getDocument().getId())) {
+                                    return;
+                                }
+                            }
+
+                            // reset milestone listener and events
+                            mileStoneEvents.clear();
+                            if (milestoneListener != null) {
+                                milestoneListener.remove();
+                            }
+
+                            // get all hosted events
+                            for (QueryDocumentSnapshot doc: value) {
+                                if (doc.getDocumentReference("host").getId().equals(currentUser.getId())) {
+                                    mileStoneEvents.add(doc.getId());
+                                    milestoneNames.put(doc.getId(), doc.getString("name"));
+                                }
+                            }
+                            Log.d("Milestone", "creating milestone listener");
+                            createMilestoneListener();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * creates a listener for the checkins table that sends an alert to the user about an attendee milestone reached
+     */
+    private void createMilestoneListener() {
+        milestoneListener = notidb.collection("checkins").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                HashMap<String, HashMap<String, Integer>> milestoneMap = new HashMap<>();
+
+                // prevent initial alert send
+                if (value != null &&
+                        milestoneLastUpdate <= System.currentTimeMillis()) {
+
+                    // go through all checkins
+                    for (QueryDocumentSnapshot doc: value) {
+                        String eventID = doc.getString("event_id");
+                        // only check events hosted
+                        if (mileStoneEvents.contains(eventID)) {
+                            // check if event has been mapped yet
+                            if (milestoneMap.containsKey(eventID)) {
+
+                                HashMap<String, Integer> upSet = milestoneMap.get(doc.getString("event_id"));
+                                String user = doc.getString("user_id");
+
+                                // increment user checkin
+                                if (upSet.containsKey(user)) {
+                                    upSet.put(user, upSet.get(user) + 1);
+                                    milestoneMap.put(eventID, upSet);
+
+                                    // user not in event map yet
+                                } else {
+                                    upSet.put(user, 1);
+                                    milestoneMap.put(eventID, upSet);
+                                }
+                                // event not in map yet
+                            } else {
+                                HashMap<String, Integer> upSet = new HashMap<>();
+                                upSet.put(doc.getString("user_id"), 1);
+                                milestoneMap.put(eventID, upSet);
+                            }
                         }
                     }
 
-                    // set up timer to enable new notification sending.
-                    notificationListenerLastUpdate = System.currentTimeMillis() + 1250;
+                    // new document in checkins
+                    for (DocumentChange doc: value.getDocumentChanges()) {
+                        DocumentSnapshot newDoc = doc.getDocument();
 
-                    // step 2
-                    // get names of events and set listeners
-                    getNames(db, eventList);
+                        HashMap<String, Integer> eventMap = milestoneMap.get(newDoc.getString("event_id"));
 
-                }  catch (NullPointerException e) {
-                    Log.e("Notifications", e.toString());
+                        // if event change has duplicates then ignore the checkin since attendees are the same
+                        if (eventMap != null && eventMap.get(newDoc.getString("user_id")) == 1) {
+                            // goto milestone
+                            switch (eventMap.size()) {
+                                case 1:
+                                    Log.d("Milestone", "1 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " just got its first attendee!",
+                                            "Milestones",
+                                            "Milestones");
+                                    break;
+                                case 5:
+                                    Log.d("Milestone", "5 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " has reached 5 attendees!",
+                                            "Milestones",
+                                            "Milestones");
+                                    break;
+                                case 10:
+                                    Log.d("Milestone", "10 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " has reached 10 attendees!",
+                                            "Milestones",
+                                            "Milestones");
+                                    break;
+                                case 100:
+                                    Log.d("Milestone", "100 person milestone reached");
+                                    showNotification(
+                                            "Milestone Reached!",
+                                            milestoneNames.get(newDoc.getString("event_id")) + " has reached 100 attendees! WOW!",
+                                            "Milestones",
+                                            "Milestones");
+                                    break;
+                                default:
+                                    return;
+                            }
+                        }
+                    }
                 }
-
             }
         });
     }
@@ -279,24 +511,21 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
     /**
      * getNames will get the name of all events specified in the list of event IDs.
      * This will also set a listener to each events notification collection
-     *
-     * @param db FirestoreFirebase that is listened to
-     * @param eventList list of events that will have their
-     *                  notifications collection listened to
      */
-    private void getNames(FirebaseFirestore db, ArrayList<String> eventList) {
+    private void getNames() {
         // for each signed up event
+        Log.d("Notifications", "Amount of listeners: " + eventMap.size());
 
-        for (String event: eventList) {
-            db.collection("events").document(event).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        for (String event: eventMap.keySet()) {
+            notidb.collection("events").document(event).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     eventIdToName.put(event, documentSnapshot.getString("name"));
                     Log.d("Firestore", "successful event name get");
 
                     // next step in listener setup
-                    setListener(db, event);
-                    }
+                    setListener(event);
+                }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
@@ -310,39 +539,42 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * setListener will set a listener to the specified events notification collection.
      * This listener will send out a notification when a new notification is detected
      *
-     * @param db FirebaseFirestore object that listeners are set to
      * @param eventID ID of the event who's notification collection will be listened to
      */
-    private void setListener(FirebaseFirestore db, String eventID) {
+    private void setListener(String eventID) {
 
-        // create new collection reference and put into fireEventsNotifs
-        CollectionReference notificationRef = db
-                .collection("events")
-                .document(eventID)
-                .collection("notifications");
+        if (!eventMap.get(eventID).booleanValue()) {
+            eventMap.put(eventID, Boolean.TRUE);
+            Log.d("Notifications", "creating listener for event: " + eventIdToName.get(eventID));
 
-        // add listener to new collection
-        notificationRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Log.e("Firestore", error.toString());
-                    return;
-                }
+            // create new collection reference for notifications
+            CollectionReference notificationRef = notidb
+                    .collection("events")
+                    .document(eventID)
+                    .collection("notifications");
 
-                Log.d("Notifications", "ListenerLastUpdate: " + notificationListenerLastUpdate + " Current Time: " + System.currentTimeMillis());
-
-                if (querySnapshots != null
-                        && notificationListenerLastUpdate <= System.currentTimeMillis()) {
-                    for (DocumentChange document: querySnapshots.getDocumentChanges() ) {
-                        DocumentSnapshot doc = document.getDocument();
-                        // push notification
-                        showNotification(eventIdToName.get(eventID) , doc.getString("message"));
+            // add listener to new collection
+            ListenerRegistration listenerRef = notificationRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                    if (error != null) {
+                        Log.e("Firestore", error.toString());
+                        return;
                     }
-                    Log.d("Notifications", "received new push notification");
+
+                    if (querySnapshots != null
+                            && notificationListenerLastUpdate <= System.currentTimeMillis()) {
+                        for (DocumentChange document : querySnapshots.getDocumentChanges()) {
+                            DocumentSnapshot doc = document.getDocument();
+                            // push notification
+                            showNotification( "'" + eventIdToName.get(eventID) + "'" + " Sent you a notification!", doc.getString("message"), "qrchannel", "Event Notifications");
+                        }
+                        Log.d("Notifications", "received new push notification");
+                    }
                 }
-            }
-        });
+            });
+            notificationCollections.add(listenerRef);
+        }
     }
 
     /**
@@ -355,15 +587,10 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * @param title title of the notification message
      * @param message the body of the notification message
      */
-    public void showNotification(String title, String message) {
-        title = "'" + title + "'" + " Sent you a notification!";
-
-        Log.d("Notifications", "creating notification for event: " + title);
+    public void showNotification(String title, String message, String channel_id, String channel_name) {
+        Log.d("Notifications", "creating notification for: " + title);
         // Pass the intent to switch to the MainActivity
 //        Intent intent = new Intent(this, MainActivity.class);
-
-        // Assign channel ID
-        String channel_id = "qrchannel";
 
 //        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        // Pass the intent to PendingIntent to start the
@@ -386,11 +613,12 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
         NotificationChannel notificationChannel = new NotificationChannel(
-                channel_id, "Event Notifications",
+                channel_id, channel_name,
                 NotificationManager.IMPORTANCE_HIGH);
 
         notificationManager.createNotificationChannel(notificationChannel);
 
         notificationManager.notify(0, builder.build());
     }
+
 }
