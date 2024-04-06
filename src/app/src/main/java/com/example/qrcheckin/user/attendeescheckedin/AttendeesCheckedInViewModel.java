@@ -31,7 +31,7 @@ public class AttendeesCheckedInViewModel extends ViewModel {
      * @param event The event that users have checked into
      */
     public void initializeAdaptor(Context context, Event event) {
-        mUserArrayAdapter.setValue(new UserArrayAdaptor(context, userList, event));
+        mUserArrayAdapter.setValue(new UserArrayAdaptor(context, userList, event.getId()));
         getUsersCheckedIntoEvent(userList, mUserArrayAdapter, event.getId());
         Log.d("userList", userList.toString());
         Log.d("Event Bundle",event.getId());
