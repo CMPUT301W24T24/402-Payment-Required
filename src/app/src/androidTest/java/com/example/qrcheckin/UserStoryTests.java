@@ -16,16 +16,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.google.common.base.CharMatcher.is;
-import static com.google.common.base.Predicates.instanceOf;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 
-import static java.util.EnumSet.allOf;
-
-import android.view.View;
-import android.widget.AdapterView;
-
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.AdapterViewProtocol;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.contrib.DrawerActions;
@@ -38,6 +32,7 @@ import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
+import com.example.qrcheckin.core.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.checkerframework.checker.units.qual.N;
@@ -252,6 +247,8 @@ public class UserStoryTests {
 
         eventName = eventName + "chAtt";
 
+        Thread.sleep(1000);
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
 
@@ -292,9 +289,38 @@ public class UserStoryTests {
 //        onData(CoreMatchers.allOf(CoreMatchers.is(instanceOf(String.class)), CoreMatchers.is(eventName)))
 //                .perform(ViewActions.click());
 
+
+
 //        onData(withId(R.id.explore_event_list_view))
 //                .inAdapterView(CoreMatchers.is(withText(eventName)))
+//                .atPosition(8)
+//                .perform(scrollTo());
+
+//        Integer i = 0;
+//        while (true) {
+//            try {
+//                onData(is(instanceOf(Event.class)))
+//                        .inAdapterView(withId(R.id.explore_event_list_view))
+//                        .usingAdapterViewProtocol(CoreMatchers.containsString(eventName))
+//                        .perform(scrollTo())
+//                        .check(matches(withText(eventName)));
+//                break;
+//            } catch (Exception e) { i++; }
+//        }
+//
+//        onData(is(instanceOf(Event.class)))
+//                .inAdapterView(withId(R.id.explore_event_list_view))
+//                .atPosition(i)
 //                .perform(click());
+
+        onData(is(instanceOf(Event.class)))
+                .inAdapterView(withId(R.id.explore_event_list_view))
+                .onChildView(withText(eventName))
+                .perform(scrollTo());
+                //.check(matches(withText(eventName)));
+
+        Thread.sleep(5000);
+
 
 
 //        Thread.sleep(5000);
