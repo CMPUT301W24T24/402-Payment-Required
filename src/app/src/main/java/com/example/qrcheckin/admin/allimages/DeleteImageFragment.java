@@ -42,7 +42,7 @@ public class DeleteImageFragment extends DialogFragment {
         binding.deleteImageNameText.setText(event != null ? "Event: " + event.getName() : "User: " + user.getName());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder.setView(binding.getRoot())
-                .setTitle("Delete Event")
+                .setTitle("Delete Image")
                 .setNegativeButton("Cancel", (dialog, which) -> {})
                 .setPositiveButton("Delete", (dialog, which) -> {
                     if (user != null) {
