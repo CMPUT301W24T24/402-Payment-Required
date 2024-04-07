@@ -308,7 +308,7 @@ public class Database {
      * @param currentUserId the id of the current user from the app user
      * @param type the type of the event list, explore, my or hosted
      */
-    public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type) {
+    public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type, String search) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -321,6 +321,9 @@ public class Database {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
                     mEventArrayAdaptor.getValue().getEvents().clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (search != null && !doc.getString("name").toLowerCase().contains(search.toLowerCase())) {
+                            continue;
+                        }
                         DocumentReference hostRef = doc.getDocumentReference("host");
                         Log.d("Firestore", "Event fetched " + doc.getId());
                         fetchHost(doc, hostRef, mEventArrayAdaptor, eventList, currentUserId, type);

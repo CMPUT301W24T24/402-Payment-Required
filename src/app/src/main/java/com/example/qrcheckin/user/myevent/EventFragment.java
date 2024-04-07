@@ -49,7 +49,7 @@ public class EventFragment extends Fragment {
         // TODO: refactor MutableLiveData to only array adaptor
         MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(getContext(), events));
 
-        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "my");
+        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "my", null);
         listView.setAdapter(mEventArrayAdaptor.getValue());
 //        eventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
 

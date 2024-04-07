@@ -58,7 +58,7 @@ public class AllEventsFragment extends Fragment {
         MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), events, true));
 
         // TODO: Change the type to "all"
-        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore");
+        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore", null);
         listView.setAdapter(mEventArrayAdaptor.getValue());
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
