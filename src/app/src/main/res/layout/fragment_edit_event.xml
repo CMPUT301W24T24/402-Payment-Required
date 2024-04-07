@@ -29,10 +29,10 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/edit_event_profile"
                 android:layout_width="322dp"
-                android:layout_height="134dp"
+                android:layout_height="200dp"
                 android:layout_marginStart="50sp"
                 android:layout_marginEnd="50sp"
                 android:contentDescription="Avatar Placeholder"
@@ -307,83 +307,3 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </RelativeLayout>
-                android:layout_weight="1"
-                android:backgroundTint="#5A5858"
-                android:text="EXPORT EVENT QR CODE"
-                android:textColor="@color/white"
-                android:textSize="15dp"
-                android:visibility="visible" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Check-In Code"
-            android:textColor="@color/black"
-            android:textSize="25dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.452"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearlayout4" />
-
-        <ImageView
-            android:id="@+id/edit_event_check_in_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit"
-            tools:src="@tools:sample/avatars" />
-
-        <ImageView
-            android:id="@+id/promote_code"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/edit_event_export_checkin_code"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="#5A5858"
-            android:text="EXPORT CHECK IN QR CODE"
-            android:textColor="@color/white"
-            android:textSize="15dp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_event_check_in_code" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/edit_event_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_weight="1"
-            android:backgroundTint="#AEA8A8"
-            android:text="UPDATE"
-            app:layout_constraintBottom_toTopOf="@+id/edit_event_export_checkin_code"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:srcCompat="@android:drawable/ic_menu_edit"
-            app:layout_constraintStart_toEndOf="@+id/edit_event_check_in_code" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/updateEventPoster"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:layout_marginEnd="24dp"
-            android:clickable="true"
-            android:src="@android:drawable/ic_menu_edit"
-            app:layout_constraintBottom_toTopOf="@+id/edit_event_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/edit_event_profile"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>

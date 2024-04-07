@@ -46,7 +46,6 @@ import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.BuildConfig;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
@@ -78,7 +77,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import io.grpc.Context;
 
 /**
  * Create Event Fragment is a class that creates a CreateEventFragment object

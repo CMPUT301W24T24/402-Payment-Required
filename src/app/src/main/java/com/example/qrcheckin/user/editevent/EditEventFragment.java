@@ -121,7 +121,7 @@ public class EditEventFragment extends Fragment {
         Button exportQREventCode = binding.editEventExportEventCode;
         ImageView checkInCode = binding.editEventCheckInCode;
         Button exportCheckCode = binding.editEventExportCheckinCode;
-        ImageView promoteCode = binding.promoteCode;
+        ImageView promoteCode = binding.editEventPromoCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
         ImageView promoCode = binding.editEventPromoCode;
 
@@ -258,7 +258,7 @@ public class EditEventFragment extends Fragment {
                         Log.d("PhotoPicker", "No media selected");
                     }
                 });
-        binding.updateEventPoster.setOnClickListener(new View.OnClickListener() {
+        binding.editEventProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 pickMedia.launch(new PickVisualMediaRequest.Builder()
