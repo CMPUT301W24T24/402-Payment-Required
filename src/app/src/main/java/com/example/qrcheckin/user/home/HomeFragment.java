@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
@@ -39,6 +40,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,9 +74,6 @@ public class HomeFragment extends Fragment implements LocationListener {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
         ImageView qrButton=root.findViewById(R.id.qr_icon);
         qrButton.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +112,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         ScanOptions options = new ScanOptions();
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
         options.setOrientationLocked(true);
-        options.setPrompt("Scan a QR code to sign in");
+        options.setPrompt("Scan an events QR code!");
         barcodeLauncher.launch(options);
     }
 
@@ -126,7 +125,7 @@ public class HomeFragment extends Fragment implements LocationListener {
             });
 
     /**
-     * Find an event in the database by QR value, returns null if the QR value is not present in the database
+     * Find an event in the database by QR value and check in if it exists, returns null if the QR value is not present in the database
      * @param qrValue Unique QR value to search for
      * @return The event object with given QR value, null otherwise
      */
@@ -138,9 +137,8 @@ public class HomeFragment extends Fragment implements LocationListener {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 User currentUser=((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
                 List<DocumentSnapshot> snapshots=querySnapshotTask.getResult().getDocuments();
-                if(snapshots.isEmpty()){
-                    Log.i("QR Scanner","Failed to check into event by QR: Code scanned is not in database");
-                    Toast.makeText(getActivity(), "Event ID does not exist: "+qrValue, Toast.LENGTH_LONG).show();
+                if(snapshots.isEmpty()){//if fails to find checkin, try promo
+                    eventPromoByQR(qrValue);
                     return;
                 }
                 DocumentSnapshot snapshot = snapshots.get(0);
@@ -172,7 +170,6 @@ public class HomeFragment extends Fragment implements LocationListener {
                         Toast.makeText(getActivity(), "Success! Checked into "+event.getName(), Toast.LENGTH_LONG).show();
                     else
                         Toast.makeText(getActivity(), "Geolocation is required for this event, please enable geolocation!", Toast.LENGTH_LONG).show();
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -180,8 +177,56 @@ public class HomeFragment extends Fragment implements LocationListener {
                 Log.e("QR Scanner","Failed to check into event by QR: Database failed to retrieve QR");
             }
         });
+    }
+
+    /**
+     * Find an event in the database by QR value and go to promo activity if it exists, returns null if the QR value is not present in the database
+     * @param qrValue Unique QR value to search for
+     * @return The event object with given QR value, null otherwise
+     */
+    public void eventPromoByQR(String qrValue){
+        CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("events");
+        Task<QuerySnapshot> querySnapshotTask = eventsRef.whereEqualTo("promote_id",qrValue).get();
+        querySnapshotTask.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                User currentUser=((QRCheckInApplication) requireActivity().getApplication()).getCurrentUser();
+                List<DocumentSnapshot> snapshots=querySnapshotTask.getResult().getDocuments();
+                if(snapshots.isEmpty()){
+                    Log.i("QR Scanner","Failed to get event by QR: Code scanned is not in database");
+                    Toast.makeText(getActivity(), "Event ID does not exist: "+qrValue, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                DocumentSnapshot snapshot = snapshots.get(0);
+                Event event=new Event(snapshot.getId(),
+                        currentUser,
+                        snapshot.getString("name"),
+                        snapshot.getString("description"),
+                        snapshot.getString("posterRef"),
+                        snapshot.getDate("time"),
+                        snapshot.getString("location"),
+                        snapshot.getDouble("location_geo_lat"),
+                        snapshot.getDouble("location_geo_long"),
+                        snapshot.getString("checkinId"),
+                        snapshot.getString("promoteId"),
+                        snapshot.getBoolean("geo"),
+                        snapshot.getDouble("limit").intValue(),
+                        new UserList()
+                );
+                Log.i("QR","Event created successfully");
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("event", event);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_home_to_nav_view_event, bundle);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("QR Scanner","Failed to get promo event by QR: Database failed to retrieve QR");
+            }
+        });
 
     }
+
     @Override
     public void onLocationChanged(@NonNull Location location) {
         currentLocation=location;

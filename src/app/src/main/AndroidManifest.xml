@@ -50,6 +50,12 @@
                 android:resource="@xml/paths" />
         </provider>
 
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"/>
+
     </application>
 
 
