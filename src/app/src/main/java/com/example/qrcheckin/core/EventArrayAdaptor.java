@@ -110,7 +110,7 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
     Comparator<Event> eventComparator = new Comparator<Event>() {
         @Override
         public int compare(Event o1, Event o2) {
-            return o1.getTime().compareTo(o2.getTime());
+            return -o1.getTime().compareTo(o2.getTime());
         }
     };
 }
