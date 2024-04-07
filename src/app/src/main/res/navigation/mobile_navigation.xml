@@ -9,7 +9,11 @@
         android:id="@+id/nav_home"
         android:name="com.example.qrcheckin.user.home.HomeFragment"
         android:label="@string/nav_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_nav_view_event"
+            app:destination="@id/nav_view_event" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_event"
