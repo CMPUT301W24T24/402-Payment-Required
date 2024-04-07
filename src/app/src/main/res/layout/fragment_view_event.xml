@@ -5,49 +5,40 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginHorizontal="20dp"
     android:fillViewport="true">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20sp"
-        android:layout_marginStart="20sp"
-        android:layout_marginEnd="20sp">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/view_event_poster"
             android:layout_width="match_parent"
-            android:layout_height="180sp"
+            android:layout_height="500dp"
             android:contentDescription="Avatar Placeholder"
-            android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
+            android:scaleType="fitCenter"
+            android:layout_marginTop="20dp"
             tools:src="@tools:sample/avatars"
-            tools:ignore="HardcodedText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            tools:ignore="HardcodedText"/>
 
         <TextView
             android:id="@+id/view_event_title"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="40sp"
             android:text="Title"
-            app:layout_constraintStart_toStartOf="@id/view_event_poster"
-            app:layout_constraintEnd_toEndOf="@id/view_event_poster"
-            app:layout_constraintTop_toBottomOf="@id/view_event_poster"
             tools:ignore="HardcodedText" />
-
 
         <TextView
             android:id="@+id/view_event_date"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Date|Time"
             android:textColor="@color/pink"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_event_title"
             tools:ignore="HardcodedText" />
 
 
@@ -60,9 +51,6 @@
             android:padding="20dp"
             android:text="Description of the event"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_event_date"
             tools:ignore="HardcodedText" />
 
         <Button
@@ -72,31 +60,22 @@
             android:layout_marginTop="15dp"
             android:backgroundTint="@color/pink"
             android:gravity="center"
+            android:layout_gravity="center"
             android:text="@string/sign_up"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textAllCaps="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_event_description"
             tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/view_event_location_title"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:gravity="center"
             android:text="Location"
             android:textColor="@color/black"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_event_sign_up"
             tools:ignore="HardcodedText" />
-
 
         <!--    <fragment-->
         <!--        android:id="@+id/view_event_map"-->
@@ -112,6 +91,6 @@
         <!--        app:layout_constraintVertical_bias="1.0" />-->
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </ScrollView>
 

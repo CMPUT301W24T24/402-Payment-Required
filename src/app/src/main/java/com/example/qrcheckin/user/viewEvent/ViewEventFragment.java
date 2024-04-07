@@ -87,9 +87,11 @@ public class ViewEventFragment extends Fragment {
                     }
                 });
         ImageView eventPoster = binding.viewEventPoster;
+        eventPoster.setVisibility(View.INVISIBLE);
         if (event.getPosterRef() != null) {
             Database dbPoster = new Database();
             dbPoster.getEventPicture(event, eventPoster);
+            eventPoster.setVisibility(View.GONE);
         }
 
         // set the button to sign up or un-sign up
