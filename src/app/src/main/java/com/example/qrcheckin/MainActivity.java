@@ -403,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                                 }
                             }
                             Log.d("Milestone", "creating milestone listener");
+                            milestoneLastUpdate = System.currentTimeMillis() + 1000;
                             createMilestoneListener();
                         }
                     }
