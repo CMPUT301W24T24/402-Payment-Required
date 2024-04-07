@@ -550,17 +550,6 @@ public class Event implements Serializable {
         this.limit = limit;
     }
 
-//    /**
-//     * This method compares two city objects based on event id
-//     *
-//     * @param o the object to be compared.
-//     * @return an integer specifying the comparison between events
-//     */
-//    @Override
-//    public int compareTo(Object o) {
-//        Event event = (Event) o;
-//        return this.id.compareTo(event.getId());
-//    }
 
     /**
      * A method that get Bitmap of the QR code from the checkin id

@@ -208,7 +208,6 @@ public class EditEventFragment extends Fragment {
                 Bundle args = new Bundle();
                 args.putString("eventId", event.getId());
                 (new EditEventFragment()).setArguments(args);
-                //TODO: navigate to the notify -> link in the navigation bar
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_create_notification, args);
             }
         });
