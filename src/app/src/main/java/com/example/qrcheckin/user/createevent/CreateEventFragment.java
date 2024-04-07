@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -16,13 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -52,8 +52,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.Firebase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
@@ -74,8 +74,12 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.ArrayList;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 /**
@@ -94,6 +98,8 @@ public class CreateEventFragment extends Fragment {
     private boolean imageUpdated = false;
     private Uri updatedImageUri;
     private boolean imageTooLarge = false;
+    private boolean pickCheckin;
+    private ListenerRegistration validatePromoteIdListener, validateCheckInIdListener;
 
     /**
      * Initializes the CreateEventFragment on create
@@ -217,6 +223,7 @@ public class CreateEventFragment extends Fragment {
         selectedMarker=new Marker(map);
         selectedMarker.setPosition(new GeoPoint(eventLocation));
         selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        selectedMarker.setInfoWindow(null);
         map.getOverlays().add(selectedMarker);
         map.invalidate(); //refresh
         map.getController().animateTo(new GeoPoint(eventLocation));
@@ -235,7 +242,6 @@ public class CreateEventFragment extends Fragment {
         });
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
-            // TODO: check that checkinId and promoteID are not the same
             if (titleTextView.getText().toString().isEmpty()) {
                 Toast.makeText(getContext(), "Please enter a Title", Toast.LENGTH_SHORT).show();
                 return;
@@ -336,6 +342,61 @@ public class CreateEventFragment extends Fragment {
 
                     });
         });
+
+        // Set up the photo picker
+        // Reference: https://developer.android.com/training/data-storage/shared/photopicker Accessed on 2024-03-31
+        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        InputStream imageStream = null;
+                        try {
+                            imageStream = requireContext().getContentResolver().openInputStream(uri);
+                        } catch (FileNotFoundException e) {
+                            Log.e("PhotoPicker", e.toString());
+                        }
+
+                        // decode the image stream into a bitmap
+                        Bitmap bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(imageStream), 800, 800, false);
+                        try {
+                            if (QRCodeGenerator.getQRCodeData(bmp) == null) {
+                                Log.d("PhotoPicker", "No QR code found");
+                                Toast.makeText(getContext(), "No QR code found", Toast.LENGTH_SHORT).show();
+                            } else {
+                                validateId(QRCodeGenerator.getQRCodeData(bmp));
+                            }
+                        } catch (Exception e) {
+                            Log.d("PhotoPicker", "Error decoding QR code");
+                            Toast.makeText(getContext(), "Error read the QR code", Toast.LENGTH_LONG).show();
+                            Log.e("PhotoPicker", e.toString());
+                        }
+
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+
+        binding.buttonCreateEventUseExistingCheckin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickCheckin = true;
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build());
+            }
+        });
+
+        binding.buttonCreateEventUseExistingDescription.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickCheckin = false;
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build());
+            }
+        });
+
         return root;
     }
 
@@ -376,8 +437,99 @@ public class CreateEventFragment extends Fragment {
      */
     public String generateQRCode() {
         QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-        String randomString = getAlphaNumericString(20);
+        String randomString = null;
+        //Check that the checkinID will not be the same as the promoteID
+        while (true) {
+            randomString = getAlphaNumericString(20);
+            if (randomString != null && (!randomString.equals(checkinId)) && (!randomString.equals(promoteId))) {
+                break;
+            }
+        }
         return QRCodeGenerator.getQRCodeData(QRCodeGenerator.generateQRCode(randomString, 400, 400));
+    }
+
+    /**
+     * This function validates the promote or checkin id of the QR code
+     * @param id - the id of the QR code
+     */
+    private void validateId(String id) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
+        // for check in qr code
+        if (pickCheckin) {
+            validateCheckInId(id, true, true);
+        // for promote qr code
+        } else {
+            validatePromoteId(id, true, true);
+        }
+    }
+
+    private void validatePromoteId (String id, boolean setID, boolean showToast) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
+        validateCheckInIdListener = cr.whereEqualTo("checkin_id", id).addSnapshotListener((value, error) -> {
+            if ((value == null || value.isEmpty()) && !Objects.equals(id, checkinId)) {
+                // CHECK FOR PROMOTE ID
+                validatePromoteIdListener = cr.whereEqualTo("promote_id", id).addSnapshotListener((value2, error2) -> {
+                    if (value2 == null || value2.isEmpty()) {
+                        if (setID) {
+                            promoteId = id;
+                            binding.imageviewCreateEventDescriptionQr.setImageBitmap(QRCodeGenerator.generateQRCode(promoteId, 800, 800));
+                            binding.imageviewCreateEventDescriptionQr.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+                    }
+                    if (error2 != null) {
+                        Log.e("Firestore", error2.toString());
+                    }
+                    removeListener(true);
+                });
+
+            } else {
+                if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+            }
+            if (error != null) {
+                Log.e("Firestore", error.toString());
+            }
+            removeListener(false);
+        });
+    }
+
+    private void validateCheckInId (String id, boolean setID, boolean showToast) {
+        CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
+        validatePromoteIdListener = cr.whereEqualTo("promote_id", id).addSnapshotListener((value, error) -> {
+            if ((value == null || value.isEmpty()) && !Objects.equals(id, promoteId)) {
+                // CHECK FOR CHECKIN ID
+                validateCheckInIdListener = cr.whereEqualTo("checkin_id", id).addSnapshotListener((value2, error2) -> {
+                    if (value2 == null || value2.isEmpty()) {
+                        if (setID) {
+                            checkinId = id;
+                            binding.imageviewCreateEventCheckinQr.setImageBitmap(QRCodeGenerator.generateQRCode(checkinId, 800, 800));
+                            binding.imageviewCreateEventCheckinQr.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+                    }
+                    if (error2 != null) {
+                        Log.e("Firestore", error2.toString());
+                    }
+                    removeListener(false);
+                });
+            } else {
+                if (showToast) Toast.makeText(getContext(), "This QR code is already is use", Toast.LENGTH_SHORT).show();
+            }
+            if (error != null) {
+                Log.e("Firestore", error.toString());
+            }
+            removeListener(true);
+        });
+    }
+
+    private void removeListener(boolean promote){
+        if (promote) {
+            validatePromoteIdListener.remove();
+        } else {
+            validateCheckInIdListener.remove();
+        }
     }
 
     @Override
@@ -431,6 +583,7 @@ public class CreateEventFragment extends Fragment {
                 selectedMarker=new Marker(map);
                 selectedMarker.setPosition(p);
                 selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                selectedMarker.setInfoWindow(null);
                 map.getOverlays().add(selectedMarker);
                 map.invalidate(); //refresh
                 map.getController().animateTo(p);

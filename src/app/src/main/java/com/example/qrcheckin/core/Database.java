@@ -25,10 +25,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -848,6 +851,34 @@ public class Database {
             }
         });
     }
+
+    public static void fetchGeoPointsForEvent(String eventId, OnGeoPointsFetchedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference checkinRef = db.collection("checkins");
+        checkinRef.whereEqualTo("event_id", eventId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<GeoPoint> geoPoints = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Double latitude = document.getDouble("latitude");
+                    Double longitude = document.getDouble("longitude");
+                    if (latitude != null && longitude != null) {
+                        GeoPoint point = new GeoPoint(latitude, longitude);
+                        geoPoints.add(point);
+                    }
+                }
+                listener.onGeoPointsFetched(geoPoints);
+            } else {
+                Log.e("CheckinDots", "Error getting documents: ", task.getException());
+                listener.onGeoPointsFetchFailed(task.getException());
+            }
+        });
+    }
+
+    public interface OnGeoPointsFetchedListener {
+        void onGeoPointsFetched(List<GeoPoint> geoPoints);
+        void onGeoPointsFetchFailed(Exception e);
+    }
+
 
     /**
      * Gets the list of users checked into an event
