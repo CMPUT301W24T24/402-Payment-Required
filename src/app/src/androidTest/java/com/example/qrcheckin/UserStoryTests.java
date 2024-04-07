@@ -287,29 +287,7 @@ public class UserStoryTests {
 
         Thread.sleep(10000);
 
-//        onData(CoreMatchers.allOf(CoreMatchers.is(instanceOf(String.class)), CoreMatchers.is(eventName)))
-//                .perform(ViewActions.click());
-
-
-
-//        onData(withId(R.id.explore_event_list_view))
-//                .inAdapterView(CoreMatchers.is(withText(eventName)))
-//                .atPosition(8)
-//                .perform(scrollTo());
-//
-//        onData(is(instanceOf(Event.class)))
-//                .inAdapterView(withId(R.id.explore_event_list_view))
-//                .atPosition(i)
-//                .perform(click());
-
-//        onData(is(instanceOf(Event.class)))
-//                .inAdapterView(withId(R.id.explore_event_list_view))
-//                .onChildView(withText(eventName))
-//                .perform(scrollTo());
-
-//        onData(allOf(is(instanceOf(String.class)), is(eventName)))
-//                .inAdapterView(withId(R.id.explore_event_list_view))
-//                .perform(click());
+        
 
         Thread.sleep(5000);
 
