@@ -19,8 +19,12 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.google.common.base.CharMatcher.is;
 import static com.google.common.base.Predicates.instanceOf;
 
+import static java.security.AccessController.getContext;
 import static java.util.EnumSet.allOf;
 
+import android.app.Instrumentation;
+import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -31,6 +35,7 @@ import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.contrib.NavigationViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.uiautomator.UiDevice;
@@ -38,18 +43,53 @@ import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
+import com.example.qrcheckin.core.Database;
+import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.User;
+import com.example.qrcheckin.core.UserList;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.checkerframework.checker.units.qual.N;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.AllOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.Date;
+@RunWith(AndroidJUnit4.class)
 
 public class UserStoryTests {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
+
+    @Rule
+    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<MainActivity>(MainActivity.class);
+
+    QRCheckInApplication app;
+    Database db;
+    User currentUser;
+    @Before
+    public void getApplication() throws InterruptedException {
+
+        // Get the application
+        Log.d("QRCheckIn", "getApplication");
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context appContext = instrumentation.getTargetContext();
+        app = (QRCheckInApplication) appContext.getApplicationContext();
+        if (app == null) {
+            app = (QRCheckInApplication) app.getApplicationContext();
+        }
+        if (app == null) {
+            Log.d("QRCheckIn", "The app is null");
+        }
+        Thread.sleep(2500);
+
+        db = new Database();
+        currentUser = app.getCurrentUser();
+    }
 
     @Test
     public void createEvent() throws InterruptedException, UiObjectNotFoundException {
@@ -300,4 +340,5 @@ public class UserStoryTests {
 //        Thread.sleep(5000);
 
     }
+
 }
