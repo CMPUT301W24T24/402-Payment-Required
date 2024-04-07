@@ -380,12 +380,15 @@ public class EditEventFragment extends Fragment {
                             @Override
                             public void onSuccess(Void unused) {
                                 Log.d("firestore", "update the event name, limit, and description sucessfully");
+                                Toast.makeText(getContext(), "Updated Event Information", Toast.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.e("Firestore", e.toString());
+                                Toast.makeText(getContext(), "Error: Event Information not updated", Toast.LENGTH_SHORT).show();
+
                             }
                         });
 
@@ -500,9 +503,12 @@ public class EditEventFragment extends Fragment {
                     docRef.update(data)
                             .addOnSuccessListener(documentReference -> {
                                 Log.d("Firestore", "Updated time: " + docRef.getId());
+                                Toast.makeText(getContext(), "Updated Time", Toast.LENGTH_SHORT).show();
+
                             })
                             .addOnFailureListener(e -> {
                                 Log.e("Firestore", e.toString());
+                                Toast.makeText(getContext(), "Error: Time not updated", Toast.LENGTH_SHORT).show();
                             });
                 } catch (ParseException e) {
                     Log.e("TAG", "Can not parse the time stamp");;
@@ -616,12 +622,15 @@ public class EditEventFragment extends Fragment {
                             public void onSuccess(Void unused) {
                                 Log.d("firestore", "update the lat and lon sucessfully");
 
+                                Toast.makeText(getContext(), "Updated Location", Toast.LENGTH_SHORT).show();
+
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.e("Firestore", e.toString());
+                                Toast.makeText(getContext(), "Error: Location not updated", Toast.LENGTH_SHORT).show();
                             }
                         });
                 return false;
