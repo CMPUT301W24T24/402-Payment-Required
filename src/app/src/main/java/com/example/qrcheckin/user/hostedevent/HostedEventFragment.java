@@ -66,7 +66,7 @@ public class HostedEventFragment extends Fragment {
         // TODO: refactor MutableLiveData to only array adaptor
         MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), eventList));
 
-        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "hosted");
+        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "hosted", null);
         listView.setAdapter(mEventArrayAdaptor.getValue());
 //        hostedEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
         return root;
