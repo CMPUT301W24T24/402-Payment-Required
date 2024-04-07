@@ -144,6 +144,7 @@ public class EditEventFragment extends Fragment {
                     newMarker.setPosition(geoPoint);
                     newMarker.setIcon(personCircle);
                     newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                    newMarker.setInfoWindow(null);
                     map.getOverlays().add(newMarker);
                 }
             }
@@ -156,6 +157,7 @@ public class EditEventFragment extends Fragment {
         selectedMarker=new Marker(map);
         selectedMarker.setPosition(new GeoPoint(eventLocation));
         selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        selectedMarker.setInfoWindow(null);
         map.getOverlays().add(selectedMarker);
 
         map.invalidate(); //refresh
@@ -444,6 +446,7 @@ public class EditEventFragment extends Fragment {
                 selectedMarker=new Marker(map);
                 selectedMarker.setPosition(p);
                 selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                selectedMarker.setInfoWindow(null);
                 map.getOverlays().add(selectedMarker);
                 map.invalidate(); //refresh
                 map.getController().animateTo(p);
