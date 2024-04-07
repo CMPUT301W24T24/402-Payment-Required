@@ -143,7 +143,7 @@ public class CreateEventFragment extends Fragment {
 
         // Set up the photo picker
         // Reference: https://developer.android.com/training/data-storage/shared/photopicker Accessed on 2024-03-31
-        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+        ActivityResultLauncher<PickVisualMediaRequest> pickMediaEventPoster =
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                     // Callback is invoked after the user selects a media item or closes the
                     // photo picker.
@@ -235,7 +235,7 @@ public class CreateEventFragment extends Fragment {
         binding.uploadEventBanner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                pickMediaEventPoster.launch(new PickVisualMediaRequest.Builder()
                         .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                         .build());
             }
