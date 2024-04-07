@@ -22,18 +22,11 @@
             <ImageView
                 android:id="@+id/image_create_event_banner"
                 android:layout_width="match_parent"
-                android:layout_height="139dp"
-                android:contentDescription="@string/event_banner"
-                android:src="@drawable/ic_launcher_foreground"
-                app:layout_constraintBottom_toTopOf="@+id/text_create_event_title"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/uploadEventBanner"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:text="Upload Poster" />
+                android:contentDescription="@string/event_banner"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/text_create_event_title"
+                android:src="@drawable/ic_launcher_foreground"/>
 
             <EditText
                 android:id="@+id/text_create_event_title"

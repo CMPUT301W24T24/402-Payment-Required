@@ -9,14 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -33,14 +26,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.Manifest;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -65,8 +54,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 
 
@@ -80,10 +67,6 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.checkerframework.checker.units.qual.A;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -103,9 +86,6 @@ public class EditEventFragment extends Fragment {
     private Location eventLocation;
     private DocumentReference docRef;
     private Marker selectedMarker;
-    private boolean imageUpdated = false;
-    private Uri updatedImageUri;
-    private boolean imageTooLarge = false;
     private Drawable personCircle;
 
     @Nullable
@@ -127,8 +107,7 @@ public class EditEventFragment extends Fragment {
         Button notify = binding.editEventNotifyAttendees;
         Button exportQREventCode = binding.editEventExportEventCode;
         ImageView checkInCode = binding.editEventCheckInCode;
-        Button exportCheckCode = binding.editEventExportCheckinCode;
-        ImageView promoteCode = binding.editEventPromoCode;
+        Button exportCheckCode = binding.editEventExportEventCode;
         FloatingActionButton editEventUpdate = binding.editEventUpdate;
         ImageView promoCode = binding.editEventPromoCode;
 
@@ -205,10 +184,7 @@ public class EditEventFragment extends Fragment {
         }
 
         //set poster
-        if (event.getPosterRef() != null) {
-            Database dbPoster = new Database();
-            dbPoster.getEventPicture(event, eventPoster);
-        }
+        eventPoster.setImageResource(R.drawable.cat);
 
         //Accessing the events database
         docRef=FirebaseFirestore.getInstance().collection("events").document(event.getId());
@@ -243,77 +219,8 @@ public class EditEventFragment extends Fragment {
                         String promoID = documentSnapshot.getString("promote_id");
                         promoCode.setImageBitmap(QRCodeGenerator.generateQRCode(promoID, 800, 800));
                         promoCode.setVisibility(View.VISIBLE);
-
-                        //get eventQRCode
-                        String eventQRId = documentSnapshot.getString("promote_id");
-                        promoteCode.setImageBitmap(QRCodeGenerator.generateQRCode(eventQRId, 800, 800));
                     }
                 }
-            }
-        });
-
-        // Set up the photo picker
-        // Reference: https://developer.android.com/training/data-storage/shared/photopicker Accessed on 2024-03-31
-        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
-                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-                    // Callback is invoked after the user selects a media item or closes the
-                    // photo picker.
-                    if (uri != null) {
-                        InputStream imageStream = null;
-                        try {
-                            imageStream = requireContext().getContentResolver().openInputStream(uri);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
-                        // decode the image stream into a bitmap
-                        Bitmap bmp = BitmapFactory.decodeStream(imageStream);
-
-                        if (bmp.getHeight() > 2048) {
-                            bmp = Bitmap.createScaledBitmap(bmp, bmp.getWidth() * 2048 / bmp.getHeight(), 2048, false);
-                            imageTooLarge = true;
-                        } else if (bmp.getWidth() > 2048) {
-                            bmp = Bitmap.createScaledBitmap(bmp, 2048, bmp.getHeight() * 2048 / bmp.getWidth(), false);
-                            imageTooLarge = true;
-                        }
-
-                        // Convert the bitmap to a URI
-                        // Reference: https://stackoverflow.com/questions/8295773/how-can-i-transform-a-bitmap-into-a-uri Ajay. DragonFire. Accessed on 2024-03-31
-                        if (imageTooLarge) {
-                            Toast.makeText(getContext(), "Image too large, scaled down to 2048x2048", Toast.LENGTH_SHORT).show();
-                            String path = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bmp, "tempImg", null);
-                            uri = Uri.parse(path);
-                        }
-                        imageUpdated = true;
-                        binding.editEventProfile.setImageURI(uri);
-                        updatedImageUri = uri;
-                    } else {
-                        Log.d("PhotoPicker", "No media selected");
-                    }
-                });
-        binding.editEventProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickMedia.launch(new PickVisualMediaRequest.Builder()
-                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                        .build());
-            }
-        });
-
-        exportCheckCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BitmapDrawable bitmapDrawable = (BitmapDrawable) checkInCode.getDrawable();
-                Bitmap bitmap = bitmapDrawable.getBitmap();
-                shareImageAndText(bitmap);
-            }
-        });
-        exportQREventCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BitmapDrawable bitmapDrawable = (BitmapDrawable) promoteCode.getDrawable();
-                Bitmap bitmap = bitmapDrawable.getBitmap();
-                shareImageAndText(bitmap);
             }
         });
 
@@ -388,34 +295,9 @@ public class EditEventFragment extends Fragment {
                                 Log.e("Firestore", e.toString());
                             }
                         });
-
-                if (imageUpdated) {
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageRef = storage.getReference();
-                    Uri imageUri = updatedImageUri;
-                    StorageReference imageRef = storageRef.child(event.getPosterRef());
-
-                    imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Log.d("Firebase", "Event poster uploaded successfully");
-
-
-                            // Delete the image if it was scaled down
-                            // Reference: https://stackoverflow.com/questions/23716683/android-delete-file-after-images-media-insertimage Nate. Accessed on 2024-03-31
-                            if (imageTooLarge) {
-                                requireContext().getContentResolver().delete(updatedImageUri, null, null);
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("Firebase", "Event poster upload failed", e);
-                        }
-                    });
-                }
             }
         });
+
 
         // Set OnClickListener for changeTime
         changeTimeButton.setOnClickListener(new View.OnClickListener() {
@@ -511,43 +393,6 @@ public class EditEventFragment extends Fragment {
         });
 
         return root;
-    }
-
-    /**
-     * Method for opening the share menu
-     * @param bitmap the coordinates of the image being shared
-     */
-    public void shareImageAndText(Bitmap bitmap) {
-        Uri uri = getImageToShare(bitmap);
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.putExtra(Intent.EXTRA_TEXT, "Sharing Image");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
-        intent.setType("image/png");
-        startActivity(Intent.createChooser(intent, "Share Via"));
-    }
-
-    /**
-     * A method which retrieves the image being shared to another app
-     * @param bitmap the coordinates of the image
-     * @return
-     * The image retrieved
-     */
-    public Uri getImageToShare(Bitmap bitmap) {
-        File imageFolder = new File(getContext().getCacheDir(), "images");
-        Uri uri = null;
-        try {
-            imageFolder.mkdirs();
-            File file = new File(imageFolder, "shared_image.png");
-            FileOutputStream outputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
-            outputStream.flush();
-            outputStream.close();
-            uri = FileProvider.getUriForFile(getContext(), "com.anni.shareimage.fileprovider", file);
-        } catch (Exception e) {
-            Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-        return uri;
     }
 
     @Override
