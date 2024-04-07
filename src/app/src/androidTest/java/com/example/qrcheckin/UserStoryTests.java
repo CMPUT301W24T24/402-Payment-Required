@@ -303,6 +303,82 @@ public class UserStoryTests {
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_notifications));
 
         onView(withText("This is my Notification")).check(matches(isDisplayed()));
+    }
 
+    @Test
+    public void pushNotification() throws UiObjectNotFoundException, InterruptedException {
+
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+        String eventName = "" + System.currentTimeMillis();
+
+        eventName = eventName.substring(eventName.length() - 7, eventName.length());
+
+        eventName = eventName + "chAtt";
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+
+        Thread.sleep(2000);
+
+        onView(withId(R.id.event_add_fab)).perform(click());
+
+        Thread.sleep(1000);
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.button_create_event_submit))
+                .perform(ViewActions.scrollTo())
+                .check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.button_create_event_submit)).perform(click());
+
+        Thread.sleep(2000);
+
+        onView(withText(eventName)).perform(click());
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_explore_event));
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.explore_event_search_button)).perform(click());
+        Thread.sleep(2000);
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.clearText());
+        onView(withText(eventName))
+                .perform(click());
+
+        onView(withText("Sign Me Up")).perform(click());
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+
+        Thread.sleep(1000);
+
+        onView(withText(eventName)).perform(click());
+
+        Thread.sleep(10000);
+
+        onView(withId(R.id.edit_event_notify_attendees)).perform(click());
+        onView(withId(R.id.create_notification_message)).perform(ViewActions.typeText("This is my Notification"));
+        onView(withId(R.id.create_notification_button)).perform(click());
+
+        onView(withId(R.id.edit_event_notify_attendees)).check(matches(isDisplayed()));
     }
 }
