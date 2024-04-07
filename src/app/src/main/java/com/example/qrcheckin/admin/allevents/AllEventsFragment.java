@@ -81,6 +81,18 @@ public class AllEventsFragment extends Fragment {
             }
         });
 
+        binding.allEventSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<Event> events = new ArrayList<>();
+                // TODO: refactor MutableLiveData to only array adaptor
+                MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), events));
+                String search = binding.allEventSearchBar.getText().toString();
+                onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore", search);
+                listView.setAdapter(mEventArrayAdaptor.getValue());
+            }
+        });
+
         return root;
     }
 

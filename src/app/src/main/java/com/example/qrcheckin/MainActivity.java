@@ -543,6 +543,9 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      * @param eventID ID of the event who's notification collection will be listened to
      */
     private void setListener(String eventID) {
+        if (eventMap.get(eventID) == null) {
+            return;
+        }
 
         if (!eventMap.get(eventID).booleanValue()) {
             eventMap.put(eventID, Boolean.TRUE);
