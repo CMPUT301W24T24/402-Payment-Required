@@ -1,5 +1,6 @@
 package com.example.qrcheckin;
 
+import static android.app.PendingIntent.getActivity;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -340,5 +341,6 @@ public class UserStoryTests {
 //        Thread.sleep(5000);
 
     }
+
 
 }
