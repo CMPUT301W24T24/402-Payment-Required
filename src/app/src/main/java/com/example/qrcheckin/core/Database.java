@@ -300,6 +300,24 @@ public class Database {
         });
     }
 
+    public void getEventPicture(Event event, ImageView imageView) {
+        if (event.getPosterRef() == null || event.getPosterRef().isEmpty()) {
+            Log.e("Firestorage", "No picture reference");
+            return;
+        }
+        storage.getReference().child(event.getPosterRef()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(bmp);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("Firestorage", exception.toString());
+            }
+        });
+    }
     /**
      * This static function is used to set on event listeners to the list of events from the database
      * It's used to update the list of events in the EventArrayAdaptor in all three explore, my and hosted events
@@ -308,7 +326,7 @@ public class Database {
      * @param currentUserId the id of the current user from the app user
      * @param type the type of the event list, explore, my or hosted
      */
-    public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type) {
+    public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type, String search) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -321,6 +339,9 @@ public class Database {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
                     mEventArrayAdaptor.getValue().getEvents().clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
+                        if (search != null && !doc.getString("name").toLowerCase().contains(search.toLowerCase())) {
+                            continue;
+                        }
                         DocumentReference hostRef = doc.getDocumentReference("host");
                         Log.d("Firestore", "Event fetched " + doc.getId());
                         fetchHost(doc, hostRef, mEventArrayAdaptor, eventList, currentUserId, type);

@@ -5,10 +5,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.net.Uri;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +38,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qrcheckin.QRCheckInApplication;
 import com.example.qrcheckin.R;
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.QRCodeGenerator;
 import com.example.qrcheckin.core.User;
@@ -41,6 +46,9 @@ import com.example.qrcheckin.databinding.FragmentCreateEventBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.BuildConfig;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.Firebase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -54,6 +62,17 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+
+import java.util.ArrayList;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.type.DateTime;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
@@ -61,6 +80,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
+
 
 /**
  * Create Event Fragment is a class that creates a CreateEventFragment object
@@ -75,6 +95,9 @@ public class CreateEventFragment extends Fragment {
     private Location eventLocation;
     private MapView map;
     private Marker selectedMarker;
+    private boolean imageUpdated = false;
+    private Uri updatedImageUri;
+    private boolean imageTooLarge = false;
     private boolean pickCheckin;
     private ListenerRegistration validatePromoteIdListener, validateCheckInIdListener;
 
@@ -93,6 +116,7 @@ public class CreateEventFragment extends Fragment {
         View root = binding.getRoot();
 
         ImageView bannerImageView = binding.imageCreateEventBanner;
+        Button uploadEventBanner = binding.uploadEventBanner;
 
         EditText titleTextView = binding.textCreateEventTitle;
         createEventViewModel.getEventTitle().observe(getViewLifecycleOwner(), titleTextView::setHint);
@@ -116,6 +140,47 @@ public class CreateEventFragment extends Fragment {
         ImageView qrCodePromoteImageView = binding.imageviewCreateEventDescriptionQr;
 
         Button generateQRCheckinButton = binding.buttonCreateEventGenerateQrCheckin;
+
+        // Set up the photo picker
+        // Reference: https://developer.android.com/training/data-storage/shared/photopicker Accessed on 2024-03-31
+        ActivityResultLauncher<PickVisualMediaRequest> pickMediaEventPoster =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        InputStream imageStream = null;
+                        try {
+                            imageStream = requireContext().getContentResolver().openInputStream(uri);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                        // decode the image stream into a bitmap
+                        Bitmap bmp = BitmapFactory.decodeStream(imageStream);
+
+                        if (bmp.getHeight() > 2048) {
+                            bmp = Bitmap.createScaledBitmap(bmp, bmp.getWidth() * 2048 / bmp.getHeight(), 2048, false);
+                            imageTooLarge = true;
+                        } else if (bmp.getWidth() > 2048) {
+                            bmp = Bitmap.createScaledBitmap(bmp, 2048, bmp.getHeight() * 2048 / bmp.getWidth(), false);
+                            imageTooLarge = true;
+                        }
+
+                        // Convert the bitmap to a URI
+                        // Reference: https://stackoverflow.com/questions/8295773/how-can-i-transform-a-bitmap-into-a-uri Ajay. DragonFire. Accessed on 2024-03-31
+                        if (imageTooLarge) {
+                            Toast.makeText(getContext(), "Image too large, scaled down to 2048x2048", Toast.LENGTH_SHORT).show();
+                            String path = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bmp, "tempImg", null);
+                            uri = Uri.parse(path);
+                        }
+                        imageUpdated = true;
+                        binding.imageCreateEventBanner.setImageURI(uri);
+                        updatedImageUri = uri;
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+
         generateQRCheckinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,6 +189,7 @@ public class CreateEventFragment extends Fragment {
                 qrCodeCheckinImageView.setVisibility(View.VISIBLE);
             }
         });
+
 
         Button generateQRPromoteButton = binding.buttonCreateEventGenerateQrDescription;
         generateQRPromoteButton.setOnClickListener(new View.OnClickListener() {
@@ -166,6 +232,14 @@ public class CreateEventFragment extends Fragment {
             selectLocation();
         });
 
+        binding.uploadEventBanner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickMediaEventPoster.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build());
+            }
+        });
 
         binding.buttonCreateEventSubmit.setOnClickListener(v -> {
             if (titleTextView.getText().toString().isEmpty()) {
@@ -187,7 +261,11 @@ public class CreateEventFragment extends Fragment {
             String titleText = titleTextView.getText().toString();
             String descriptionText = descriptionTextView.getText().toString();
             // TODO: get the poster reference
-            String posterRef = "";
+
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            String posterRef = "events/" + now.format(formatter);
+
             int year = dateView.getYear();
             int month = dateView.getMonth();
             int date = dateView.getDayOfMonth();
@@ -210,6 +288,31 @@ public class CreateEventFragment extends Fragment {
 
             Log.d("testlol", "limit= " + limit);
 
+            if (imageUpdated) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference();
+                Uri imageUri = updatedImageUri;
+                StorageReference imageRef = storageRef.child(posterRef);
+
+                imageRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("Firebase", "Event poster uploaded successfully");
+
+
+                        // Delete the image if it was scaled down
+                        // Reference: https://stackoverflow.com/questions/23716683/android-delete-file-after-images-media-insertimage Nate. Accessed on 2024-03-31
+                        if (imageTooLarge) {
+                            requireContext().getContentResolver().delete(updatedImageUri, null, null);
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Firebase", "Event poster upload failed", e);
+                    }
+                });
+            }
 
             Event event = new Event(user, titleText, descriptionText, posterRef, time, location, locationGeoLat, locationGeoLong, checkinId, checkinQR, promoteId, promoteQR, geo, limit);
 
@@ -238,8 +341,6 @@ public class CreateEventFragment extends Fragment {
                         Log.e("Firestore", e.toString());
 
                     });
-
-
         });
 
         // Set up the photo picker

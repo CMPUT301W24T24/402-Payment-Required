@@ -57,15 +57,26 @@ public class ExploreEventFragment extends Fragment {
         binding = FragmentExploreEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        String search = binding.exploreEventSearchBar.getText().toString();
         listView = binding.exploreEventListView;
-//        exploreEventViewModel.initializeAdaptor(getContext());
         ArrayList<Event> events = new ArrayList<>();
         // TODO: refactor MutableLiveData to only array adaptor
         MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), events));
 
-        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore");
+        onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore", search.isEmpty() ? null : search);
         listView.setAdapter(mEventArrayAdaptor.getValue());
-//        exploreEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
+
+        binding.exploreEventSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<Event> events = new ArrayList<>();
+                // TODO: refactor MutableLiveData to only array adaptor
+                MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), events));
+                String search = binding.exploreEventSearchBar.getText().toString();
+                onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore", search);
+                listView.setAdapter(mEventArrayAdaptor.getValue());
+            }
+        });
 
         return root;
     }
