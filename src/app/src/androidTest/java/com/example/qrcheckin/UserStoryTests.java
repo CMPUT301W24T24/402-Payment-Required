@@ -20,6 +20,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 
+import android.view.View;
+
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.AdapterViewProtocol;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
@@ -285,15 +288,21 @@ public class UserStoryTests {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_explore_event));
 
-        Thread.sleep(10000);
+        Thread.sleep(1000);
 
-        
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.explore_event_search_button)).perform(click());
+        Thread.sleep(2000);
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.clearText());
+        onView(withText(eventName))
+                .perform(click());
 
-        Thread.sleep(5000);
+        onView(withText("Sign Me Up")).perform(click());
 
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_notifications));
 
-
-//        Thread.sleep(5000);
+        onView(withText("This is my Notification")).check(matches(isDisplayed()));
 
     }
 }
