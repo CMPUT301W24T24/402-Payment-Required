@@ -333,6 +333,8 @@ public class NotificationsFragment extends Fragment {
 
 
     /**
+     * used to compare and sort notifications in the notification page
+     *
      * Reference:
      * https://ioflood.com/blog/sort-array-java/#:~:text=Java%20provides%20a%20built%2Din,%2C%20string%2C%20or%20custom%20objects.
      * by Gabriel Ramuglia, Accessed 2024-03-28

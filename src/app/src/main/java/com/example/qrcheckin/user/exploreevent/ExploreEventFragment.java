@@ -26,6 +26,7 @@ import com.example.qrcheckin.databinding.FragmentExploreEventBinding;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * The fragment for exploring available events

@@ -16,6 +16,7 @@ import com.example.qrcheckin.R;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -98,6 +99,18 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         // Set a uniquely identifiable tag for the event
         view.setTag(event.getId());
 
+        this.events.sort(eventComparator);
+
         return view;
     }
+
+    /**
+     * used to compare and sort events
+     */
+    Comparator<Event> eventComparator = new Comparator<Event>() {
+        @Override
+        public int compare(Event o1, Event o2) {
+            return o1.getTime().compareTo(o2.getTime());
+        }
+    };
 }

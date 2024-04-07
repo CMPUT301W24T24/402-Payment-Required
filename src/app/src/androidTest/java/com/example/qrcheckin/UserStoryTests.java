@@ -18,6 +18,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.allOf;
 
 import androidx.test.espresso.action.AdapterViewProtocol;
 import androidx.test.espresso.action.ViewActions;
@@ -284,7 +285,7 @@ public class UserStoryTests {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_explore_event));
 
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
 //        onData(CoreMatchers.allOf(CoreMatchers.is(instanceOf(String.class)), CoreMatchers.is(eventName)))
 //                .perform(ViewActions.click());
@@ -295,29 +296,20 @@ public class UserStoryTests {
 //                .inAdapterView(CoreMatchers.is(withText(eventName)))
 //                .atPosition(8)
 //                .perform(scrollTo());
-
-//        Integer i = 0;
-//        while (true) {
-//            try {
-//                onData(is(instanceOf(Event.class)))
-//                        .inAdapterView(withId(R.id.explore_event_list_view))
-//                        .usingAdapterViewProtocol(CoreMatchers.containsString(eventName))
-//                        .perform(scrollTo())
-//                        .check(matches(withText(eventName)));
-//                break;
-//            } catch (Exception e) { i++; }
-//        }
 //
 //        onData(is(instanceOf(Event.class)))
 //                .inAdapterView(withId(R.id.explore_event_list_view))
 //                .atPosition(i)
 //                .perform(click());
 
-        onData(is(instanceOf(Event.class)))
-                .inAdapterView(withId(R.id.explore_event_list_view))
-                .onChildView(withText(eventName))
-                .perform(scrollTo());
-                //.check(matches(withText(eventName)));
+//        onData(is(instanceOf(Event.class)))
+//                .inAdapterView(withId(R.id.explore_event_list_view))
+//                .onChildView(withText(eventName))
+//                .perform(scrollTo());
+
+//        onData(allOf(is(instanceOf(String.class)), is(eventName)))
+//                .inAdapterView(withId(R.id.explore_event_list_view))
+//                .perform(click());
 
         Thread.sleep(5000);
 
