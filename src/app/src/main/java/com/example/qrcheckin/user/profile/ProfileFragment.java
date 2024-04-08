@@ -43,6 +43,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 
+/**
+ * Displays the user profile
+ */
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
@@ -52,6 +55,13 @@ public class ProfileFragment extends Fragment {
     private boolean imageTooLarge = false;
     int selectPicture = 200;
 
+    /**
+     * Initializes the ProfileFragment on creation of the view
+     * @param inflater: the inflater used to create the binding
+     * @param container: the ViewGroup used to create the binding
+     * @param savedInstanceState: the Bundle used to pass information
+     * @return root of the view
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -70,9 +80,8 @@ public class ProfileFragment extends Fragment {
             // Set geolocation checkbox state based on user's preference
             binding.profileGeolocation.setChecked(user.isGeo());
 
-            //String uri = "@drawable/cat.jpg";
-            //int imageResource = getResources().getIdentifier(uri, null, getPackageName());
             ImageView profileImage = binding.profilePicture;
+
             // Set the profile picture of the user to the XML view
             Database db = new Database();
             db.getUserPicture(user, profileImage);
@@ -122,6 +131,10 @@ public class ProfileFragment extends Fragment {
                 });
 
         binding.editProfilePictureButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Edits the profile picture
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 pickMedia.launch(new PickVisualMediaRequest.Builder()
@@ -131,6 +144,10 @@ public class ProfileFragment extends Fragment {
         });
 
         binding.removeProfilePictureButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Removes the profile picture from the database
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 binding.profilePicture.setImageBitmap(user.generateProfilePicture());
@@ -140,6 +157,10 @@ public class ProfileFragment extends Fragment {
         });
 
         binding.profileSaveButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Stores the profile to the database
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 if (user != null) {
@@ -236,12 +257,19 @@ public class ProfileFragment extends Fragment {
         });
         return root;
     }
+
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
+    /**
+     * Changes the profile when the view is paused
+     */
     @Override
     public void onPause() {
         super.onPause();

@@ -15,23 +15,13 @@ import com.example.qrcheckin.core.User;
 
 import java.util.ArrayList;
 
+/**
+ * A ViewModel used to display the list of events to explore
+ */
 public class ExploreEventViewModel extends ViewModel {
-//    private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
-//    private final ArrayList<Event> eventList;
-//    private User currentUser;
     /**
      * Initializes the ExploreEventViewModel class
      */
     public ExploreEventViewModel() {
-//        mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
-//        eventList = new ArrayList<Event>();
     }
-//    public void initializeAdaptor(Context context) {
-//        mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-//        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "explore");
-//    }
-
-//    public LiveData<EventArrayAdaptor> getEventList() {
-//        return mEventArrayAdaptor;
-//    }
 }

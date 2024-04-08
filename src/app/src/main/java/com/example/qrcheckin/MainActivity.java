@@ -122,8 +122,6 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
 
 
         getDeviceUser(this);
-
-        //Set up the map view
     }
 
     /**
@@ -584,14 +582,6 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
      */
     public void showNotification(String title, String message, String channel_id, String channel_name) {
         Log.d("Notifications", "creating notification for: " + title);
-        // Pass the intent to switch to the MainActivity
-//        Intent intent = new Intent(this, MainActivity.class);
-
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        // Pass the intent to PendingIntent to start the
-//        // next Activity
-//        PendingIntent pendingIntent = PendingIntent.getActivity(
-//                this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         // Create a Builder object using NotificationCompat
         // class. This will allow control over all the flags
@@ -599,7 +589,6 @@ public class MainActivity extends AppCompatActivity implements Database.UserList
                 .Builder(getApplicationContext(), channel_id)
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.nav_events)
-                // .setContentIntent(pendingIntent)
                 .setContentTitle(title)
                 .setContentText(message);
 

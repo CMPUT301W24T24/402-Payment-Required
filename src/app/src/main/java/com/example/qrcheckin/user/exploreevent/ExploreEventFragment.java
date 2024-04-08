@@ -67,6 +67,10 @@ public class ExploreEventFragment extends Fragment {
         listView.setAdapter(mEventArrayAdaptor.getValue());
 
         binding.exploreEventSearchButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Filters the events displayed
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 ArrayList<Event> events = new ArrayList<>();
@@ -92,6 +96,14 @@ public class ExploreEventFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Navigates to the events details page
+             * @param parent The AdapterView where the click happened.
+             * @param view The view within the AdapterView that was clicked (this
+             *            will be a view provided by the adapter)
+             * @param position The position of the view in the adapter.
+             * @param id The row id of the item that was clicked.
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event event = (Event) listView.getItemAtPosition(position);

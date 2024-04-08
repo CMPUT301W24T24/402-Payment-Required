@@ -96,6 +96,7 @@ public class NotificationsFragment extends Fragment {
     private FirebaseFirestore notidb;
     private ListenerRegistration signups;
     private ListenerRegistration checkins;
+
     /**
      * onCreateView initializes the attributes the Notification Fragment uses
      * and sets listeners to the notification collections in case of new notifications
@@ -109,7 +110,7 @@ public class NotificationsFragment extends Fragment {
      * @param savedInstanceState If non-null, this fragment is being re-constructed
      * from a previous saved state as given here.
      *
-     * @return
+     * @return the root of the view
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -340,6 +341,14 @@ public class NotificationsFragment extends Fragment {
      * by Gabriel Ramuglia, Accessed 2024-03-28
      */
     Comparator<Notification> notificationComparator = new Comparator<Notification>() {
+        /**
+         * Compares the notifications
+         * @param o1 the first object to be compared.
+         * @param o2 the second object to be compared.
+         * @return 1 if o1 was posted first
+         * 0 if posted at the same time
+         * -1 if o2 ws posted first
+         */
         @Override
         public int compare(Notification o1, Notification o2) {
             try {

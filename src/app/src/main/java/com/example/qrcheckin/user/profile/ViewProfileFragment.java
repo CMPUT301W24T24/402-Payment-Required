@@ -15,11 +15,21 @@ import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentViewProfileBinding;
 
+/**
+ * displays the profile page
+ */
 public class ViewProfileFragment extends Fragment {
 
     private FragmentViewProfileBinding binding;
     private User user;
 
+    /**
+     * Initializes the ViewProfileFragment on create
+     * @param inflater: the inflater used to create the binding
+     * @param container: the ViewGroup used to create the binding
+     * @param savedInstanceState: the Bundle used to pass information
+     * @return root of the view
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentViewProfileBinding.inflate(inflater, container, false);
@@ -37,6 +47,10 @@ public class ViewProfileFragment extends Fragment {
         }
         return root;
     }
+
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

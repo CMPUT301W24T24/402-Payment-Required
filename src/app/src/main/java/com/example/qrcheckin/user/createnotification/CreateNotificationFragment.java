@@ -85,6 +85,10 @@ public class CreateNotificationFragment extends Fragment {
 
         createNotificationButton = binding.createNotificationButton;
         createNotificationButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Sends the user to the main page
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 String message = editText.getText().toString();

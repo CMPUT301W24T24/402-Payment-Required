@@ -16,10 +16,16 @@ import com.example.qrcheckin.core.UserArrayAdaptor;
 
 import java.util.ArrayList;
 
+/**
+ * The ViewModel displaying the attendees checked into a given event
+ */
 public class AttendeesCheckedInViewModel extends ViewModel {
     private final MutableLiveData<UserArrayAdaptor> mUserArrayAdapter;
     private final ArrayList<User> userList;
 
+    /**
+     * Constructs the AttendeesCheckedInViewModel
+     */
     public AttendeesCheckedInViewModel() {
         mUserArrayAdapter = new MutableLiveData<UserArrayAdaptor>();
         userList = new ArrayList<User>();

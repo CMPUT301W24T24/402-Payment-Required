@@ -52,6 +52,10 @@ public class HomeFragment extends Fragment implements LocationListener {
     private FragmentHomeBinding binding;
     private Location currentLocation;
 
+    /**
+     * Creates a new HomeFragment
+     * @return the new HomeFragment
+     */
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -227,10 +231,15 @@ public class HomeFragment extends Fragment implements LocationListener {
 
     }
 
+    /**
+     * Updates the current location
+     * @param location the updated location
+     */
     @Override
     public void onLocationChanged(@NonNull Location location) {
         currentLocation=location;
     }
+
 
     //needed for location permissions
     @Override
@@ -243,6 +252,10 @@ public class HomeFragment extends Fragment implements LocationListener {
             ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
     }
 
+    /**
+     * Request the permissions to location if necessary
+     * @param permissions the list of permissions allowed by the user
+     */
     private void requestPermissionsIfNecessary(String[] permissions) {//needed for location permissions
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (String permission : permissions)

@@ -65,6 +65,14 @@ public class AttendeesSignedUpFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Navigates to the attendees profile when the user is clicked
+             * @param parent The AdapterView where the click happened.
+             * @param view The view within the AdapterView that was clicked (this
+             *            will be a view provided by the adapter)
+             * @param position The position of the view in the adapter.
+             * @param id The row id of the item that was clicked.
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User user = (User) listView.getItemAtPosition(position);

@@ -16,21 +16,10 @@ import com.example.qrcheckin.core.EventArrayAdaptor;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * ViewModel that displays the the list of events the current user is hosting
+ */
 public class HostedEventViewModel extends ViewModel {
-//    private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
-//    private final ArrayList<Event> eventList;
-
     public HostedEventViewModel() {
-//        mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
-//        eventList = new ArrayList<Event>();
     }
-
-//    public void initializeAdaptor(Context context) {
-//        mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-//        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "hosted");
-//    }
-
-//    public LiveData<EventArrayAdaptor> getEventList() {
-//        return mEventArrayAdaptor;
-//    }
 }

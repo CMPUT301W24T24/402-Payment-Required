@@ -97,6 +97,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * The Fragment that displays the the page to edit an event
+ */
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
     private MapView map;
@@ -109,6 +112,13 @@ public class EditEventFragment extends Fragment {
     private boolean imageTooLarge = false;
     private Drawable personCircle;
 
+    /**
+     * Creates the EditEventFragment view
+     * @param inflater the inflater used to create the binding
+     * @param container the ViewGroup used to create the binding
+     * @param savedInstanceState the Bundle used to pass information
+     * @return the root of the fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -159,6 +169,10 @@ public class EditEventFragment extends Fragment {
         personCircle=DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.person_circle));
         DrawableCompat.setTint(personCircle, ContextCompat.getColor(getContext(), android.R.color.holo_green_dark));
         Database.fetchGeoPointsForEvent(event.getId(), new Database.OnGeoPointsFetchedListener() {
+            /**
+             * When the geolocation of the event is returned it will update the map
+             * @param geoPoints
+             */
             @Override
             public void onGeoPointsFetched(List<GeoPoint> geoPoints) {
                 for(GeoPoint geoPoint : geoPoints){
@@ -170,6 +184,11 @@ public class EditEventFragment extends Fragment {
                     map.getOverlays().add(newMarker);
                 }
             }
+
+            /**
+             * If the geolocation fails, the error is handled
+             * @param e the error
+             */
             @Override
             public void onGeoPointsFetchFailed(Exception e) {
                 Log.e("CheckinDots", "Error fetching GeoPoints " + e.getMessage());
@@ -214,6 +233,10 @@ public class EditEventFragment extends Fragment {
         docRef=FirebaseFirestore.getInstance().collection("events").document(event.getId());
 
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            /**
+             * When the document is retrieved it will display the event
+             * @param documentSnapshot
+             */
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
@@ -292,6 +315,10 @@ public class EditEventFragment extends Fragment {
                     }
                 });
         binding.editEventProfile.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When the view is clicked it will display a media picker
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 pickMedia.launch(new PickVisualMediaRequest.Builder()
@@ -301,6 +328,10 @@ public class EditEventFragment extends Fragment {
         });
 
         exportCheckCode.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Exports the CheckIn QR Code
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 BitmapDrawable bitmapDrawable = (BitmapDrawable) checkInCode.getDrawable();
@@ -309,6 +340,10 @@ public class EditEventFragment extends Fragment {
             }
         });
         exportQREventCode.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Exports the Description QR Code
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 BitmapDrawable bitmapDrawable = (BitmapDrawable) promoteCode.getDrawable();
@@ -319,7 +354,10 @@ public class EditEventFragment extends Fragment {
 
         //see a list of attendees
         showSignUps.setOnClickListener(new View.OnClickListener() {
-
+            /**
+             * Navigates to show the attendees signed up to the event
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
@@ -330,7 +368,10 @@ public class EditEventFragment extends Fragment {
 
         //see a list of attendees
         showCheckIns.setOnClickListener(new View.OnClickListener() {
-
+            /**
+             * Navigates to show the attendees checked into the event
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
@@ -341,18 +382,25 @@ public class EditEventFragment extends Fragment {
 
         //notify atendees
         notify.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Navigates to the create notification page
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putString("eventId", event.getId());
                 (new EditEventFragment()).setArguments(args);
-                //TODO: navigate to the notify -> link in the navigation bar
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_edit_event_to_nav_create_notification, args);
             }
         });
 
         //set OnClickListener for editInformation
         editEventUpdate.setOnClickListener(new View.OnClickListener(){
+            /**
+             * Updates the event in the database
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 if (imageUpdated && !Objects.equals(event.getPosterRef(), "events/" + event.getId()) && !event.getPosterRef().isEmpty() && event.getPosterRef() != null) {
@@ -441,6 +489,11 @@ public class EditEventFragment extends Fragment {
         // Set OnClickListener for changeTime
         changeTimeButton.setOnClickListener(new View.OnClickListener() {
             String holderTime;
+
+            /**
+             * Shows a dialog that allows the user to change the data and time
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 // Fetch timestamp from the database
@@ -466,6 +519,12 @@ public class EditEventFragment extends Fragment {
                     }
                 });
             }
+
+            /**
+             * Opens the Time Dialog
+             * @param hour current hour
+             * @param minute current min
+             */
             private void openTimeDialog(int hour, int minute) {
                 TimePickerDialog dialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -485,6 +544,12 @@ public class EditEventFragment extends Fragment {
                 dialog.show();
             }
 
+            /**
+             * Opens the data dialog
+             * @param year current year
+             * @param month current month
+             * @param day current day
+             */
             private void openDateDialog(int year, int month, int day) {
                 DatePickerDialog dialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -506,6 +571,10 @@ public class EditEventFragment extends Fragment {
                 dialog.show();
             }
 
+            /**
+             * Updates the time to the database
+             * @param calendar stores the data and time
+             */
             private void updateTimeFireStore(Calendar calendar) {
                 // Combine date and time into a single timestamp
                 Date selectedDate = calendar.getTime();
@@ -574,24 +643,39 @@ public class EditEventFragment extends Fragment {
         return uri;
     }
 
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
+    /**
+     * updates the map on view resumed
+     */
     @Override
     public void onResume() {//needed for OSM display
         super.onResume();
         map.onResume();
     }
 
+    /**
+     * Pauses the map when the view is paused
+     */
     @Override
     public void onPause() {//needed for OSM display
         super.onPause();
         map.onPause();
     }
 
+    /**
+     * Requests permission to location
+     * @param requestCode the code of the request
+     * @param permissions what the user has allowed access to
+     * @param grantResults results
+     */
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {//needed for OSM permissions
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (int i = 0; i < grantResults.length; i++)// array to arraylist
@@ -601,6 +685,10 @@ public class EditEventFragment extends Fragment {
             ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
     }
 
+    /**
+     * Requests permission to location if required
+     * @param permissions what the user has allowed access to
+     */
     private void requestPermissionsIfNecessary(String[] permissions) {//needed for location permissions
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (String permission : permissions)
@@ -611,6 +699,9 @@ public class EditEventFragment extends Fragment {
             ActivityCompat.requestPermissions(this.getActivity(),permissionsToRequest.toArray(new String[0]),1);
     }
 
+    /**
+     * Selects a location on the map
+     */
     private void selectLocation() {
         Toast.makeText(getContext(), "Tap a location on the map", Toast.LENGTH_SHORT).show();
         MapEventsReceiver receiver = new MapEventsReceiver() {

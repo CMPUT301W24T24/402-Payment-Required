@@ -61,14 +61,11 @@ public class HostedEventFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.hostedEventListView;
-//        hostedEventViewModel.initializeAdaptor(getContext());
         ArrayList<Event> eventList = new ArrayList<>();
-        // TODO: refactor MutableLiveData to only array adaptor
         MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(requireContext(), eventList));
 
         onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "hosted", null);
         listView.setAdapter(mEventArrayAdaptor.getValue());
-//        hostedEventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
         return root;
     }
 
@@ -82,6 +79,14 @@ public class HostedEventFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Navigates to the edit event page
+             * @param parent The AdapterView where the click happened.
+             * @param view The view within the AdapterView that was clicked (this
+             *            will be a view provided by the adapter)
+             * @param position The position of the view in the adapter.
+             * @param id The row id of the item that was clicked.
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event event = (Event) listView.getItemAtPosition(position);
@@ -93,6 +98,10 @@ public class HostedEventFragment extends Fragment {
 
         Button fab = binding.eventAddFab;
         fab.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Navigates to create event page
+             * @param view The view that was clicked.
+             */
             @Override
             public void onClick(View view) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_nav_event_to_nav_create_event);

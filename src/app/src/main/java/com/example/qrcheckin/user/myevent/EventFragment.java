@@ -35,6 +35,13 @@ public class EventFragment extends Fragment {
     private FragmentEventBinding binding;
     private ListView listView;
 
+    /**
+     * Initializes the EventFragment on creation
+     * @param inflater the inflater used to create the binding
+     * @param container: the ViewGroup used to create the binding
+     * @param savedInstanceState: the Bundle used to pass information
+     * @return the root of the view model
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         EventViewModel eventViewModel =
@@ -44,14 +51,11 @@ public class EventFragment extends Fragment {
         View root = binding.getRoot();
 
         listView = binding.eventListView;
-//        eventViewModel.initializeAdaptor(getContext());
         ArrayList<Event> events = new ArrayList<>();
-        // TODO: refactor MutableLiveData to only array adaptor
         MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor = new MutableLiveData<>(new EventArrayAdaptor(getContext(), events));
 
         onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "my", null);
         listView.setAdapter(mEventArrayAdaptor.getValue());
-//        eventViewModel.getEventList().observe(getViewLifecycleOwner(), listView::setAdapter);
 
         return root;
     }
@@ -61,6 +65,15 @@ public class EventFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            /**
+             * Navigates to view the event clicked on
+             * @param parent The AdapterView where the click happened.
+             * @param view The view within the AdapterView that was clicked (this
+             *            will be a view provided by the adapter)
+             * @param position The position of the view in the adapter.
+             * @param id The row id of the item that was clicked.
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event event = (Event) listView.getItemAtPosition(position);
@@ -71,6 +84,9 @@ public class EventFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets the binding ot null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

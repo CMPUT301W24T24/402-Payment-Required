@@ -107,7 +107,7 @@ public class CreateEventFragment extends Fragment {
      * @param inflater: the inflater used to create the binding
      * @param container: the ViewGroup used to create the binding
      * @param savedInstanceState: the Bundle used to pass information
-     * @return root
+     * @return root of the view
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CreateEventViewModel createEventViewModel = new ViewModelProvider(this).get(CreateEventViewModel.class);

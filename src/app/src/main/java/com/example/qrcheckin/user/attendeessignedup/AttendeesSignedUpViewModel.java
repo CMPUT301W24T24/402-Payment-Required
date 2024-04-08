@@ -21,11 +21,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
-
+/**
+ * The ViewModel that displays the attendees signed up to an event
+ */
 public class AttendeesSignedUpViewModel extends ViewModel {
     private final MutableLiveData<UserArrayAdaptor> mUserArrayAdapter;
     private final ArrayList<User> userList;
 
+    /**
+     * Constructs the AttendeesSignedUpViewModel
+     */
     public AttendeesSignedUpViewModel() {
         mUserArrayAdapter = new MutableLiveData<UserArrayAdaptor>();
         userList = new ArrayList<User>();

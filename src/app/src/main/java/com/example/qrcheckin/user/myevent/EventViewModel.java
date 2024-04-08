@@ -15,21 +15,13 @@ import com.example.qrcheckin.core.EventArrayAdaptor;
 
 import java.util.ArrayList;
 
+/**
+ * Helps display the EventViewFragment
+ */
 public class EventViewModel extends ViewModel {
-//    private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
-//    private final ArrayList<Event> eventList;
-
+    /**
+     * Initializes the EventViewModel
+     */
     public EventViewModel() {
-//        mEventArrayAdaptor = new MutableLiveData<EventArrayAdaptor>();
-//        eventList = new ArrayList<Event>();
     }
-
-//    public void initializeAdaptor(Context context) {
-//        mEventArrayAdaptor.setValue(new EventArrayAdaptor(context, eventList));
-//        onEventListChanged(eventList, mEventArrayAdaptor, ((QRCheckInApplication) context.getApplicationContext()).getCurrentUser().getId(), "my");
-//    }
-
-//    public LiveData<EventArrayAdaptor> getEventList() {
-//        return mEventArrayAdaptor;
-//    }
 }

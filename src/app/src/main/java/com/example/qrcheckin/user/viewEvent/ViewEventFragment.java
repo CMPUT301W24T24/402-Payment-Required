@@ -38,6 +38,14 @@ public class ViewEventFragment extends Fragment {
     private Event event;
     private User user;
 
+
+    /**
+     * Initializes the ViewEventFragment on creation
+     * @param inflater: the inflater used to create the binding
+     * @param container: the ViewGroup used to create the binding
+     * @param savedInstanceState: the Bundle used to pass information
+     * @return root of the view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -102,8 +110,6 @@ public class ViewEventFragment extends Fragment {
             setSignUpButton();
             binding.viewEventSignUp.setText(R.string.sign_up);
         }
-
-        // Handle the "Attend Event" button click
 
         return root;
     }
@@ -188,10 +194,9 @@ public class ViewEventFragment extends Fragment {
         });
     }
 
-    private void getEventPoster() {
-
-    }
-
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
