@@ -33,6 +33,7 @@ import com.example.qrcheckin.user.myevent.EventViewModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * The fragment class for all events which can only be seen by admins
@@ -74,7 +75,7 @@ public class AllEventsFragment extends Fragment {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Event event = events.get(position);
+                Event event = (Event) listView.getItemAtPosition(position);
                 DeleteEventFragment deleteEventFragment = new DeleteEventFragment(event);
                 deleteEventFragment.show(getParentFragmentManager(), "delete event");
                 return true;
@@ -101,5 +102,4 @@ public class AllEventsFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 }

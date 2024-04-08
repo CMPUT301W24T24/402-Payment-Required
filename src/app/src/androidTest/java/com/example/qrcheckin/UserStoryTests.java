@@ -1,5 +1,6 @@
 package com.example.qrcheckin;
 
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -18,7 +19,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.allOf;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.view.View;
+
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.AdapterViewProtocol;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
@@ -284,46 +291,100 @@ public class UserStoryTests {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_explore_event));
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
-//        onData(CoreMatchers.allOf(CoreMatchers.is(instanceOf(String.class)), CoreMatchers.is(eventName)))
-//                .perform(ViewActions.click());
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.explore_event_search_button)).perform(click());
+        Thread.sleep(2000);
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.clearText());
+        onView(withText(eventName))
+                .perform(click());
 
+        onView(withText("Sign Me Up")).perform(click());
 
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_notifications));
 
-//        onData(withId(R.id.explore_event_list_view))
-//                .inAdapterView(CoreMatchers.is(withText(eventName)))
-//                .atPosition(8)
-//                .perform(scrollTo());
+        onView(withText("This is my Notification")).check(matches(isDisplayed()));
+    }
 
-//        Integer i = 0;
-//        while (true) {
-//            try {
-//                onData(is(instanceOf(Event.class)))
-//                        .inAdapterView(withId(R.id.explore_event_list_view))
-//                        .usingAdapterViewProtocol(CoreMatchers.containsString(eventName))
-//                        .perform(scrollTo())
-//                        .check(matches(withText(eventName)));
-//                break;
-//            } catch (Exception e) { i++; }
-//        }
-//
-//        onData(is(instanceOf(Event.class)))
-//                .inAdapterView(withId(R.id.explore_event_list_view))
-//                .atPosition(i)
-//                .perform(click());
+    @Test
+    public void pushNotification() throws UiObjectNotFoundException, InterruptedException {
 
-        onData(is(instanceOf(Event.class)))
-                .inAdapterView(withId(R.id.explore_event_list_view))
-                .onChildView(withText(eventName))
-                .perform(scrollTo());
-                //.check(matches(withText(eventName)));
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
 
-        Thread.sleep(5000);
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+        String eventName = "" + System.currentTimeMillis();
 
+        eventName = eventName.substring(eventName.length() - 7, eventName.length());
 
+        eventName = eventName + "chAtt";
 
-//        Thread.sleep(5000);
+        Thread.sleep(1000);
 
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+
+        Thread.sleep(2000);
+
+        onView(withId(R.id.event_add_fab)).perform(click());
+
+        Thread.sleep(1000);
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.button_create_event_submit))
+                .perform(ViewActions.scrollTo())
+                .check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.button_create_event_submit)).perform(click());
+
+        Thread.sleep(2000);
+
+        onView(withText(eventName)).perform(click());
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_explore_event));
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.explore_event_search_button)).perform(click());
+        Thread.sleep(2000);
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.clearText());
+        onView(withText(eventName))
+                .perform(click());
+
+        onView(withText("Sign Me Up")).perform(click());
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.close());
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.edit_event_notify_attendees)).perform(click());
+        onView(withId(R.id.create_notification_message)).perform(ViewActions.typeText("This is my Notification"));
+        onView(withId(R.id.create_notification_button)).perform(click());
+
+        onView(withId(R.id.edit_event_notify_attendees)).check(matches(isDisplayed()));
+
+        NotificationManager notificationManager = (NotificationManager) getTargetContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        assert (notificationManager.getActiveNotifications().length == 1);
     }
 }
