@@ -11,6 +11,7 @@ import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.CursorMatchers.withRowString;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
@@ -71,13 +72,11 @@ public class UserStoryTests {
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
 
+    public QRCheckInApplication app;
+
     Database db;
-    User currentUser;
 
 
-    public Event getMockEvent() {
-        return new Event("Tina's hosted exciting event", currentUser, "Event for delete Event", "hey, what is this event for other than testing?", "", new Date(), "", 0.00, 0.00, "", "", true, 100, new UserList());
-    }
     /**
      * Test that will create an event, modify the event details, then makes sure the correct event
      * details are displayed, then makes sure QR codes have been generated
@@ -306,6 +305,8 @@ public class UserStoryTests {
 
         Thread.sleep(1000);
         onView(withText("0 checkins")).check(matches(isDisplayed()));
+        onView(withId(R.id.profile_save_button)).perform(ViewActions.scrollTo()).check(matches(isDisplayed()));
+        onView(withId(R.id.profile_save_button)).perform(click());
 
     }
 
@@ -536,8 +537,8 @@ public class UserStoryTests {
 
     /**
      * Check if the event created can be viewed by the admin (create the event, check if the event appears on the addminAllEvents)
-     * @throws UiObjectNotFoundException
-     * @throws InterruptedException
+     * @throws UiObjectNotFoundException if any UI element required for the test (such as buttons, text fields) cannot be found.
+     * @throws InterruptedException if the thread is interrupted while waiting for UI elements to become available or any other operation.
      * Reference: ChatGPT
      * Prompt: how to perform press action on the UI test?
      */
@@ -592,8 +593,10 @@ public class UserStoryTests {
 
     /**
      * Check if the admin can delete an event
-     * @throws UiObjectNotFoundException
-     * @throws InterruptedException
+     * Reference: ChatGPT
+     * Prompt: How can I perform click action for UI test on a pop-up dialog?
+     * @throws UiObjectNotFoundException if any UI element required for the test (such as buttons, text fields) cannot be found.
+     * @throws InterruptedException if the thread is interrupted while waiting for UI elements to become available or any other operation.
      */
     @Test
     public void adminDeleteEvent() throws UiObjectNotFoundException, InterruptedException{
@@ -609,7 +612,7 @@ public class UserStoryTests {
             allowNPermissions.click();
         }
         String time = String.valueOf(System.currentTimeMillis());
-        String eventName = "Tina's TestEvent For adminShowEvent" + time;
+        String eventName = "TestEvent For adminShowEvent" + time;
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
         Thread.sleep(1000);
@@ -620,19 +623,28 @@ public class UserStoryTests {
             allowPPermissions.click();
         }
         Thread.sleep(1000);
-
+        String eventName1 = "TestEvent For adminShowEvent" + System.currentTimeMillis();
         onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
         Thread.sleep(1000);
         onView(withId(R.id.button_create_event_submit))
-                .perform(ViewActions.scrollTo())
-                .check(ViewAssertions.matches(isDisplayed()));
+                .perform(scrollTo())
+                .check(matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
         Thread.sleep(1000);
-        //Goto the admin all profiles and check
+        //create another event
+        onView(withId(R.id.event_add_fab)).perform(click());
+        onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName1));
+        Thread.sleep(1000);
+        onView(withId(R.id.button_create_event_submit))
+                .perform(scrollTo())
+                .check(matches(isDisplayed()));
+        onView(withId(R.id.button_create_event_submit)).perform(click());
+        Thread.sleep(1000);
+        //Goto the admin all events and check
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
         Thread.sleep(2500);
-        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText("TestEvent For adminShowEvent"));
         Thread.sleep(3000);
         onView(withId(R.id.all_event_search_button)).perform(click());
         Thread.sleep(3000);
@@ -643,14 +655,23 @@ public class UserStoryTests {
         Thread.sleep(2000);
         onView(withId(R.id.delete_event_name_text)).check(matches(withText(eventName)));
         Thread.sleep(3000);
-//        Espresso.onView(withText("Delete")).perform(click());
-        //Search again on the bar
-//        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
-//        Thread.sleep(3000);
-//        onView(withId(R.id.all_event_search_button)).perform(click());
-//        Thread.sleep(3000);
+        Espresso.onView(withText("DELETE"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+        Thread.sleep(3000);
+        //search on the bar again
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText("TestEvent For adminShowEvent"));
+        Thread.sleep(3000);
+        onView(withId(R.id.all_event_search_button)).perform(click());
+        onView(withText(eventName)).check(doesNotExist());
     }
 
+    /**
+     * Check if the admin can see the profile -> first edit the admin's profile name and then check on the allProfiles fragment
+     * @throws UiObjectNotFoundException if any UI element required for the test (such as buttons, text fields) cannot be found.
+     * @throws InterruptedException if the thread is interrupted while waiting for UI elements to become available or any other operation.
+     */
     @Test
     public void adminShowProfile() throws UiObjectNotFoundException, InterruptedException{
         activityRule.getScenario().onActivity(Database::displayAdminDrawer);
@@ -664,35 +685,32 @@ public class UserStoryTests {
         if (allowNPermissions.exists()) {
             allowNPermissions.click();
         }
-        String time = String.valueOf(System.currentTimeMillis());
-        String userName = "adminShowProfile " + time;
-        //create a user and add it the firestore database to check
-        User user = new User(null, userName, "test@gmail.com", "0905192111", "html", true, true, "");
-        db.addUser(user);
-        //Go to adminShowProfile
+
+        String userName = "AdminAllProfile's Test" + System.currentTimeMillis();
+
+        //change the name in the editProfile
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_profile));
+        onView(withId(R.id.profile_name)).check(matches(isDisplayed()));
+        onView(withId(R.id.profile_name)).perform(ViewActions.clearText());
+        onView(withId(R.id.profile_name)).perform(ViewActions.typeText(userName));
+        onView(withId(R.id.profile_save_button)).perform(ViewActions.scrollTo()).check(matches(isDisplayed()));
+        onView(withId(R.id.profile_save_button)).perform(click());
+        Thread.sleep(1000);
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+
+        Thread.sleep(4000);
+        //Go to adminShowProfile
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_profile));
         Thread.sleep(3000);
         onView(withId(R.id.all_profile_search_bar)).perform(ViewActions.typeText(userName));
         onView(withId(R.id.all_profile_search_button)).perform(click());
-
         Thread.sleep(3000);
         onView(withId(R.id.all_profile_search_bar)).perform(ViewActions.clearText());
         Thread.sleep(3000);
-        onView(withText(userName)).check(matches(isDisplayed()));
+        onView(withId(R.id.adminProfileName)).check(matches(withText(userName)));
+        Thread.sleep(3000);
+        onView(withId(R.id.adminProfileName)).perform(click());
     }
 
-    @Test
-    public void adminDeleteProfile() throws UiObjectNotFoundException {
-        activityRule.getScenario().onActivity(Database::displayAdminDrawer);
-        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
-        if (allowPermissions.exists()) {
-            allowPermissions.click();
-        }
-        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
-        if (allowNPermissions.exists()) {
-            allowNPermissions.click();
-        }
-    }
 }
