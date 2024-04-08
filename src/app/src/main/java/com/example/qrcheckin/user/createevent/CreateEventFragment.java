@@ -286,8 +286,6 @@ public class CreateEventFragment extends Fragment {
                 limit = Integer.parseInt(limitNumberPicker.getText().toString());
             }
 
-            Log.d("testlol", "limit= " + limit);
-
             if (imageUpdated) {
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReference();
