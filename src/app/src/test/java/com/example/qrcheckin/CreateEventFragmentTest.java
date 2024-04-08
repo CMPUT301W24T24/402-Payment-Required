@@ -13,10 +13,13 @@ import com.example.qrcheckin.user.createevent.CreateEventFragment;
 import org.checkerframework.checker.units.qual.C;
 import org.junit.Test;
 
+/**
+ * Tests the methods of the CreateEventFragment class
+ */
 public class CreateEventFragmentTest {
     @Test
     /**
-     * This test function ensures gererateQRCode is generating a string
+     * This test function ensures getAlphaNumericString is generating a string
      */
     public void testGenerateRandomNumber() {
         CreateEventFragment createEventFragment = new CreateEventFragment();

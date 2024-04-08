@@ -24,12 +24,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.contrib.NavigationViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiObject;
+import androidx.test.uiautomator.UiObjectNotFoundException;
+import androidx.test.uiautomator.UiSelector;
 
 import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
@@ -68,9 +73,8 @@ public class AttendeesSignedUpTest {
      * "No candidates found for method call scenario.getActivity()"
      */
     @Before
-    public void getApplication() {
+    public void getApplication() throws InterruptedException{
         // Get the application
-        Log.d("QRCheckIn", "getApplication");
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         Context appContext = instrumentation.getTargetContext();
         app = (QRCheckInApplication) appContext.getApplicationContext();
@@ -89,32 +93,67 @@ public class AttendeesSignedUpTest {
      */
 
     @Test
-    public void testSignedUpAttendeeViewable() throws InterruptedException {
+    public void testSignedUpAttendeeViewable() throws InterruptedException, UiObjectNotFoundException {
         // add an event with the organizer signed up to the event
         Database db = new Database();
+
         Thread.sleep(2500);
+
         User currentUser = app.getCurrentUser();
+
+        if (currentUser == null) {
+            User newUser = new User(null, "Test User", "", "", "", false, false);
+            db.addUser(newUser);
+            app.setCurrentUser(newUser);
+            currentUser = app.getCurrentUser();
+        }
+
         Event newEvent = new Event(currentUser, "Attendee Test Event", "Event description", "", new Date(), "", null, null, "", "", "", "", true, 100);
         db.addEvent(newEvent);
         db.signUpUser(currentUser, newEvent);
-        //Thread.sleep(2500);
+
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+
+        Thread.sleep(2500);
 
         // Test the user is viewable
-        //onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-        //Thread.sleep(1000);
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+
+        Thread.sleep(1000);
 
         // Click on hosted events
-        //onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
-        /*
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+
         Thread.sleep(1000);
 
         // Click on hosted event view
-        onView(withId(R.id.hosted_event_list_view)).perform(click((ViewAction) withTagValue(is((Object)newEvent.getId()))));
+        //onView(withId(R.id.hosted_event_list_view)).perform(click((ViewAction) withTagValue(is((Object)newEvent.getId()))));
+        onView(withText("Attendee Test Event")).perform(click());
 
         Thread.sleep(1000);
-        // Click on events signed up
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
         onView(withId(R.id.edit_event_show_sign_ups)).perform(click());
-        */
+
+        Thread.sleep(1000);
+
+        //onView(withText(currentUser.getName())).check(matches(isDisplayed()));
+
+        Database.deleteEvent(newEvent.getId());
+        db.deleteUser(currentUser.getId());
     }
 
 

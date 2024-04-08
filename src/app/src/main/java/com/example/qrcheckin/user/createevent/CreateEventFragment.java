@@ -131,8 +131,6 @@ public class CreateEventFragment extends Fragment {
         EditText locationTextView = binding.textCreateEventLocation;
 
         EditText limitNumberPicker = binding.createEventAttendLimit;
-        // limitNumberPicker.setMinValue(0);
-        // limitNumberPicker.setMaxValue(1000000000);
 
         CheckBox geoCheckBox = binding.checkboxCreateEventGeolocation;
 

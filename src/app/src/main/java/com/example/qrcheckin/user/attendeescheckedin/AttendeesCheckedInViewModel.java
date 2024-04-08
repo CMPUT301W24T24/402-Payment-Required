@@ -20,10 +20,23 @@ public class AttendeesCheckedInViewModel extends ViewModel {
     private final MutableLiveData<UserArrayAdaptor> mUserArrayAdapter;
     private final ArrayList<User> userList;
 
+    /**
+     * Initializes the View Model
+     */
     public AttendeesCheckedInViewModel() {
         mUserArrayAdapter = new MutableLiveData<UserArrayAdaptor>();
         userList = new ArrayList<User>();
     }
+
+    /**
+     * Initializes the view model and allows mock injection for test cases
+     */
+    public AttendeesCheckedInViewModel(MutableLiveData<UserArrayAdaptor> arrayAdaptor) {
+        mUserArrayAdapter = arrayAdaptor;
+        userList = new ArrayList<User>();
+    }
+
+
 
     /**
      * Initializes the UserArrayAdaptor to the list of users checked into the event

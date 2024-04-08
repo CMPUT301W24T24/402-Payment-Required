@@ -33,6 +33,17 @@ public class CreateEventViewModel extends ViewModel {
     }
 
     /**
+     * An initialization that allows mock injection for test cases
+     */
+    public CreateEventViewModel(MutableLiveData<String> bannerMock, MutableLiveData<String> eventTitleMock, MutableLiveData<String> eventDateMock, MutableLiveData<String> eventTimeMock, MutableLiveData<String> eventDescriptionMock) {
+        bannerRef = bannerMock;
+        eventTitle = eventTitleMock;
+        eventDate = eventDateMock;
+        eventTime = eventTimeMock;
+        eventDescription = eventDescriptionMock;
+    }
+
+    /**
      * Gets the banner reference
      * @return bannerRef
      */
