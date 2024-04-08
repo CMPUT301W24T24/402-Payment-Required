@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -127,6 +128,12 @@ public class AllProfilesFragment extends Fragment {
              */
             private void deleteProfile(int position) {
                 User profileDelete = profileDataList.get(position);
+
+                // delete image
+                String profileImageRef = profileDelete.getImageRef();
+                if (profileImageRef != null && !profileImageRef.isEmpty()) {
+                    FirebaseStorage.getInstance().getReference().child(profileImageRef).delete();
+                }
 
                 //delete the user in the FireStore Collection
                 String userId = profileDelete.getId();
