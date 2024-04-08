@@ -54,6 +54,7 @@ public class ViewEventFragment extends Fragment {
         binding.viewEventTitle.setText(event.getName());
         binding.viewEventDate.setText(event.getTime().toString());
         binding.viewEventDescription.setText(event.getDescription());
+        binding.viewEventLocation.setText(event.getLocation().isEmpty() ? "Not set" : event.getLocation());
 
         FirebaseFirestore.getInstance()
                 .collection("signUpTable").whereEqualTo("event_id", event.getId())
