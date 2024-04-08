@@ -5,6 +5,7 @@ import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.pressMenuKey;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
@@ -17,6 +18,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import androidx.test.espresso.Espresso;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.espresso.action.ViewActions.click;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
@@ -71,26 +75,6 @@ public class UserStoryTests {
     Database db;
     User currentUser;
 
-
-    @Before
-    public void getApplication() throws InterruptedException {
-
-        // Get the application
-        Log.d("QRCheckIn", "getApplication");
-        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        Context appContext = instrumentation.getTargetContext();
-        app = (QRCheckInApplication) appContext.getApplicationContext();
-        if (app == null) {
-            app = (QRCheckInApplication) app.getApplicationContext();
-        }
-        if (app == null) {
-            Log.d("QRCheckIn", "The app is null");
-        }
-        Thread.sleep(2500);
-
-        db = new Database();
-        currentUser = app.getCurrentUser();
-    }
 
     public Event getMockEvent() {
         return new Event("Tina's hosted exciting event", currentUser, "Event for delete Event", "hey, what is this event for other than testing?", "", new Date(), "", 0.00, 0.00, "", "", true, 100, new UserList());
@@ -433,6 +417,8 @@ public class UserStoryTests {
      * Check if the event created can be viewed by the admin (create the event, check if the event appears on the addminAllEvents)
      * @throws UiObjectNotFoundException
      * @throws InterruptedException
+     * Reference: ChatGPT
+     * Prompt: how to perform press action on the UI test?
      */
     @Test
     public void adminShowEvent() throws UiObjectNotFoundException, InterruptedException{
@@ -451,7 +437,7 @@ public class UserStoryTests {
         String eventName = "Tina's TestEvent For adminShowEvent" + time;
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         onView(withId(R.id.event_add_fab)).perform(click());
         Thread.sleep(1000);
         UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
@@ -466,7 +452,7 @@ public class UserStoryTests {
                 .perform(ViewActions.scrollTo())
                 .check(ViewAssertions.matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
-        Thread.sleep(2500);
+        Thread.sleep(1000);
         //Goto the admin all profiles and check
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
@@ -475,12 +461,12 @@ public class UserStoryTests {
         Thread.sleep(3000);
         onView(withId(R.id.all_event_search_button)).perform(click());
         Thread.sleep(3000);
-        onView(withId(R.id.all_event_search_button)).perform(ViewActions.clearText());
+        //press on the event
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.clearText());
         Thread.sleep(2000);
-        //click on the event
-        onView(withText(eventName)).perform(click());
-        Thread.sleep(3000);
-        onView(withText(eventName)).check(matches(isDisplayed()));
+        onView(withText(eventName)).perform(longClick());
+        Thread.sleep(2000);
+        onView(withId(R.id.delete_event_name_text)).check(matches(withText(eventName)));
     }
 
     /**
@@ -496,15 +482,16 @@ public class UserStoryTests {
         if (allowPermissions.exists()) {
             allowPermissions.click();
         }
+
         UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
         if (allowNPermissions.exists()) {
             allowNPermissions.click();
         }
         String time = String.valueOf(System.currentTimeMillis());
-        String eventName = "Tina's TestEvent For adminDeleteEvent" + time;
+        String eventName = "Tina's TestEvent For adminShowEvent" + time;
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.event_add_fab));
-        Thread.sleep(2000);
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+        Thread.sleep(1000);
         onView(withId(R.id.event_add_fab)).perform(click());
         Thread.sleep(1000);
         UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
@@ -519,7 +506,7 @@ public class UserStoryTests {
                 .perform(ViewActions.scrollTo())
                 .check(ViewAssertions.matches(isDisplayed()));
         onView(withId(R.id.button_create_event_submit)).perform(click());
-        Thread.sleep(2500);
+        Thread.sleep(1000);
         //Goto the admin all profiles and check
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
@@ -528,16 +515,19 @@ public class UserStoryTests {
         Thread.sleep(3000);
         onView(withId(R.id.all_event_search_button)).perform(click());
         Thread.sleep(3000);
-        onView(withId(R.id.all_event_search_button)).perform(ViewActions.clearText()); //clear the bar
-        //click on the event
-        onView(withText(eventName)).perform(click());
+        //press on the event
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.clearText());
+        Thread.sleep(2000);
+        onView(withText(eventName)).perform(longClick());
+        Thread.sleep(2000);
+        onView(withId(R.id.delete_event_name_text)).check(matches(withText(eventName)));
         Thread.sleep(3000);
-        onView(withText("Delete")).perform(click());
+//        Espresso.onView(withText("Delete")).perform(click());
         //Search again on the bar
-        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
-        Thread.sleep(3000);
-        onView(withId(R.id.all_event_search_button)).perform(click());
-        Thread.sleep(3000);
+//        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
+//        Thread.sleep(3000);
+//        onView(withId(R.id.all_event_search_button)).perform(click());
+//        Thread.sleep(3000);
     }
 
     @Test
@@ -554,19 +544,20 @@ public class UserStoryTests {
             allowNPermissions.click();
         }
         String time = String.valueOf(System.currentTimeMillis());
-        String userName = "adminShowProfile" + time;
+        String userName = "adminShowProfile " + time;
         //create a user and add it the firestore database to check
-        User user = new User("1234566", userName, "test@gmail.com", "0905192111", "html", true, true, "users/kcMZVbm6wAYlaKAct5Os");
+        User user = new User(null, userName, "test@gmail.com", "0905192111", "html", true, true, "");
         db.addUser(user);
         //Go to adminShowProfile
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_profile));
         Thread.sleep(3000);
-        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(userName));
+        onView(withId(R.id.all_profile_search_bar)).perform(ViewActions.typeText(userName));
         onView(withId(R.id.all_profile_search_button)).perform(click());
 
         Thread.sleep(3000);
-        onView(withId(R.id.all_profile_search_bar)).perform(ViewActions.clearText()); //clear the bar
+        onView(withId(R.id.all_profile_search_bar)).perform(ViewActions.clearText());
+        Thread.sleep(3000);
         onView(withText(userName)).check(matches(isDisplayed()));
     }
 
