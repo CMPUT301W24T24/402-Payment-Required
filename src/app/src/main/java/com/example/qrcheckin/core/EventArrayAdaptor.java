@@ -66,6 +66,8 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
 
+        this.events.sort(eventComparator);
+
         if (view == null && !allEvent) {
             view = LayoutInflater.from(context).inflate(R.layout.content_event, parent,false);
         } else if (view == null) {
@@ -98,8 +100,6 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
 
         // Set a uniquely identifiable tag for the event
         view.setTag(event.getId());
-
-        this.events.sort(eventComparator);
 
         return view;
     }
