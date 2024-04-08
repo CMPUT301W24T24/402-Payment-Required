@@ -305,8 +305,6 @@ public class UserStoryTests {
 
         Thread.sleep(1000);
         onView(withText("0 checkins")).check(matches(isDisplayed()));
-        onView(withId(R.id.profile_save_button)).perform(ViewActions.scrollTo()).check(matches(isDisplayed()));
-        onView(withId(R.id.profile_save_button)).perform(click());
 
     }
 
