@@ -3,6 +3,8 @@ com.example.qrcheckin.admin.allevents
 com.example.qrcheckin.admin.allimages
 com.example.qrcheckin.admin.allprofiles
 com.example.qrcheckin.core
+com.example.qrcheckin.user.attendeescheckedin
+com.example.qrcheckin.user.attendeessignedup
 com.example.qrcheckin.user.createevent
 com.example.qrcheckin.user.createnotification
 com.example.qrcheckin.user.editevent
