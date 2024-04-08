@@ -189,7 +189,6 @@ public class EditEventFragment extends Fragment {
         });
 
         // Set event information
-        assert event != null;
         editEventTitle.setText(event.getName());
         editEventDescription.setText(event.getDescription());
 
@@ -357,10 +356,6 @@ public class EditEventFragment extends Fragment {
             public void onClick(View v) {
                 if (editEventTitle.getText().toString().isEmpty()) {
                     Toast.makeText(getContext(), "Please enter event title", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (editEventDescription.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter event description", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (editEventAttendLimit.getText().toString().isEmpty()) {
