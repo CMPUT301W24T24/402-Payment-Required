@@ -25,6 +25,9 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
 
     }
 
+    /**
+     * Listener that waits for the user to be created
+     */
     interface CreateListener {
         void createUser(int position);
     }
@@ -80,6 +83,10 @@ public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnC
 
         View finalView = view;
         Database.getCheckInCountForUser(user.getId(), eventId, new Database.OnCheckInCountRetrievedListener() {
+            /**
+             * Called when the checkin count is retrieved and then displays the output to the user
+             * @param checkInCount The number of times the user has checked into the event
+             */
             @Override
             public void onCheckInCountRetrieved(long checkInCount) {
                 String numCheckins;

@@ -14,6 +14,9 @@ import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+/**
+ * A class that generates qr codes
+ */
 public class QRCodeGenerator {
 
     /**

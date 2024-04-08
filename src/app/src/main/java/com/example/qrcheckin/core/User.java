@@ -179,10 +179,18 @@ public class User implements Serializable {
         return admin;
     }
 
+    /**
+     * This method returns the imageRef of the user
+     * @return the imageRef of the user
+     */
     public String getImageRef() {
         return imageRef;
     }
 
+    /**
+     * This method sets the imageRef of the user
+     * @param imageRef the imageRef to be set to
+     */
     public void setImageRef(String imageRef) {
         this.imageRef = imageRef;
     }
@@ -219,6 +227,12 @@ public class User implements Serializable {
         canvas.drawCircle(50, 50, 35, paint);
         return bitmap;
     }
+
+    /**
+     * This method gets the hashed color of the character
+     * @param s the character to be hashed
+     * @return The hashed color of the character
+     */
     private int hashedColor(Character s) {
         StringBuilder colorString = new StringBuilder();
         int ascii = (int) s;

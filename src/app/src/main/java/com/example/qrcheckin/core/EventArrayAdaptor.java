@@ -42,6 +42,12 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         this.allEvent = false;
     }
 
+    /**
+     * Constructor for the EventArrayAdaptor
+     * @param context the context of the app
+     * @param events the ArrayList of events
+     * @param allEvent a Boolean confirming whether or not this is for allEvents
+     */
     public EventArrayAdaptor(Context context, ArrayList<Event> events, Boolean allEvent) {
         super(context, 0, events);
         this.events = events;
@@ -49,9 +55,14 @@ public class EventArrayAdaptor extends ArrayAdapter<Event> {
         this.allEvent = allEvent;
     }
 
+    /**
+     * Gets the ArrayList of events
+     * @return events - an ArrayList of events
+     */
     public ArrayList<Event> getEvents() {
         return events;
     }
+
 
     /**
      * Get the view of the event

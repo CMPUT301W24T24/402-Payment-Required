@@ -42,6 +42,9 @@ import java.util.Objects;
  */
 public class Database {
 
+    /**
+     * Creates a listener that waits for the user to be fetched and added to the database
+     */
     public interface UserListener {
         void onUserFetched(User user);
         void onUserAdded(String id);
@@ -897,6 +900,11 @@ public class Database {
         });
     }
 
+    /**
+     * Gets the geolocation for an event
+     * @param eventId the event id we are looking for the geolocation for
+     * @param listener OnGeoPointsFetchedListener waiting for geolocation to be found
+     */
     public static void fetchGeoPointsForEvent(String eventId, OnGeoPointsFetchedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference checkinRef = db.collection("checkins");
@@ -919,6 +927,9 @@ public class Database {
         });
     }
 
+    /**
+     * listener waiting for geolocation to be found
+     */
     public interface OnGeoPointsFetchedListener {
         void onGeoPointsFetched(List<GeoPoint> geoPoints);
         void onGeoPointsFetchFailed(Exception e);

@@ -101,7 +101,7 @@ public class AllProfilesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Animation zoomAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.zoom_in);
                 view.startAnimation(zoomAnimation);
-                profileArrayAdapter.setSelectedPosition(position, true);
+                profileArrayAdapter.setSelectedPosition(position);
                 AllProfilesFragment.this.position = position;
                 Toast.makeText(requireContext(), "Please click the floating button to delete the selected profile", Toast.LENGTH_LONG).show();
             }

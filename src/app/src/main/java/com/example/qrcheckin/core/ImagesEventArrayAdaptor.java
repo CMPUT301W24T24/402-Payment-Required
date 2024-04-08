@@ -53,6 +53,10 @@ public class ImagesEventArrayAdaptor extends ArrayAdapter<Event> {
         return view;
     }
 
+    /**
+     * Gets the ArrayList of events
+     * @return events - the ArrayList of events
+     */
     public ArrayList<Event> getEvents() {
         return events;
     }

@@ -1,7 +1,5 @@
 package com.example.qrcheckin;
 
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,9 +14,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,11 +24,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.qrcheckin.core.Database;
-import com.example.qrcheckin.core.MapSetUp;
-import com.example.qrcheckin.core.Notification;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.ActivityMainBinding;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
@@ -56,10 +49,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * The main activity class which contains the navigation bar and starts the user on the Home fragment

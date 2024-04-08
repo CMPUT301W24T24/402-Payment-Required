@@ -56,6 +56,10 @@ public class ImagesUserArrayAdaptor extends ArrayAdapter<User> {
         return view;
     }
 
+    /**
+     * Gets the ArrayList of users
+     * @return events - an ArrayList of users
+     */
     public ArrayList<User> getUsers() {
         return users;
     }

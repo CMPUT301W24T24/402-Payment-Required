@@ -17,16 +17,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ProfileArrayAdaptor displays the users profile
+ */
 public class ProfileArrayAdapter extends ArrayAdapter<User> {
 
 
     int selectedPosition = -1;
 
-    public void setSelectedPosition(int position, boolean b) {
+    /**
+     * Sets the selected position
+     * @param position the position to pass to
+     */
+    public void setSelectedPosition(int position) {
         selectedPosition = position;
         notifyDataSetChanged();
     }
 
+    /**
+     * A listener that waits for the profile to be created
+     */
     interface CreateProfileListener {
         void createProfile(int position);
     }
