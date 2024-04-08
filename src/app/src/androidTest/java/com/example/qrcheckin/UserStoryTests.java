@@ -20,6 +20,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
+import static org.junit.Assert.assertEquals;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -58,6 +59,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Date;
+import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 
 public class UserStoryTests {
     @Rule
@@ -426,6 +429,11 @@ public class UserStoryTests {
 //        Thread.sleep(5000);
     }
 
+    /**
+     * Check if the event created can be viewed by the admin (create the event, check if the event appears on the addminAllEvents)
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
     @Test
     public void adminShowEvent() throws UiObjectNotFoundException, InterruptedException{
         activityRule.getScenario().onActivity(Database::displayAdminDrawer);
@@ -464,18 +472,22 @@ public class UserStoryTests {
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
         Thread.sleep(2500);
         onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         onView(withId(R.id.all_event_search_button)).perform(click());
         Thread.sleep(3000);
-        onData(withId(R.id.all_event_listview))
-                .inAdapterView(CoreMatchers.is(withText(eventName)))
-                .atPosition(0)
-                .perform(click());
+        onView(withId(R.id.all_event_search_button)).perform(ViewActions.clearText());
         Thread.sleep(2000);
-
-
+        //click on the event
+        onView(withText(eventName)).perform(click());
+        Thread.sleep(3000);
+        onView(withText(eventName)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Check if the admin can delete an event
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
     @Test
     public void adminDeleteEvent() throws UiObjectNotFoundException, InterruptedException{
         activityRule.getScenario().onActivity(Database::displayAdminDrawer);
@@ -484,17 +496,91 @@ public class UserStoryTests {
         if (allowPermissions.exists()) {
             allowPermissions.click();
         }
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+        String time = String.valueOf(System.currentTimeMillis());
+        String eventName = "Tina's TestEvent For adminDeleteEvent" + time;
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.event_add_fab));
         Thread.sleep(2000);
+        onView(withId(R.id.event_add_fab)).perform(click());
+        Thread.sleep(1000);
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+        Thread.sleep(1000);
+
+        onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
+        Thread.sleep(1000);
+        onView(withId(R.id.button_create_event_submit))
+                .perform(ViewActions.scrollTo())
+                .check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.button_create_event_submit)).perform(click());
+        Thread.sleep(2500);
+        //Goto the admin all profiles and check
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
+        Thread.sleep(2500);
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
+        Thread.sleep(3000);
+        onView(withId(R.id.all_event_search_button)).perform(click());
+        Thread.sleep(3000);
+        onView(withId(R.id.all_event_search_button)).perform(ViewActions.clearText()); //clear the bar
+        //click on the event
+        onView(withText(eventName)).perform(click());
+        Thread.sleep(3000);
+        onView(withText("Delete")).perform(click());
+        //Search again on the bar
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
+        Thread.sleep(3000);
+        onView(withId(R.id.all_event_search_button)).perform(click());
+        Thread.sleep(3000);
+    }
+
+    @Test
+    public void adminShowProfile() throws UiObjectNotFoundException, InterruptedException{
+        activityRule.getScenario().onActivity(Database::displayAdminDrawer);
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
 
         UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
         if (allowNPermissions.exists()) {
             allowNPermissions.click();
         }
-        Thread.sleep(2000);
+        String time = String.valueOf(System.currentTimeMillis());
+        String userName = "adminShowProfile" + time;
+        //create a user and add it the firestore database to check
+        User user = new User("1234566", userName, "test@gmail.com", "0905192111", "html", true, true, "users/kcMZVbm6wAYlaKAct5Os");
+        db.addUser(user);
+        //Go to adminShowProfile
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-        Thread.sleep(2000);
-        // Click on a navigation item
-        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
-        Thread.sleep(2000);
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_profile));
+        Thread.sleep(3000);
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(userName));
+        onView(withId(R.id.all_profile_search_button)).perform(click());
+
+        Thread.sleep(3000);
+        onView(withId(R.id.all_profile_search_bar)).perform(ViewActions.clearText()); //clear the bar
+        onView(withText(userName)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void adminDeleteProfile() throws UiObjectNotFoundException {
+        activityRule.getScenario().onActivity(Database::displayAdminDrawer);
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
     }
 }
