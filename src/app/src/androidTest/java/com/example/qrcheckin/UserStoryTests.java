@@ -406,10 +406,16 @@ public class UserStoryTests {
         Thread.sleep(2000);
         onView(withId(R.id.all_event_search_button)).perform(click());
         Thread.sleep(3000);
+        onData(withId(R.id.all_event_listview))
+                .inAdapterView(CoreMatchers.is(withText(eventName)))
+                .atPosition(0)
+                .perform(click());
+        Thread.sleep(2000);
+
     }
 
     @Test
-    public void deleteEvent() throws UiObjectNotFoundException, InterruptedException{
+    public void adminDeleteEvent() throws UiObjectNotFoundException, InterruptedException{
         activityRule.getScenario().onActivity(Database::displayAdminDrawer);
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
