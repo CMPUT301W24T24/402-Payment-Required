@@ -1,5 +1,6 @@
 package com.example.qrcheckin;
 
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -20,6 +21,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.view.View;
 
 import androidx.test.espresso.ViewAction;
@@ -366,19 +369,25 @@ public class UserStoryTests {
 
         onView(withText("Sign Me Up")).perform(click());
 
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
-
         Thread.sleep(1000);
 
-        onView(withText(eventName)).perform(click());
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.close());
 
-        Thread.sleep(10000);
+        Thread.sleep(1000);
 
         onView(withId(R.id.edit_event_notify_attendees)).perform(click());
         onView(withId(R.id.create_notification_message)).perform(ViewActions.typeText("This is my Notification"));
         onView(withId(R.id.create_notification_button)).perform(click());
 
         onView(withId(R.id.edit_event_notify_attendees)).check(matches(isDisplayed()));
+
+        NotificationManager notificationManager = (NotificationManager) getTargetContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        assert (notificationManager.getActiveNotifications().length == 1);
     }
+
+    
+
 }
