@@ -122,7 +122,7 @@
     <fragment
         android:id="@+id/nav_attendees_signed_up"
         android:name="com.example.qrcheckin.user.attendeessignedup.AttendeesSignedUpFragment"
-        android:label="attendees_signed_up"
+        android:label="Signed-ups"
         tools:layout="@layout/fragment_attendees_signed_up">
         <action
             android:id="@+id/action_nav_attendeessignedup_to_nav_view_profile"
@@ -132,7 +132,7 @@
     <fragment
         android:id="@+id/nav_attendees_checked_in"
         android:name="com.example.qrcheckin.user.attendeescheckedin.AttendeesCheckedInFragment"
-        android:label="attendees_checked_in"
+        android:label="Checked-in Attendees"
         tools:layout="@layout/fragment_attendees_checked_in">
         <action
             android:id="@+id/action_nav_attendeescheckedin_to_nav_view_profile"
