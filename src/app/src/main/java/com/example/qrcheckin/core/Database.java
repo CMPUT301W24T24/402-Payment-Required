@@ -109,8 +109,10 @@ public class Database {
                     );
                     userListener.onUserFetched(user);
                 } else {
-                    // TODO: Handle user not found
                     Log.d("Firestore", "User not found");
+                    User user = new User(id, "Anonymous User", "", "", "", false, false);
+                    addUser(user);
+                    userListener.onUserFetched(user);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -300,6 +302,11 @@ public class Database {
         });
     }
 
+    /**
+     * This method fetches the picture of an event from the storage and sets it to an ImageView
+     * @param event the event to fetch the picture from
+     * @param imageView the ImageView to set the picture to
+     */
     public void getEventPicture(Event event, ImageView imageView) {
         if (event.getPosterRef() == null || event.getPosterRef().isEmpty()) {
             Log.e("Firestorage", "No picture reference");
@@ -318,6 +325,7 @@ public class Database {
             }
         });
     }
+
     /**
      * This static function is used to set on event listeners to the list of events from the database
      * It's used to update the list of events in the EventArrayAdaptor in all three explore, my and hosted events
@@ -325,6 +333,7 @@ public class Database {
      * @param mEventArrayAdaptor the MutableLiveData of the EventArrayAdaptor to notify the adaptor of the change
      * @param currentUserId the id of the current user from the app user
      * @param type the type of the event list, explore, my or hosted
+     * @param search the search string to filter the events
      */
     public static void onEventListChanged(ArrayList<Event> eventList, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String currentUserId, String type, String search) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("events");
@@ -361,6 +370,7 @@ public class Database {
      * @param mEventArrayAdaptor The MutableLiveData of the EventArrayAdaptor
      * @param eventList The list of events
      * @param currentUserId The id of the current user
+     * @param type The type of the event list
      */
     private static void fetchHost(QueryDocumentSnapshot doc, DocumentReference userRef, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, ArrayList<Event> eventList, String currentUserId, String type) {
         userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -429,6 +439,8 @@ public class Database {
      * @param event The event to check
      * @param mEventArrayAdaptor The MutableLiveData of the EventArrayAdaptor
      * @param userId The id of the current user
+     * @param toAdd Boolean to add the event to the eventList
+     * @param eventList The list of events to update
      */
     private static void getCurrentUserCheckedIns(Event event, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String userId, Boolean toAdd, ArrayList<Event> eventList) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("checkins");
@@ -463,6 +475,8 @@ public class Database {
      * @param event The event to check
      * @param mEventArrayAdaptor The MutableLiveData of the EventArrayAdaptor
      * @param userId The id of the current user
+     * @param toAdd Boolean to add the event to the eventList
+     * @param eventList The list of events to update
      */
     private static void getCurrentUserSignedUps(Event event, MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor, String userId, Boolean toAdd, ArrayList<Event> eventList) {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("signUpTable");
@@ -490,6 +504,11 @@ public class Database {
         });
 
     }
+
+    /**
+     * Delete an event from the database
+     * @param id The id of the event to delete
+     */
     public static void deleteEvent(String id) {
         // Delete the event
         FirebaseFirestore.getInstance().collection("events").document(id).delete()
@@ -667,7 +686,11 @@ public class Database {
     }
 
 
-
+    /**
+     * delete an image on firebase storage of a user
+     * @param user the user to delete the image from
+     * @param imagesUserArrayAdaptor the adaptor to notify of the change
+     */
     public static void deleteImage(User user, ImagesUserArrayAdaptor imagesUserArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference usersRef = db.collection("users");
@@ -687,7 +710,11 @@ public class Database {
         });
     }
 
-
+    /**
+     * Fetches all the images from the database and sets them to the adaptors
+     * @param events the adaptor for the events
+     * @param users the adaptor for the users
+     */
     public static void getAllImages(ImagesEventArrayAdaptor events, ImagesUserArrayAdaptor users) {
         CollectionReference usersRef = FirebaseFirestore.getInstance().collection("users");
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("events");
@@ -785,6 +812,12 @@ public class Database {
         });
     }
 
+    /**
+     * get the certain image of a single user
+     * @param imagesUserArrayAdaptor the adaptor to set to
+     * @param position the position of the user in the list
+     * @param imageView the image view to set the image to
+     */
     public static void getAllImagesUserPicture(ImagesUserArrayAdaptor imagesUserArrayAdaptor, int position, ImageView imageView) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         ArrayList<User> users = imagesUserArrayAdaptor.getUsers();
@@ -811,6 +844,12 @@ public class Database {
         });
     }
 
+    /**
+     * get the certain image of a single event
+     * @param imagesEventArrayAdaptor the adaptor to set to
+     * @param position the position of the event in the list
+     * @param imageView the image view to set the image to
+     */
     public static void getAllImagesEventPoster(ImagesEventArrayAdaptor imagesEventArrayAdaptor, int position, ImageView imageView) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         ArrayList<Event> events = imagesEventArrayAdaptor.getEvents();
@@ -834,8 +873,11 @@ public class Database {
         });
     }
 
-
-
+    /**
+     * delete an image on firebase storage of an event
+     * @param event the event to delete the image from
+     * @param imagesEventArrayAdaptor the adaptor to notify of the change
+     */
     public static void deleteImage(Event event, ImagesEventArrayAdaptor imagesEventArrayAdaptor) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsRef = db.collection("events");
