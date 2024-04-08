@@ -45,6 +45,14 @@ public class AllEventsFragment extends Fragment {
 
     private ListView listView;
 
+    /**
+     * Inflates the layout for AllEventsFragment and sets up the UI and click listeners
+     * for the list view and search button
+     * @param inflater The LayoutInflater object used to inflate the xml
+     * @param container The ViewGroup that the inflated view will be added to
+     * @param savedInstanceState A Bundle containing state data from the previous instance
+     * @return the root view of the inflated layout
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         AllEventsViewModel allEventsViewModel =
@@ -62,6 +70,9 @@ public class AllEventsFragment extends Fragment {
         onEventListChanged(events, mEventArrayAdaptor, ((QRCheckInApplication) requireContext().getApplicationContext()).getCurrentUser().getId(), "explore", null);
         listView.setAdapter(mEventArrayAdaptor.getValue());
 
+        /**
+         * Allows admins to click on items in the event list view
+         */
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -72,6 +83,9 @@ public class AllEventsFragment extends Fragment {
             }
         });
 
+        /**
+         * Deletes events from the event list view if the admin long clicks on an event in the event list
+         */
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -82,6 +96,9 @@ public class AllEventsFragment extends Fragment {
             }
         });
 
+        /**
+         * Allows the admin to click on the search button and see a filtered list of events
+         */
         binding.allEventSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +114,9 @@ public class AllEventsFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

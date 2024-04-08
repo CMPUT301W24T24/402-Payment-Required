@@ -11,6 +11,9 @@ import androidx.lifecycle.ViewModel;
 public class AllEventsViewModel extends ViewModel {
 //    private final MutableLiveData<String> mText;
 
+    /**
+     * Initializes the AllEventsViewModel class by calling its super
+     */
     public AllEventsViewModel() {
 //        mText = new MutableLiveData<>();
 //        mText.setValue("This is all events fragment");

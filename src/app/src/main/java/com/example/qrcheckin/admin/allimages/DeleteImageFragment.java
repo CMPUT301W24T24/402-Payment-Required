@@ -17,6 +17,9 @@ import com.example.qrcheckin.databinding.FragmentDeleteImageBinding;
 
 import javax.annotation.Nullable;
 
+/**
+ * The fragment class that asks the admin if they would like to delete the image
+ */
 public class DeleteImageFragment extends DialogFragment {
     private FragmentDeleteImageBinding binding;
     private Event event;
@@ -24,17 +27,34 @@ public class DeleteImageFragment extends DialogFragment {
     private ImagesEventArrayAdaptor eventAdapter;
     private ImagesUserArrayAdaptor userAdapter;
 
+    /**
+     * Initializes the DeleteImageFragment for images referenced by an event
+     * @param event the event that the image is referenced by
+     * @param user the user that the image is referenced by (null)
+     * @param eventAdapter the ImagesEventArrayAdaptor to be used
+     */
     public DeleteImageFragment(@Nullable Event event, @Nullable User user, @Nullable ImagesEventArrayAdaptor eventAdapter) {
         this.event = event;
         this.user = user;
         this.eventAdapter = eventAdapter;
     }
+
+    /**
+     * Initializes the DeleteImageFragment for images referenced by a user
+     * @param event the event that the image is referenced by (null)
+     * @param user the user that the image is referenced by
+     * @param userAdapter the ImagesUserArrayAdaptor to be used
+     */
     public DeleteImageFragment(@Nullable Event event, @Nullable User user, @Nullable ImagesUserArrayAdaptor userAdapter) {
         this.event = event;
         this.user = user;
         this.userAdapter = userAdapter;
     }
 
+    /**
+     * Inflates the layout for DeleteImageFragment and sets up the UI and click listeners
+     * @return the root view of the inflated layout
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

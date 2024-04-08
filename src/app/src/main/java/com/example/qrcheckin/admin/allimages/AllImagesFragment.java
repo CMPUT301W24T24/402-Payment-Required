@@ -30,6 +30,13 @@ public class AllImagesFragment extends Fragment {
 
     private FragmentAllImagesBinding binding;
 
+    /**
+     * Inflates the layout for AllImagesFragment and sets up the UI and click listeners for the list view
+     * @param inflater The LayoutInflater object used to inflate the xml
+     * @param container The ViewGroup that the inflated view will be added to
+     * @param savedInstanceState A Bundle containing state data from the previous instance
+     * @return the root view of the inflated layout
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         AllImagesViewModel allImagesViewModel =
@@ -47,6 +54,9 @@ public class AllImagesFragment extends Fragment {
         binding.allImagesEventListView.setAdapter(eventAdapter);
         binding.allImagesProfileListView.setAdapter(userAdapter);
 
+        /**
+         * Allows admin to click on each individual image in the list
+         */
         binding.allImagesEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -74,6 +84,9 @@ public class AllImagesFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

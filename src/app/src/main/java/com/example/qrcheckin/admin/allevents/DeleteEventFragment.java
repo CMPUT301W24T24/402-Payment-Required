@@ -18,15 +18,27 @@ import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.databinding.FragmentAllEventsBinding;
 import com.example.qrcheckin.databinding.FragmentDeleteEventBinding;
 
+/**
+ * The fragment class that asks the admin if they would like to delete the event
+ */
 public class DeleteEventFragment extends DialogFragment {
     private FragmentDeleteEventBinding binding;
     private Event event;
 
+    /**
+     * Initializes the delete event fragment
+     * @param event The event the admin is in the process of deleting
+     */
     public DeleteEventFragment(Event event) {
         super();
         this.event = event;
     }
 
+    /**
+     * Inflates the layout for DeleteEventFragment and sets up the UI and click listeners
+     * @param savedInstanceState A Bundle containing state data from the previous instance
+     * @return the root view of the inflated layout
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

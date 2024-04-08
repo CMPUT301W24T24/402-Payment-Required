@@ -237,6 +237,9 @@ public class AllProfilesFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets the binding to null when the view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

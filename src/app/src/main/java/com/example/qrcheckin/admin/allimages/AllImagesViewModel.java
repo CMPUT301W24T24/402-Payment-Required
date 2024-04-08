@@ -11,6 +11,9 @@ import androidx.lifecycle.ViewModel;
 public class AllImagesViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
 
+    /**
+     * Initializes the AllImagesViewModel
+     */
     public AllImagesViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is all images fragment");
