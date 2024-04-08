@@ -355,10 +355,11 @@ public class EditEventFragment extends Fragment {
         editEventUpdate.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if (imageUpdated && !Objects.equals(event.getPosterRef(), "events/" + event.getId()) && (!event.getPosterRef().isEmpty() || event.getPosterRef() != null)) {
+                if (imageUpdated && !Objects.equals(event.getPosterRef(), "events/" + event.getId()) && !event.getPosterRef().isEmpty() && event.getPosterRef() != null) {
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference storageRef = storage.getReference();
                     StorageReference imageRef = storageRef.child(event.getPosterRef());
+                    event.setPosterRef("events/" + event.getId());
                     imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -370,8 +371,11 @@ public class EditEventFragment extends Fragment {
                             Log.e("Firebase", "Event poster deletion failed", e);
                         }
                     });
+                }
+                if (imageUpdated && (event.getPosterRef() == null || event.getPosterRef().isEmpty())) {
                     event.setPosterRef("events/" + event.getId());
                 }
+
                 if (editEventTitle.getText().toString().isEmpty()) {
                     Toast.makeText(getContext(), "Please enter event title", Toast.LENGTH_SHORT).show();
                     return;
