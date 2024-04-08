@@ -19,6 +19,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import android.util.Log;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -604,6 +607,8 @@ public class Event implements Serializable {
     public void setCurrentUserCheckedIn(Boolean currentUserCheckedIn) {
         this.currentUserCheckedIn = currentUserCheckedIn;
     }
+
+
 
 }
 
