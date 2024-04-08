@@ -29,10 +29,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * The fragment class for all profiles which can only be seen by admins
@@ -49,8 +51,7 @@ public class AllProfilesFragment extends Fragment {
     private FloatingActionButton deleteCityButton;
     private CollectionReference checkinsRef;
     private CollectionReference signupsRef;
-    private Database database = new Database();;
-
+    private Database database = new Database();
     private int position = ListView.INVALID_POSITION;
 
     /**
@@ -83,7 +84,16 @@ public class AllProfilesFragment extends Fragment {
         checkinsRef = db.collection("checkins");
         signupsRef = db.collection("signUpTable");
 
-        getAllUsers();
+        String search = binding.allProfileSearchBar.getText().toString();
+        getAllUsers(search.isEmpty() ? null : search);
+
+        binding.allProfileSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String search = binding.allProfileSearchBar.getText().toString();
+                getAllUsers(search.isEmpty() ? null : search);
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -188,11 +198,15 @@ public class AllProfilesFragment extends Fragment {
     /**
      * Get all the users from the Firestore database
      */
-    private void getAllUsers() {
+    private void getAllUsers(String search) {
         profileDataList.clear();
+
         usersRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
+                    if (search != null && !Objects.requireNonNull(Objects.requireNonNull(document.getString("name")).toLowerCase()).contains(search.toLowerCase())) {
+                        continue;
+                    }
                     // Convert each document to a User object and add it to the list
                     String id = document.getId();
                     String name = document.getString("name");
