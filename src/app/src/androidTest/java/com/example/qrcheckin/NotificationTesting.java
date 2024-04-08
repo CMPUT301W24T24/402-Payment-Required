@@ -8,6 +8,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.contrib.NavigationViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiObject;
+import androidx.test.uiautomator.UiObjectNotFoundException;
+import androidx.test.uiautomator.UiSelector;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +28,18 @@ public class NotificationTesting {
     // prompt: how do I create a unit test with Junit that interacts
     // with my navigation view in mainactivity from any fragment
     @Test
-    public void testNavigationNotificationInteraction() throws InterruptedException {
+    public void testNavigationNotificationInteraction() throws InterruptedException, UiObjectNotFoundException {
+
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
 
         Thread.sleep(2500);
 

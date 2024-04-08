@@ -1,5 +1,6 @@
 package com.example.qrcheckin.core;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import com.example.qrcheckin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -982,5 +984,17 @@ public class Database {
 
             }
         });
+    }
+
+    /**
+     * This method is used to display the admin drawer in the navigation view (for testing purposes)
+     * Do not call this method in production code
+     * @param activity The activity that contains the navigation view
+     */
+    public static void displayAdminDrawer(Activity activity) {
+        NavigationView navigationView = activity.findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_all_event).setVisible(true);
+        navigationView.getMenu().findItem(R.id.nav_all_images).setVisible(true);
+        navigationView.getMenu().findItem(R.id.nav_all_profile).setVisible(true);
     }
 }
