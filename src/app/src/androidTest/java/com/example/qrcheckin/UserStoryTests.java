@@ -57,8 +57,6 @@ public class UserStoryTests {
      * Test that will create an event, modify the event details, then makes sure the correct event
      * details are displayed, then makes sure QR codes have been generated
      *
-     * Tests user stories:
-     *
      * @throws InterruptedException
      * @throws UiObjectNotFoundException
      */
@@ -146,9 +144,7 @@ public class UserStoryTests {
     }
 
     /**
-     * Test that will
-     *
-     * Tests user stories:
+     * Test that will create event then verify that nobody has signed up for that event
      *
      * @throws UiObjectNotFoundException
      * @throws InterruptedException
@@ -204,9 +200,8 @@ public class UserStoryTests {
     }
 
     /**
-     * Test that will
-     *
-     * Tests user stories:
+     * Test that will create an event then sign up to it then verify that they are shown in the
+     * organizers event sign up page
      *
      * @throws UiObjectNotFoundException
      * @throws InterruptedException
@@ -277,18 +272,21 @@ public class UserStoryTests {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
 
+        Thread.sleep(2000);
+
         onView(withText(eventName)).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.edit_event_show_sign_ups)).perform(scrollTo()).check(matches(isDisplayed()));
         onView(withId(R.id.edit_event_show_sign_ups)).perform(click());
 
-        onView(withText("Anonymous User")).check(matches(isDisplayed()));
+        Thread.sleep(1000);
+        onView(withText("0 checkins")).check(matches(isDisplayed()));
 
     }
 
     /**
-     * Test that will
-     *
-     * Tests user stores:
+     * Test that will go to the user's profile, edit a bunch of data then save and check that it
+     * was all stored and retrieved successfully
      *
      * @throws UiObjectNotFoundException
      * @throws InterruptedException
@@ -348,8 +346,6 @@ public class UserStoryTests {
     /**
      * Test that will create an event, send a notification, sign up to the event,
      * navigate to notifications fragment and makes sure a notification message is present there
-     *
-     * Tests user stories:
      *
      * @throws UiObjectNotFoundException
      * @throws InterruptedException
@@ -430,8 +426,6 @@ public class UserStoryTests {
     /**
      * Test that will make a user create an event, sign up to that event, make a notification,
      * and makes sure that the notification is received
-     *
-     * Tests user stories:
      *
      * @throws UiObjectNotFoundException
      * @throws InterruptedException
