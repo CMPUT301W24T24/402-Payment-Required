@@ -15,6 +15,9 @@ import com.example.qrcheckin.R;
 
 import java.util.ArrayList;
 
+/**
+ *  * An array adapter for displaying user info in formation and connecting it with the ui of attendees
+ */
 public class UserArrayAdaptor extends ArrayAdapter<User> implements Database.OnCheckInCountRetrievedListener {
     /**
      * Sets the view to the number of users checkins.

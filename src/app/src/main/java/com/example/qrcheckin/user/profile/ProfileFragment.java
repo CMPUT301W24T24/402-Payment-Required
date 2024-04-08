@@ -43,6 +43,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 
+/**
+ * A fragment where a user can edit their personal details
+ */
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;

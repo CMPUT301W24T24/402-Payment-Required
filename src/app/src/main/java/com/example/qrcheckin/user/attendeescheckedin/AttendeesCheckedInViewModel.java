@@ -16,6 +16,9 @@ import com.example.qrcheckin.core.UserArrayAdaptor;
 
 import java.util.ArrayList;
 
+/**
+ * A viewmodel for attendees who are checked in which connects to the fragment
+ */
 public class AttendeesCheckedInViewModel extends ViewModel {
     private final MutableLiveData<UserArrayAdaptor> mUserArrayAdapter;
     private final ArrayList<User> userList;

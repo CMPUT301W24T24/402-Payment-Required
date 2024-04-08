@@ -15,6 +15,9 @@ import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentViewProfileBinding;
 
+/**
+ * A fragment where a user can view another user's profile
+ */
 public class ViewProfileFragment extends Fragment {
 
     private FragmentViewProfileBinding binding;
