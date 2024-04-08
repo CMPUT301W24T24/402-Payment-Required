@@ -387,7 +387,4 @@ public class UserStoryTests {
 
         assert (notificationManager.getActiveNotifications().length == 1);
     }
-
-    
-
 }
