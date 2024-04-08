@@ -109,8 +109,10 @@ public class Database {
                     );
                     userListener.onUserFetched(user);
                 } else {
-                    // TODO: Handle user not found
                     Log.d("Firestore", "User not found");
+                    User user = new User(id, "Anonymous User", "", "", "", false, false);
+                    addUser(user);
+                    userListener.onUserFetched(user);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
