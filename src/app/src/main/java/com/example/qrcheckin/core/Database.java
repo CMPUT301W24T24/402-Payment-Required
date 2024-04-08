@@ -348,6 +348,11 @@ public class Database {
                     Log.e("Firestore", error.toString());
                     return;
                 }
+                if (querySnapshots == null || querySnapshots.isEmpty()) {
+                    mEventArrayAdaptor.getValue().getEvents().clear();
+                    Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
+                    return;
+                }
                 if (querySnapshots != null) {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
                     mEventArrayAdaptor.getValue().getEvents().clear();
