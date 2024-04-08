@@ -53,6 +53,13 @@ public class UserStoryTests {
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
 
+    /**
+     * Test that will create an event, modify the event details, then makes sure the correct event
+     * details are displayed, then makes sure QR codes have been generated
+     *
+     * @throws InterruptedException
+     * @throws UiObjectNotFoundException
+     */
     @Test
     public void createEvent() throws InterruptedException, UiObjectNotFoundException {
         Thread.sleep(1000);
@@ -131,10 +138,19 @@ public class UserStoryTests {
         onView(withId(R.id.edit_event_check_in_code))
                 .perform(ViewActions.scrollTo())
                 .check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.edit_event_promo_code))
+                .perform(ViewActions.scrollTo())
+                .check(ViewAssertions.matches(isDisplayed()));
     }
 
+    /**
+     * Test that will create event then verify that nobody has signed up for that event
+     *
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
     @Test
-    public void checkAttendees() throws UiObjectNotFoundException, InterruptedException {
+    public void checkNoAttendees() throws UiObjectNotFoundException, InterruptedException {
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
@@ -183,6 +199,98 @@ public class UserStoryTests {
         onView(withText("No one has signed up for this event")).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test that will create an event then sign up to it then verify that they are shown in the
+     * organizers event sign up page
+     *
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
+    @Test
+    public void checkAttendees() throws UiObjectNotFoundException, InterruptedException {
+
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+
+        String eventName = "" + System.currentTimeMillis();
+
+        eventName = eventName.substring(eventName.length() - 7, eventName.length());
+
+        eventName = eventName + "chAtt";
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+
+        Thread.sleep(2000);
+
+        onView(withId(R.id.event_add_fab)).perform(click());
+
+        Thread.sleep(1000);
+
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.button_create_event_submit))
+                .perform(ViewActions.scrollTo())
+                .check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.button_create_event_submit)).perform(click());
+
+        Thread.sleep(2500);
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_explore_event));
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.typeText(eventName));
+        onView(withId(R.id.explore_event_search_button)).perform(click());
+        Thread.sleep(2000);
+        onView(withId(R.id.explore_event_search_bar)).perform(ViewActions.clearText());
+
+        Thread.sleep(2000);
+
+        onView(withText(eventName))
+                .perform(click());
+
+        onView(withText("Sign Me Up")).perform(click());
+
+        Thread.sleep(1000);
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+
+        Thread.sleep(2000);
+
+        onView(withText(eventName)).perform(click());
+        Thread.sleep(1000);
+        onView(withId(R.id.edit_event_show_sign_ups)).perform(scrollTo()).check(matches(isDisplayed()));
+        onView(withId(R.id.edit_event_show_sign_ups)).perform(click());
+
+        Thread.sleep(1000);
+        onView(withText("0 checkins")).check(matches(isDisplayed()));
+
+    }
+
+    /**
+     * Test that will go to the user's profile, edit a bunch of data then save and check that it
+     * was all stored and retrieved successfully
+     *
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
     @Test
     public void EditProfile() throws UiObjectNotFoundException, InterruptedException {
 
@@ -235,6 +343,13 @@ public class UserStoryTests {
         onView(withId(R.id.profile_homepage_link)).check(matches(withText("my homepage link")));
     }
 
+    /**
+     * Test that will create an event, send a notification, sign up to the event,
+     * navigate to notifications fragment and makes sure a notification message is present there
+     *
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
     @Test
     public void sendNotification() throws UiObjectNotFoundException, InterruptedException {
 
@@ -308,6 +423,13 @@ public class UserStoryTests {
         onView(withText("This is my Notification")).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test that will make a user create an event, sign up to that event, make a notification,
+     * and makes sure that the notification is received
+     *
+     * @throws UiObjectNotFoundException
+     * @throws InterruptedException
+     */
     @Test
     public void pushNotification() throws UiObjectNotFoundException, InterruptedException {
 

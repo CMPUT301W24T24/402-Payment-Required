@@ -64,16 +64,15 @@ public class AttendeesSignedUpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User user = (User) listView.getItemAtPosition(position);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("user", (Serializable) user);
-                // TODO: Update to show user profile
-                // Navigation.findNavController(requireView()).navigate(R.id.action_nav_attendeessignedup_to_nav_view_profile, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_attendeessignedup_to_nav_view_profile, bundle);
             }
-        });*/
+        });
     }
 
     /**
