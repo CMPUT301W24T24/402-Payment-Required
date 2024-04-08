@@ -11,8 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.qrcheckin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -344,6 +346,11 @@ public class Database {
                     Log.e("Firestore", error.toString());
                     return;
                 }
+                if (querySnapshots == null || querySnapshots.isEmpty()) {
+                    mEventArrayAdaptor.getValue().getEvents().clear();
+                    Objects.requireNonNull(mEventArrayAdaptor.getValue()).notifyDataSetChanged();
+                    return;
+                }
                 if (querySnapshots != null) {
                     Log.d("Firestore", "Event list changed " + querySnapshots.size());
                     mEventArrayAdaptor.getValue().getEvents().clear();
@@ -510,23 +517,36 @@ public class Database {
      * @param id The id of the event to delete
      */
     public static void deleteEvent(String id) {
-        // Delete the event
-        FirebaseFirestore.getInstance().collection("events").document(id).delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Firestore", e.toString());
-                    }
-                });
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("events").document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                String posterRef = task.getResult().getString("posterRef");
+                if (task.isSuccessful() && posterRef != null && !posterRef.isEmpty()) {
+                    FirebaseStorage.getInstance().getReference().child(posterRef).delete();
+                    Log.d("FirebaseStorage", posterRef + "deleted");
+                }
+                // Delete the event
+                db.collection("events").document(id).delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Firestore", e.toString());
+                            }
+                        });
+            }
+        });
+
+
 
         // Delete the related check ins
-        FirebaseFirestore.getInstance().collection("checkins").whereEqualTo("event_id", id).get()
+        db.collection("checkins").whereEqualTo("event_id", id).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -537,7 +557,7 @@ public class Database {
                 });
 
         // Delete the related sign ups
-        FirebaseFirestore.getInstance().collection("signUpTable").whereEqualTo("event_id", id).get()
+        db.collection("signUpTable").whereEqualTo("event_id", id).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
