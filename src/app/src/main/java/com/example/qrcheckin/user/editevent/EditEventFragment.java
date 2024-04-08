@@ -95,6 +95,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
@@ -354,6 +355,27 @@ public class EditEventFragment extends Fragment {
         editEventUpdate.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                if (imageUpdated && !Objects.equals(event.getPosterRef(), "events/" + event.getId()) && !event.getPosterRef().isEmpty() && event.getPosterRef() != null) {
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReference();
+                    StorageReference imageRef = storageRef.child(event.getPosterRef());
+                    event.setPosterRef("events/" + event.getId());
+                    imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Firebase", "Event poster deleted successfully");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("Firebase", "Event poster deletion failed", e);
+                        }
+                    });
+                }
+                if (imageUpdated && (event.getPosterRef() == null || event.getPosterRef().isEmpty())) {
+                    event.setPosterRef("events/" + event.getId());
+                }
+
                 if (editEventTitle.getText().toString().isEmpty()) {
                     Toast.makeText(getContext(), "Please enter event title", Toast.LENGTH_SHORT).show();
                     return;
@@ -370,11 +392,12 @@ public class EditEventFragment extends Fragment {
                 data.put("description", event.getDescription());
                 data.put("limit", event.getLimit());
                 data.put("name", event.getName());
+                data.put("posterRef", event.getPosterRef());
                 docRef.update(data)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                Log.d("firestore", "update the event name, limit, and description sucessfully");
+                                Log.d("firestore", "update the event name, limit, posterRef, and description successfully");
                                 Toast.makeText(getContext(), "Updated Event Information", Toast.LENGTH_SHORT).show();
                             }
                         })

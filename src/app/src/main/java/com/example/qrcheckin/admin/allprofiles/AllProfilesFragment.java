@@ -24,6 +24,7 @@ import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.ProfileArrayAdapter;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.databinding.FragmentAllProfilesBinding;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
@@ -126,9 +127,7 @@ public class AllProfilesFragment extends Fragment {
              */
             private void deleteProfile(int position) {
                 User profileDelete = profileDataList.get(position);
-                profileDataList.remove(position);
-                profileArrayAdapter.notifyDataSetChanged();
-                listView.setAdapter(profileArrayAdapter);
+
                 //delete the user in the FireStore Collection
                 String userId = profileDelete.getId();
                 DocumentReference ownerRef = usersRef.document(userId);
@@ -141,7 +140,17 @@ public class AllProfilesFragment extends Fragment {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
+                                String search = binding.allProfileSearchBar.getText().toString();
+                                getAllUsers(search.isEmpty() ? null : search);
                                 Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                String search = binding.allProfileSearchBar.getText().toString();
+                                getAllUsers(search.isEmpty() ? null : search);
+                                Log.d("Firestore", "Profile not deleted " + e.toString());
                             }
                         });
                 //delete the checkins and signups with userID

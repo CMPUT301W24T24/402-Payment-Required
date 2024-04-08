@@ -126,7 +126,7 @@
         tools:layout="@layout/fragment_attendees_signed_up">
         <action
             android:id="@+id/action_nav_attendeessignedup_to_nav_view_profile"
-            app:destination="@id/nav_profile" />
+            app:destination="@id/nav_view_profile" />
     </fragment>
 
     <fragment
@@ -136,7 +136,13 @@
         tools:layout="@layout/fragment_attendees_checked_in">
         <action
             android:id="@+id/action_nav_attendeescheckedin_to_nav_view_profile"
-            app:destination="@id/nav_profile" />
+            app:destination="@id/nav_view_profile" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_view_profile"
+        android:name="com.example.qrcheckin.user.profile.ViewProfileFragment"
+        android:label="Current Profile"
+        tools:layout="@layout/fragment_view_profile" />
 
 </navigation>
