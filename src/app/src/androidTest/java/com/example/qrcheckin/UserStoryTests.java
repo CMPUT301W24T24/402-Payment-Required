@@ -444,6 +444,8 @@ public class UserStoryTests {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_notifications));
 
+        Thread.sleep(2000);
+
         onView(withText("This is my Notification")).check(matches(isDisplayed()));
     }
 

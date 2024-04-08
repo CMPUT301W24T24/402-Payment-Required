@@ -5,19 +5,57 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import android.app.Instrumentation;
+import android.content.Context;
+import android.util.Log;
+
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.core.EventList;
 import com.example.qrcheckin.core.User;
 import com.example.qrcheckin.core.UserList;
 import com.google.type.DateTime;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Date;
 
 public class EventListTest {
+    @Rule
+    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<MainActivity>(MainActivity.class);
+
+    QRCheckInApplication app;
+    Database db;
+    User currentUser;
+
+
+    @Before
+    public void getApplication() throws InterruptedException {
+
+        // Get the application
+        Log.d("QRCheckIn", "getApplication");
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context appContext = instrumentation.getTargetContext();
+        app = (QRCheckInApplication) appContext.getApplicationContext();
+        if (app == null) {
+            app = (QRCheckInApplication) app.getApplicationContext();
+        }
+        if (app == null) {
+            Log.d("QRCheckIn", "The app is null");
+        }
+        Thread.sleep(2500);
+
+        db = new Database();
+        currentUser = app.getCurrentUser();
+    }
+
     private Event mockEvent() {
-        User user = new User("123", "Tina", "ngocthuy@gmail.com", "12344555", "123", false, false);
+        User user = currentUser;
         UserList list = new UserList();
         list.add(user);
         Event testEvent = new Event("1", user, "TestEvent", "TestDescription", "TestRef", new Date(), "TestLocation", 0.0, 0.0, "Test", "Test", "Test", "Test", false, 10, list);
