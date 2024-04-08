@@ -19,6 +19,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.Context;
+import android.util.Log;
+
 import androidx.test.espresso.action.AdapterViewProtocol;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
@@ -32,20 +37,54 @@ import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
+import com.example.qrcheckin.core.Database;
 import com.example.qrcheckin.core.Event;
+import com.example.qrcheckin.core.User;
+import com.example.qrcheckin.core.UserList;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.checkerframework.checker.units.qual.N;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.AllOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.Date;
 
 public class UserStoryTests {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
 
+    QRCheckInApplication app;
+    Database db;
+    User currentUser;
+
+
+    @Before
+    public void getApplication() throws InterruptedException {
+
+        // Get the application
+        Log.d("QRCheckIn", "getApplication");
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Context appContext = instrumentation.getTargetContext();
+        app = (QRCheckInApplication) appContext.getApplicationContext();
+        if (app == null) {
+            app = (QRCheckInApplication) app.getApplicationContext();
+        }
+        if (app == null) {
+            Log.d("QRCheckIn", "The app is null");
+        }
+        Thread.sleep(2500);
+
+        db = new Database();
+        currentUser = app.getCurrentUser();
+    }
+
+    public Event getMockEvent() {
+        return new Event("Tina's hosted exciting event", currentUser, "Event for delete Event", "hey, what is this event for other than testing?", "", new Date(), "", 0.00, 0.00, "", "", true, 100, new UserList());
+    }
     @Test
     public void createEvent() throws InterruptedException, UiObjectNotFoundException {
         Thread.sleep(1000);
@@ -324,6 +363,70 @@ public class UserStoryTests {
 
 
 //        Thread.sleep(5000);
+    }
 
+    @Test
+    public void adminShowEvent() throws UiObjectNotFoundException, InterruptedException{
+        activityRule.getScenario().onActivity(Database::displayAdminDrawer);
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+        String time = String.valueOf(System.currentTimeMillis());
+        String eventName = "Tina's TestEvent For adminShowEvent" + time;
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_host_event));
+        Thread.sleep(2000);
+        onView(withId(R.id.event_add_fab)).perform(click());
+        Thread.sleep(1000);
+        UiObject allowPPermissions = device.findObject(new UiSelector().text("Change to precise location"));
+        if (allowPPermissions.exists()) {
+            allowPPermissions.click();
+        }
+        Thread.sleep(1000);
+
+        onView(withId(R.id.text_create_event_title)).perform(ViewActions.typeText(eventName));
+        Thread.sleep(1000);
+        onView(withId(R.id.button_create_event_submit))
+                .perform(ViewActions.scrollTo())
+                .check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.button_create_event_submit)).perform(click());
+        Thread.sleep(2500);
+        //Goto the admin all profiles and check
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
+        Thread.sleep(2500);
+        onView(withId(R.id.all_event_search_bar)).perform(ViewActions.typeText(eventName));
+        Thread.sleep(2000);
+        onView(withId(R.id.all_event_search_button)).perform(click());
+        Thread.sleep(3000);
+    }
+
+    @Test
+    public void deleteEvent() throws UiObjectNotFoundException, InterruptedException{
+        activityRule.getScenario().onActivity(Database::displayAdminDrawer);
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
+        if (allowPermissions.exists()) {
+            allowPermissions.click();
+        }
+        Thread.sleep(2000);
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
+        }
+        Thread.sleep(2000);
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        Thread.sleep(2000);
+        // Click on a navigation item
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_all_event));
+        Thread.sleep(2000);
     }
 }
