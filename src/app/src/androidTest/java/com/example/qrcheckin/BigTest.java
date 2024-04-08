@@ -3,6 +3,7 @@ package com.example.qrcheckin;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressMenuKey;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
@@ -43,9 +44,14 @@ public class BigTest {
         Thread.sleep(1000);
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        UiObject allowPermissions = device.findObject(new UiSelector().text("Allow"));
+        UiObject allowPermissions = device.findObject(new UiSelector().text("While using the app"));
         if (allowPermissions.exists()) {
             allowPermissions.click();
+        }
+
+        UiObject allowNPermissions = device.findObject(new UiSelector().text("Allow"));
+        if (allowNPermissions.exists()) {
+            allowNPermissions.click();
         }
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
@@ -90,7 +96,8 @@ public class BigTest {
         onView(withText("This is my name")).check(doesNotExist());
         onView(withId(R.id.profile_name)).perform(ViewActions.clearText());
         onView(withId(R.id.profile_name)).perform(ViewActions.typeText("Name Change!"));
-        onView(withId(R.id.profile_save_button));
+        onView(withId(R.id.profile_save_button)).perform(scrollTo());
+        onView(withId(R.id.profile_save_button)).perform(click());
 
         Thread.sleep(1000);
 
@@ -98,5 +105,12 @@ public class BigTest {
         // Click on a navigation item
         onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_event));
 
+        Thread.sleep(1000);
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        // Click on a navigation item
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_profile));
+
+        onView(withId(R.id.profile_name)).check(matches(withText("Name Change!")));
     }
 }
