@@ -15,6 +15,9 @@ import com.example.qrcheckin.core.User;
 
 import java.util.ArrayList;
 
+/**
+ * An unused viewmodel class for the ExploreEvent fragment
+ */
 public class ExploreEventViewModel extends ViewModel {
 //    private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
 //    private final ArrayList<Event> eventList;
