@@ -17,6 +17,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  * An array adapter for displaying a profile in formation and connecting it with the ui for admins
+ */
 public class ProfileArrayAdapter extends ArrayAdapter<User> {
 
 

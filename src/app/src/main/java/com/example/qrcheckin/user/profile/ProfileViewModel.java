@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.qrcheckin.core.User;
 
+/**
+ * A viewmodel class which connects to the profile fragment
+ */
 public class ProfileViewModel extends ViewModel {
 
     private final MutableLiveData<User> userLiveData;

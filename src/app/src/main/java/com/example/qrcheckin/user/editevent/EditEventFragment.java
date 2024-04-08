@@ -97,6 +97,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * A fragment for editing all the event information
+ */
 public class EditEventFragment extends Fragment {
     private FragmentEditEventBinding binding;
     private MapView map;

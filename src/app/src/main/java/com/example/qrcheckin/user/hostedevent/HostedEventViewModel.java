@@ -16,6 +16,9 @@ import com.example.qrcheckin.core.EventArrayAdaptor;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * An unused viewmodel class which connects to the HostedEvent fragment
+ */
 public class HostedEventViewModel extends ViewModel {
 //    private final MutableLiveData<EventArrayAdaptor> mEventArrayAdaptor;
 //    private final ArrayList<Event> eventList;

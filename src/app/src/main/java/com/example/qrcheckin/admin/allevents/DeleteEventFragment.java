@@ -18,6 +18,9 @@ import com.example.qrcheckin.core.Event;
 import com.example.qrcheckin.databinding.FragmentAllEventsBinding;
 import com.example.qrcheckin.databinding.FragmentDeleteEventBinding;
 
+/**
+ * A fragment for admins to delete an event
+ */
 public class DeleteEventFragment extends DialogFragment {
     private FragmentDeleteEventBinding binding;
     private Event event;
