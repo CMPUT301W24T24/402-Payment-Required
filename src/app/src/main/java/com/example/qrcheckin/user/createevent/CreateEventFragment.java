@@ -262,9 +262,7 @@ public class CreateEventFragment extends Fragment {
             String descriptionText = descriptionTextView.getText().toString();
             // TODO: get the poster reference
 
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-            String posterRef = "events/" + now.format(formatter);
+            String posterRef = "";
 
             int year = dateView.getYear();
             int month = dateView.getMonth();
@@ -287,6 +285,10 @@ public class CreateEventFragment extends Fragment {
             }
 
             if (imageUpdated) {
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+                posterRef = "events/" + now.format(formatter);
+
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReference();
                 Uri imageUri = updatedImageUri;
